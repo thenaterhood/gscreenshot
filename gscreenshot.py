@@ -41,6 +41,7 @@ class main_window(threading.Thread):
         userName = os.popen("echo $USER")
         self.defaultPath = "/home/" + userName.read().rstrip()
 
+
         # set the glade file
         self.gladefile = "gscreenshot_main/gscreenshot_main.glade"
         self.builder.add_from_file(self.gladefile)
@@ -64,9 +65,8 @@ class main_window(threading.Thread):
         self.delay_setter = self.builder.get_object("spinbutton1")
         self.button_saveas = self.builder.get_object("button_saveas")
 
-        # set the "save as" button unsensitive, because there's no screenshot
-        # yet (what would be saved?? nothing)
-        self.button_saveas.set_sensitive(False)
+        self.grab_screenshot("")
+        self.show_preview()
 
         # create the "about" dialog object
         self.about = about_dialog()
@@ -234,7 +234,7 @@ class main_window(threading.Thread):
 
         # resolve the delay_setter+1 sec.  delay
         # repr(delay) - converts integer to a string
-        delay = self.delay_setter.get_value() + 1
+        delay = self.delay_setter.get_value()
 
         # grab the screenshot with scrot to the /tmp directory
         os.system("scrot " + " -d " + repr(delay) + " " +
