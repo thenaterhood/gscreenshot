@@ -1,9 +1,9 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
-<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+<!DOCTYPE interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
-<glade-interface>
+<interface>
 
-<widget class="GtkDialog" id="window_replace">
+<object class="GtkDialog" id="window_replace">
   <property name="visible">True</property>
   <property name="title" translatable="yes">Question</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -23,18 +23,18 @@
   <signal name="destroy" handler="on_window_replace_destroy" last_modification_time="Thu, 27 Jul 2006 22:21:13 GMT"/>
 
   <child internal-child="vbox">
-    <widget class="GtkVBox" id="dialog-vbox1">
+    <object class="GtkVBox" id="dialog-vbox1">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>
 
       <child internal-child="action_area">
-	<widget class="GtkHButtonBox" id="dialog-action_area1">
+	<object class="GtkHButtonBox" id="dialog-action_area1">
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
 
 	  <child>
-	    <widget class="GtkButton" id="cancelbutton1">
+	    <object class="GtkButton" id="cancelbutton1">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
@@ -44,11 +44,11 @@
 	      <property name="focus_on_click">True</property>
 	      <property name="response_id">-6</property>
 	      <signal name="clicked" handler="on_replace_dialog_cancel_button_clicked" last_modification_time="Thu, 27 Jul 2006 22:20:12 GMT"/>
-	    </widget>
+	    </object>
 	  </child>
 
 	  <child>
-	    <widget class="GtkButton" id="okbutton1">
+	    <object class="GtkButton" id="okbutton1">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
@@ -58,7 +58,7 @@
 	      <signal name="clicked" handler="on_replace_dialog_replace_button_clicked" last_modification_time="Thu, 27 Jul 2006 22:20:39 GMT"/>
 
 	      <child>
-		<widget class="GtkAlignment" id="alignment1">
+		<object class="GtkAlignment" id="alignment1">
 		  <property name="visible">True</property>
 		  <property name="xalign">0.5</property>
 		  <property name="yalign">0.5</property>
@@ -70,13 +70,13 @@
 		  <property name="right_padding">0</property>
 
 		  <child>
-		    <widget class="GtkHBox" id="hbox1">
+		    <object class="GtkHBox" id="hbox1">
 		      <property name="visible">True</property>
 		      <property name="homogeneous">False</property>
 		      <property name="spacing">2</property>
 
 		      <child>
-			<widget class="GtkImage" id="image1">
+			<object class="GtkImage" id="image1">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-save-as</property>
 			  <property name="icon_size">4</property>
@@ -84,7 +84,7 @@
 			  <property name="yalign">0.5</property>
 			  <property name="xpad">0</property>
 			  <property name="ypad">0</property>
-			</widget>
+			</object>
 			<packing>
 			  <property name="padding">0</property>
 			  <property name="expand">False</property>
@@ -93,7 +93,7 @@
 		      </child>
 
 		      <child>
-			<widget class="GtkLabel" id="label7">
+			<object class="GtkLabel" id="label7">
 			  <property name="visible">True</property>
 			  <property name="label">Replace</property>
 			  <property name="use_underline">True</property>
@@ -109,20 +109,20 @@
 			  <property name="width_chars">-1</property>
 			  <property name="single_line_mode">False</property>
 			  <property name="angle">0</property>
-			</widget>
+			</object>
 			<packing>
 			  <property name="padding">0</property>
 			  <property name="expand">False</property>
 			  <property name="fill">False</property>
 			</packing>
 		      </child>
-		    </widget>
+		    </object>
 		  </child>
-		</widget>
+		</object>
 	      </child>
-	    </widget>
+	    </object>
 	  </child>
-	</widget>
+	</object>
 	<packing>
 	  <property name="padding">0</property>
 	  <property name="expand">False</property>
@@ -132,7 +132,7 @@
       </child>
 
       <child>
-	<widget class="GtkTable" id="table1">
+	<object class="GtkTable" id="table1">
 	  <property name="visible">True</property>
 	  <property name="n_rows">3</property>
 	  <property name="n_columns">3</property>
@@ -141,7 +141,7 @@
 	  <property name="column_spacing">0</property>
 
 	  <child>
-	    <widget class="GtkImage" id="image2">
+	    <object class="GtkImage" id="image2">
 	      <property name="visible">True</property>
 	      <property name="stock">gtk-dialog-question</property>
 	      <property name="icon_size">6</property>
@@ -149,7 +149,7 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xpad">10</property>
 	      <property name="ypad">10</property>
-	    </widget>
+	    </object>
 	    <packing>
 	      <property name="left_attach">0</property>
 	      <property name="right_attach">1</property>
@@ -160,7 +160,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkLabel" id="label1">
+	    <object class="GtkLabel" id="label1">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes">A file with the same file name already exists in the current directory. Should it be replaced?</property>
 	      <property name="use_underline">False</property>
@@ -176,7 +176,7 @@
 	      <property name="width_chars">-1</property>
 	      <property name="single_line_mode">False</property>
 	      <property name="angle">0</property>
-	    </widget>
+	    </object>
 	    <packing>
 	      <property name="left_attach">1</property>
 	      <property name="right_attach">2</property>
@@ -188,7 +188,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkLabel" id="label3">
+	    <object class="GtkLabel" id="label3">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes"></property>
 	      <property name="use_underline">False</property>
@@ -204,7 +204,7 @@
 	      <property name="width_chars">0</property>
 	      <property name="single_line_mode">False</property>
 	      <property name="angle">0</property>
-	    </widget>
+	    </object>
 	    <packing>
 	      <property name="left_attach">1</property>
 	      <property name="right_attach">2</property>
@@ -216,7 +216,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkLabel" id="label5">
+	    <object class="GtkLabel" id="label5">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes"></property>
 	      <property name="use_underline">False</property>
@@ -232,7 +232,7 @@
 	      <property name="width_chars">-1</property>
 	      <property name="single_line_mode">False</property>
 	      <property name="angle">0</property>
-	    </widget>
+	    </object>
 	    <packing>
 	      <property name="left_attach">1</property>
 	      <property name="right_attach">2</property>
@@ -244,7 +244,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkLabel" id="label4">
+	    <object class="GtkLabel" id="label4">
 	      <property name="visible">True</property>
 	      <property name="label" translatable="yes"></property>
 	      <property name="use_underline">False</property>
@@ -260,7 +260,7 @@
 	      <property name="width_chars">1</property>
 	      <property name="single_line_mode">False</property>
 	      <property name="angle">0</property>
-	    </widget>
+	    </object>
 	    <packing>
 	      <property name="left_attach">2</property>
 	      <property name="right_attach">3</property>
@@ -270,15 +270,15 @@
 	      <property name="y_options"></property>
 	    </packing>
 	  </child>
-	</widget>
+	</object>
 	<packing>
 	  <property name="padding">0</property>
 	  <property name="expand">False</property>
 	  <property name="fill">False</property>
 	</packing>
       </child>
-    </widget>
+    </object>
   </child>
-</widget>
+</object>
 
-</glade-interface>
+</interface>
