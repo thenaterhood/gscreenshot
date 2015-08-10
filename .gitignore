@@ -1,0 +1,4 @@
+*.bak
+*.gladep
+*.pyc
+__pycache__
