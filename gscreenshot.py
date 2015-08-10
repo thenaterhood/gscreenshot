@@ -9,11 +9,13 @@
 
 import sys
 import os
-import pygtk
-pygtk.require("2.0")
+from gi import pygtkcompat
+pygtkcompat.enable()
+pygtkcompat.enable_gtk(version='3.0')
+
 import gtk
-import gtk.glade
-import Image
+#import gtk.glade
+from PIL import Image
 import os.path
 import string
 import threading
@@ -29,21 +31,22 @@ class main_window(threading.Thread):
         
         # find/create the /tmp file name
         self.imageName = self.get_temp_file_name()
+        self.builder = gtk.Builder()
         
-	# resolve the username to set the default "Save As" path
+        # resolve the username to set the default "Save As" path
         userName = os.popen("echo $USER")
-	self.defaultPath = "/home/" + userName.read().rstrip()
-	
+        self.defaultPath = "/home/" + userName.read().rstrip()
+        
         # set the glade file
         self.gladefile = "gscreenshot_main/gscreenshot_main.glade"  
+        self.builder.add_from_file(self.gladefile)
   
-        self.wTree = gtk.glade.XML(self.gladefile) 
+        self.window = self.builder.get_object('window_main');
 
-	# create the main window
-        self.window = self.wTree.get_widget("window_main")
+        # create the main window
 
-	# show the (main) window in the center of the screen
-	self.window.set_position(gtk.WIN_POS_CENTER)
+        # show the (main) window in the center of the screen
+        self.window.set_position(gtk.WIN_POS_CENTER)
 
 
         # create a signal dictionary and connect it to the handler functions
@@ -52,30 +55,30 @@ class main_window(threading.Thread):
                 , "on_button_window_clicked" : self.button_window_clicked
                 , "on_button_selectarea_clicked" : self.button_select_area_clicked
                 , "on_button_saveas_clicked" : self.button_saveas_clicked
-		, "on_button_about_clicked" : self.button_about_clicked
-		, "on_button_quit_clicked" : self.button_quit_clicked} 
+                , "on_button_about_clicked" : self.button_about_clicked
+                , "on_button_quit_clicked" : self.button_quit_clicked} 
 
-        self.wTree.signal_autoconnect(dic)
+        self.builder.connect_signals(dic)
 
 
 
-	# create objects from selected widgets in the main window
-        self.image_preview = self.wTree.get_widget("image1")
-        self.hide_check = self.wTree.get_widget("checkbutton1")
-        self.delay_setter = self.wTree.get_widget("spinbutton1")
-	self.button_saveas = self.wTree.get_widget("button_saveas")
+        # create objects from selected widgets in the main window
+        self.image_preview = self.builder.get_object("image1")
+        self.hide_check = self.builder.get_object("checkbutton1")
+        self.delay_setter = self.builder.get_object("spinbutton1")
+        self.button_saveas = self.builder.get_object("button_saveas")
 
-	# set the "save as" button unsensitive, because there's no screenshot yet (what would be saved?? nothing)
-	self.button_saveas.set_sensitive(False)
-	
-	# create the "about" dialog object
-	self.about = about_dialog()
+        # set the "save as" button unsensitive, because there's no screenshot yet (what would be saved?? nothing)
+        self.button_saveas.set_sensitive(False)
+        
+        # create the "about" dialog object
+        self.about = about_dialog()
 
-	# create the "save as" dialog object
+        # create the "save as" dialog object
         self.save_as_dialog = save_dialog()
-	
+        
 
-	            
+                    
         
 
     #--------------------------------------------
@@ -88,55 +91,55 @@ class main_window(threading.Thread):
     #---- button_all_clicked  :grab a screenshot of the whole screen
     #
     def button_all_clicked(self, widget):
-	# check if the window should be hidden while grabbing screenshot
-	if self.hide_check.get_active():
-		# hide the window to grab the screenshot without it
-	        self.window.hide()		
+        # check if the window should be hidden while grabbing screenshot
+        if self.hide_check.get_active():
+                # hide the window to grab the screenshot without it
+                self.window.hide()                
         
-	# wait until the window is completely hidden
-        while gtk.events_pending():		 
-            gtk.main_iteration()		
+        # wait until the window is completely hidden
+        while gtk.events_pending():                 
+            gtk.main_iteration()                
 
-	# grab the screenshot
-        self.grab_screenshot("")	 	   
+        # grab the screenshot
+        self.grab_screenshot("")                    
 
-	# show the window
-	self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.show_all()		
+        # show the window
+        self.window.set_position(gtk.WIN_POS_CENTER)
+        self.window.show_all()                
 
-	# create and show a preview of the grabbed screenshot
-	self.show_preview()
+        # create and show a preview of the grabbed screenshot
+        self.show_preview()
 
-	# now, there is a screenshot, so the "save as" function can be enabled (hint: line 74)
-	self.button_saveas.set_sensitive(True)	
-	
+        # now, there is a screenshot, so the "save as" function can be enabled (hint: line 74)
+        self.button_saveas.set_sensitive(True)        
+        
 
      
     # 
     #---- button_window_clicked  :grab a screenshot of a selected window
     #
     def button_window_clicked(self, widget):
-	# check if the window should be hidden while grabbing screenshot
-	if self.hide_check.get_active():
-		# hide the window to grab the screenshot without it
-	        self.window.hide()		
+        # check if the window should be hidden while grabbing screenshot
+        if self.hide_check.get_active():
+                # hide the window to grab the screenshot without it
+                self.window.hide()                
         
-	# wait until the window is completely hidden 
-        while gtk.events_pending():		
-            gtk.main_iteration()		
+        # wait until the window is completely hidden 
+        while gtk.events_pending():                
+            gtk.main_iteration()                
         
-	# grab the screenshot
-        self.grab_screenshot("-s")	 	        
+        # grab the screenshot
+        self.grab_screenshot("-s")                         
         
-	# show the window
-	self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.show_all()		
+        # show the window
+        self.window.set_position(gtk.WIN_POS_CENTER)
+        self.window.show_all()                
 
-	# create and show a preview of the grabbed screenshot
-	self.show_preview()
+        # create and show a preview of the grabbed screenshot
+        self.show_preview()
 
-	# now, there is a screenshot, so the "save as" function can be enabled (hint: line 74)	
-	self.button_saveas.set_sensitive(True)			
+        # now, there is a screenshot, so the "save as" function can be enabled (hint: line 74)        
+        self.button_saveas.set_sensitive(True)                        
 
 
 
@@ -144,27 +147,27 @@ class main_window(threading.Thread):
     #---- button_select_area_clicked  :grab a screenshot of a selected area
     #
     def button_select_area_clicked(self, widget):
-	# check if the window should be hidden while grabbing screenshot
-	if self.hide_check.get_active():
-		# hide the window to grab the screenshot without it
-	        self.window.hide()		
+        # check if the window should be hidden while grabbing screenshot
+        if self.hide_check.get_active():
+                # hide the window to grab the screenshot without it
+                self.window.hide()                
         
-	# wait until the window is completely hidden
-        while gtk.events_pending(): 		 
-            gtk.main_iteration()		
+        # wait until the window is completely hidden
+        while gtk.events_pending():                  
+            gtk.main_iteration()                
         
-	# grab the screenshot
-        self.grab_screenshot("-s")	        
+        # grab the screenshot
+        self.grab_screenshot("-s")                
 
-	# show the window
-	self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.show_all()		
+        # show the window
+        self.window.set_position(gtk.WIN_POS_CENTER)
+        self.window.show_all()                
 
-	# create and show a preview of the grabbed screenshot
-	self.show_preview()
+        # create and show a preview of the grabbed screenshot
+        self.show_preview()
 
-	# now, there is a screenshot, so the "save as" function can be enabled (hint: line 74)	
-	self.button_saveas.set_sensitive(True)			
+        # now, there is a screenshot, so the "save as" function can be enabled (hint: line 74)        
+        self.button_saveas.set_sensitive(True)                        
 
 
 
@@ -172,19 +175,32 @@ class main_window(threading.Thread):
     #---- button_saveas_clicked  :save the grabbed screenshot
     #
     def button_saveas_clicked(self, widget):
-	# make the main window unsensitive while saving your image
-	self.window.set_sensitive(False)
+        # make the main window unsensitive while saving your image
+        self.window.set_sensitive(False)
 
-	# send the "save as" dialog object a request to create it's window
-	self.save_as_dialog.create()
+        chooser = gtk.FileChooserDialog(title=None,action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                                  buttons=(gtk.STOCK_CANCEL,gtk.RESPONSE_CANCEL,gtk.STOCK_OPEN,gtk.RESPONSE_OK))
 
-	# set the last path in the "save as" dialog 
-	# (very useful if you want to grab more screenshots into the same directory - 
-	# - you don't need to there from $HOME again and again)
-        self.save_as_dialog.window.set_current_folder(self.defaultPath)
+        response = chooser.run()
 
-	# place the "save as" dialog into the center of the screen
-	self.save_as_dialog.window.set_position(gtk.WIN_POS_CENTER)
+        if (response == gtk.RESPONSE_OK):
+            self.save_file_handler(chooser)
+        elif (response == gtk.RESPONSE_CANCEL):
+            pass
+
+        chooser.destroy()
+        self.window.set_sensitive(True)
+
+        # send the "save as" dialog object a request to create it's window
+        #self.save_as_dialog.create()
+
+        # set the last path in the "save as" dialog 
+        # (very useful if you want to grab more screenshots into the same directory - 
+        # - you don't need to there from $HOME again and again)
+        #self.save_as_dialog.window.set_current_folder(self.defaultPath)
+
+        # place the "save as" dialog into the center of the screen
+        #self.save_as_dialog.window.set_position(gtk.WIN_POS_CENTER)
 
 
 
@@ -193,29 +209,29 @@ class main_window(threading.Thread):
     #---- button_about_clicked  :show the "about" dialog
     #
     def button_about_clicked(self, widget):
-	# make the main window unsensitive while viewing the "about" information
-	gscreenshot.window.set_sensitive(False)
+        # make the main window unsensitive while viewing the "about" information
+        gscreenshot.window.set_sensitive(False)
 
-	# send the "about" dialog object a request to create it's window
-	self.about.create()
+        # send the "about" dialog object a request to create it's window
+        self.about.create()
 
-	# place the "about" dialog into the center of the screen
-	self.about.window.set_position(gtk.WIN_POS_CENTER)
+        # place the "about" dialog into the center of the screen
+        self.about.window.set_position(gtk.WIN_POS_CENTER)
 
 
     #
     #---- button_quit_clicked  :quit the application
     #
     def button_quit_clicked(self, widget):
-	self.quit(widget)
+        self.quit(widget)
 
  
     def quit(self,widget):
-	try:
-	    os.remove(self.imageName)
-	except:
-	    pass
-	sys.exit(0)
+        try:
+            os.remove(self.imageName)
+        except:
+            pass
+        sys.exit(0)
 
 
 
@@ -225,47 +241,104 @@ class main_window(threading.Thread):
     #--------------------------------------------
     
     def get_temp_file_name(self):
-	# create a unique image file name based on the application PID
+        # create a unique image file name based on the application PID
         imageName = "/tmp/gscreenshot_" + str(os.getpid()) + ".png"
-						
-	# return the result
-        return imageName			
+                                                
+        # return the result
+        return imageName                        
 
 
     def grab_screenshot(self, commandParameters):
-	# remove the temporary file ( in /tmp) from the past
+        # remove the temporary file ( in /tmp) from the past
         try:
             os.remove(self.imageName)
         except:
             print("no temporary file deleted - nothing found")
 
-	# resolve the delay_setter+1 sec.  delay
-	# repr(delay) - converts integer to a string
-	delay = self.delay_setter.get_value() + 1
+        # resolve the delay_setter+1 sec.  delay
+        # repr(delay) - converts integer to a string
+        delay = self.delay_setter.get_value() + 1
 
-	# grab the screenshot with scrot to the /tmp directory
+        # grab the screenshot with scrot to the /tmp directory
         os.system("scrot " + " -d " + repr(delay) + " " + commandParameters + " " + self.imageName)
 
-	# change it's permissions
-        os.chmod(self.imageName,0600)
+        # change it's permissions
+        os.chmod(self.imageName,0o600)
 
 
     def show_preview(self):
-	# create an image buffer (pixbuf) and insert the grabbed image
-	previewPixbuf = gtk.gdk.pixbuf_new_from_file(self.imageName)
+        # create an image buffer (pixbuf) and insert the grabbed image
+        previewPixbuf = gtk.gdk.pixbuf_new_from_file(self.imageName)
 
-	# resolve the preview image width and height
-	previewHeight = previewPixbuf.get_height() / 4
-	previewWidth = previewPixbuf.get_width() / 4
+        # resolve the preview image width and height
+        previewHeight = previewPixbuf.get_height() / 4
+        previewWidth = previewPixbuf.get_width() / 4
 
-	# resize the previewPixbuf to previewWidth, previewHeight
-	previewPixbuf = previewPixbuf.scale_simple(previewWidth,previewHeight,gtk.gdk.INTERP_BILINEAR)
+        # resize the previewPixbuf to previewWidth, previewHeight
+        previewPixbuf = previewPixbuf.scale_simple(previewWidth,previewHeight,gtk.gdk.INTERP_BILINEAR)
 
-	# set the image_preview widget to the preview image size (previewWidth, previewHeight)
-	self.image_preview.set_size_request(previewWidth,previewHeight)
+        # set the image_preview widget to the preview image size (previewWidth, previewHeight)
+        self.image_preview.set_size_request(previewWidth,previewHeight)
 
-	# view the previewPixbuf in the image_preview widget
-	self.image_preview.set_from_pixbuf(previewPixbuf)
+        # view the previewPixbuf in the image_preview widget
+        self.image_preview.set_from_pixbuf(previewPixbuf)
+
+    def save_file_handler(self, chooser):
+
+        # save the last path into the defaultPath variable
+        gscreenshot.defaultPath = chooser.get_current_folder()
+
+        # resolve a selected file and it's extension
+        self.actualFile = chooser.get_filename()
+
+        # if there's a file selected, save (copy) the temporary screenshot into the selected directory 
+        # with the selected file name
+        if self.actualFile != None :
+
+            self.actualSplit = os.path.split(self.actualFile)[1]
+            self.actualDir = os.path.basename(chooser.get_current_folder())
+
+            if os.path.isfile(self.actualFile):
+                # if the file exists ask the user using the replace dialog if to replace the image 
+                chooser.set_sensitive(False)        
+
+                # create the replace dialog object and run it
+                replace_dialog_instance = replace_dialog(self.actualSplit,self.actualDir)
+                result = replace_dialog_instance.dialog.run()
+
+                chooser.set_sensitive(True)
+                
+                # destroy the dialog window and delete the replace_dialog_instance object
+                replace_dialog_instance.dialog.destroy()
+                del replace_dialog_instance
+
+            if not os.path.isfile(self.actualFile) or result ==1:
+                # if the file doesn't exist or it's allowed to replace it, save it 
+                
+                self.save_file(self.actualFile)
+                # make the "main" window sensitive
+
+
+    def save_file(self,actual_file):
+
+        actual_file_ext = os.path.splitext(actual_file)[1][1:]
+        im = Image.open(gscreenshot.get_temp_file_name())
+
+        if (actual_file_ext.lower()) == 'png':
+            # if it is .png just copy it
+            os.system("cp " + gscreenshot.get_temp_file_name() + " " + actual_file)
+        else:
+            supported_formats = ('bmp' , 'eps' , 'gif' , 'jpg' , 'pcx' , 'pdf' , 'ppm' , 'tiff')
+            for i in supported_formats:
+                # if it's supported convert it
+                if (i == actual_file_ext.lower()):
+                    # if it's jpeg, change the descriptor
+                    if i == 'jpg':
+                        i = 'jpeg'
+                    i = string.upper(i)
+                    im.save(actual_file, i)                        
+                    break
+        print(actual_file)
 
 
 
@@ -274,51 +347,53 @@ class main_window(threading.Thread):
 class about_dialog:
     def create(self):
         # set the glade file
-        self.gladefile = "gscreenshot_about/gscreenshot_about.glade"  
+        self.builder = gtk.Builder()
 
-        # create the widget three
-        self.wTree = gtk.glade.XML(self.gladefile, "window_about")
+        self.gladefile = "gscreenshot_about/gscreenshot_about.glade"
+        self.builder.add_from_file(self.gladefile)
 
         # create the "about" window
-        self.window = self.wTree.get_widget("window_about")
-	self.window.set_name("gscreenshot")
-	self.window.connect("response", lambda d, r: self.close())
+        self.window = self.builder.get_object("window_about")
+        self.window.set_name("gscreenshot")
+        self.window.connect("response", lambda d, r: self.close())
 
     def close(self):
-	# while closing the "about" dialog, make the main window sensitive
-	gscreenshot.window.set_sensitive(True)
+        # while closing the "about" dialog, make the main window sensitive
+        gscreenshot.window.set_sensitive(True)
         self.window.destroy()
 
 
 
 class save_dialog:
     def create(self):
-	# set the glade file
-	self.gladefile = "gscreenshot_saveDialog/saveas.glade"  
+        # set the glade file
+        self.gladefile = "gscreenshot_saveDialog/saveas.glade"  
 
-	# create the widget three
-	self.wTree = gtk.glade.XML(self.gladefile, "filechooserdialog1")
+        self.builder = gtk.Builder()
+        self.builder.add_from_file(self.gladefile)
+
+        self.window = self.builder.get_object("filechooserdialog1")
+        # create the widget three
 
         # create a signal dictionary and connect it to the handler functions
-	dic = {"saveas_cancel_clicked" : self.button_cancel_clicked
-		, "saveas_save_clicked" : self.button_saveAs_clicked
-		,"saveas_destroy" : self.close} 
+        dic = {"saveas_cancel_clicked" : self.button_cancel_clicked
+                , "saveas_save_clicked" : self.button_saveAs_clicked
+                ,"saveas_destroy" : self.close} 
 
-        self.wTree.signal_autoconnect(dic)
+        #self.window.connect_signals(dic)
 
-	# create the "about" window
-	self.window = self.wTree.get_widget("filechooserdialog1")
-	self.window.show_all()
+        # create the "about" window
+        self.window.show_all()
 
 
     #
     #---- button_cancel_clicked  :close the save_dialog and make the window sensitive
     #
     def button_cancel_clicked(self, widget):
-	# while closing the "save as" dialog, make the main window sensitive
-	gscreenshot.window.set_sensitive(True)
+        # while closing the "save as" dialog, make the main window sensitive
+        gscreenshot.window.set_sensitive(True)
 
-	# destroy the "save as" dialog window
+        # destroy the "save as" dialog window
         self.window.destroy()
 
 
@@ -327,52 +402,52 @@ class save_dialog:
     #
     def button_saveAs_clicked(self, widget):
 
-	# save the last path into the defaultPath variable
-	gscreenshot.defaultPath = self.window.get_current_folder()
+        # save the last path into the defaultPath variable
+        gscreenshot.defaultPath = self.window.get_current_folder()
 
-	# resolve a selected file and it's extension
-	self.actualFile = self.window.get_filename()
+        # resolve a selected file and it's extension
+        self.actualFile = self.window.get_filename()
 
-	# if there's a file selected, save (copy) the temporary screenshot into the selected directory 
-	# with the selected file name
-	if self.actualFile != None :
+        # if there's a file selected, save (copy) the temporary screenshot into the selected directory 
+        # with the selected file name
+        if self.actualFile != None :
 
-	    self.actualSplit = os.path.split(self.actualFile)[1]
-	    self.actualDir = os.path.basename(self.window.get_current_folder())
+            self.actualSplit = os.path.split(self.actualFile)[1]
+            self.actualDir = os.path.basename(self.window.get_current_folder())
 
             if os.path.isfile(self.actualFile):
-		# if the file exists ask the user using the replace dialog if to replace the image 
-		self.window.set_sensitive(False)	
+                # if the file exists ask the user using the replace dialog if to replace the image 
+                self.window.set_sensitive(False)        
 
-		# create the replace dialog object and run it
-		replace_dialog_instance = replace_dialog(self.actualSplit,self.actualDir)
+                # create the replace dialog object and run it
+                replace_dialog_instance = replace_dialog(self.actualSplit,self.actualDir)
                 result = replace_dialog_instance.dialog.run()
 
                 self.window.set_sensitive(True)
-		
-		# destroy the dialog window and delete the replace_dialog_instance object
-	        replace_dialog_instance.dialog.destroy()
-		del replace_dialog_instance
+                
+                # destroy the dialog window and delete the replace_dialog_instance object
+                replace_dialog_instance.dialog.destroy()
+                del replace_dialog_instance
 
             if not os.path.isfile(self.actualFile) or result ==1:
-		# if the file doesn't exist or it's allowed to replace it, save it 
-		
+                # if the file doesn't exist or it's allowed to replace it, save it 
+                
                 self.save_file(self.actualFile)
                 # make the "main" window sensitive
-	        gscreenshot.window.set_sensitive(True)	
-	        # destroy the "save as" dialog window
-	        self.window.destroy()
+                gscreenshot.window.set_sensitive(True)        
+                # destroy the "save as" dialog window
+                self.window.destroy()
 
 
 
 
     def save_file(self,actual_file):
 
-	actual_file_ext = os.path.splitext(actual_file)[1][1:]
+        actual_file_ext = os.path.splitext(actual_file)[1][1:]
         im = Image.open(gscreenshot.get_temp_file_name())
 
-	if string.lower(actual_file_ext) == 'png':
-	    # if it is .png just copy it
+        if string.lower(actual_file_ext) == 'png':
+            # if it is .png just copy it
             os.system("cp " + gscreenshot.get_temp_file_name() + " " + actual_file)
         else:
             supported_formats = ('bmp' , 'eps' , 'gif' , 'jpg' , 'pcx' , 'pdf' , 'ppm' , 'tiff')
@@ -385,7 +460,7 @@ class save_dialog:
                     i = string.upper(i)
                     im.save(actual_file, i)                        
                     break
-        print actual_file
+        print(actual_file)
 
 
 
@@ -395,26 +470,26 @@ class save_dialog:
     #---- closed  :close the saveDialog and make the main window sensitive
     #
     def close(self, widget):
-	# while closing the "save as" dialog, make the main window sensitive
-	gscreenshot.window.set_sensitive(True)
+        # while closing the "save as" dialog, make the main window sensitive
+        gscreenshot.window.set_sensitive(True)
 
-	# destroy the "save as" dialog window
+        # destroy the "save as" dialog window
         self.window.destroy()
-	
+        
 
 class replace_dialog(threading.Thread):
     #
     #---- create the "replace" dialog window and make the main and "save as" window unsensitive
     #
     def __init__(self,file_name,dir_name):
-	buttons = gtk.BUTTONS_CANCEL, 0, "Replace",1
-	message = "A file named \"" + file_name + "\" already exists.  Do you\nwant to replace it?"
+        buttons = gtk.BUTTONS_CANCEL, 0, "Replace",1
+        message = "A file named \"" + file_name + "\" already exists.  Do you\nwant to replace it?"
         self.dialog = gtk.MessageDialog(None,
                      gtk.DIALOG_MODAL, 
                      gtk.MESSAGE_QUESTION,                       
                      gtk.BUTTONS_NONE,
                      message)
-	self.dialog.add_buttons(gtk.STOCK_CANCEL,0,gtk.STOCK_OK,1)
+        self.dialog.add_buttons(gtk.STOCK_CANCEL,0,gtk.STOCK_OK,1)
         self.dialog.format_secondary_text("The file already exists in \"" + dir_name + "\".  Replacing it will overwrite its contents.")
         self.dialog.show_all()     
 

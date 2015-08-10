@@ -13,7 +13,6 @@
     <property name="modal">True</property>
     <property name="window_position">GTK_WIN_POS_CENTER</property>
     <property name="destroy_with_parent">True</property>
-    <property name="has_separator">False</property>
     <signal name="destroy" handler="saveas_destroy"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox1">
