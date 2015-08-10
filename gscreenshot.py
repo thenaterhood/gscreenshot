@@ -74,12 +74,6 @@ class main_window(threading.Thread):
         # create the "about" dialog object
         self.about = about_dialog()
 
-        # create the "save as" dialog object
-        self.save_as_dialog = save_dialog()
-        
-
-                    
-        
 
     #--------------------------------------------
     # signal handlers
@@ -362,120 +356,6 @@ class about_dialog:
         gscreenshot.window.set_sensitive(True)
         self.window.destroy()
 
-
-
-class save_dialog:
-    def create(self):
-        # set the glade file
-        self.gladefile = "gscreenshot_saveDialog/saveas.glade"  
-
-        self.builder = gtk.Builder()
-        self.builder.add_from_file(self.gladefile)
-
-        self.window = self.builder.get_object("filechooserdialog1")
-        # create the widget three
-
-        # create a signal dictionary and connect it to the handler functions
-        dic = {"saveas_cancel_clicked" : self.button_cancel_clicked
-                , "saveas_save_clicked" : self.button_saveAs_clicked
-                ,"saveas_destroy" : self.close} 
-
-        #self.window.connect_signals(dic)
-
-        # create the "about" window
-        self.window.show_all()
-
-
-    #
-    #---- button_cancel_clicked  :close the save_dialog and make the window sensitive
-    #
-    def button_cancel_clicked(self, widget):
-        # while closing the "save as" dialog, make the main window sensitive
-        gscreenshot.window.set_sensitive(True)
-
-        # destroy the "save as" dialog window
-        self.window.destroy()
-
-
-    #
-    #---- button_saveAs_clicked  :close the save_dialog and make the window sensitive
-    #
-    def button_saveAs_clicked(self, widget):
-
-        # save the last path into the defaultPath variable
-        gscreenshot.defaultPath = self.window.get_current_folder()
-
-        # resolve a selected file and it's extension
-        self.actualFile = self.window.get_filename()
-
-        # if there's a file selected, save (copy) the temporary screenshot into the selected directory 
-        # with the selected file name
-        if self.actualFile != None :
-
-            self.actualSplit = os.path.split(self.actualFile)[1]
-            self.actualDir = os.path.basename(self.window.get_current_folder())
-
-            if os.path.isfile(self.actualFile):
-                # if the file exists ask the user using the replace dialog if to replace the image 
-                self.window.set_sensitive(False)        
-
-                # create the replace dialog object and run it
-                replace_dialog_instance = replace_dialog(self.actualSplit,self.actualDir)
-                result = replace_dialog_instance.dialog.run()
-
-                self.window.set_sensitive(True)
-                
-                # destroy the dialog window and delete the replace_dialog_instance object
-                replace_dialog_instance.dialog.destroy()
-                del replace_dialog_instance
-
-            if not os.path.isfile(self.actualFile) or result ==1:
-                # if the file doesn't exist or it's allowed to replace it, save it 
-                
-                self.save_file(self.actualFile)
-                # make the "main" window sensitive
-                gscreenshot.window.set_sensitive(True)        
-                # destroy the "save as" dialog window
-                self.window.destroy()
-
-
-
-
-    def save_file(self,actual_file):
-
-        actual_file_ext = os.path.splitext(actual_file)[1][1:]
-        im = Image.open(gscreenshot.get_temp_file_name())
-
-        if string.lower(actual_file_ext) == 'png':
-            # if it is .png just copy it
-            os.system("cp " + gscreenshot.get_temp_file_name() + " " + actual_file)
-        else:
-            supported_formats = ('bmp' , 'eps' , 'gif' , 'jpg' , 'pcx' , 'pdf' , 'ppm' , 'tiff')
-            for i in supported_formats:
-                # if it's supported convert it
-                if i == string.lower(actual_file_ext):
-                    # if it's jpeg, change the descriptor
-                    if i == 'jpg':
-                        i = 'jpeg'
-                    i = string.upper(i)
-                    im.save(actual_file, i)                        
-                    break
-        print(actual_file)
-
-
-
-
-
-    #
-    #---- closed  :close the saveDialog and make the main window sensitive
-    #
-    def close(self, widget):
-        # while closing the "save as" dialog, make the main window sensitive
-        gscreenshot.window.set_sensitive(True)
-
-        # destroy the "save as" dialog window
-        self.window.destroy()
-        
 
 class replace_dialog(threading.Thread):
     #
