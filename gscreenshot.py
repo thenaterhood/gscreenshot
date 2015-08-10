@@ -23,6 +23,7 @@ from PIL import Image
 import os.path
 import string
 import threading
+from time import sleep
 
 
 class main_window(threading.Thread):
@@ -89,6 +90,7 @@ class main_window(threading.Thread):
             gtk.main_iteration()
 
         # grab the screenshot
+        sleep(0.2)
         self.grab_screenshot("")
 
         # show the window
