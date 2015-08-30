@@ -55,7 +55,7 @@ class main_window(threading.Thread):
         self.window.set_position(gtk.WIN_POS_CENTER)
 
         # create a signal dictionary and connect it to the handler functions
-        dic = {"on_window_main_destroy": self.quit, "on_button_all_clicked": self.button_all_clicked, "on_button_window_clicked": self.button_window_clicked, "on_button_selectarea_clicked":
+        dic = {"on_window_main_destroy": self.quit, "on_button_all_clicked": self.button_all_clicked, "on_button_selectarea_window_clicked": self.button_window_clicked, "on_button_selectarea_window_clicked":
                self.button_select_area_clicked, "on_button_saveas_clicked": self.button_saveas_clicked, "on_button_about_clicked": self.button_about_clicked, "on_button_quit_clicked": self.button_quit_clicked}
 
         self.builder.connect_signals(dic)
@@ -104,37 +104,7 @@ class main_window(threading.Thread):
         # (hint: line 74)
         self.button_saveas.set_sensitive(True)
 
-    #
-    #---- button_window_clicked  :grab a screenshot of a selected window
-    #
-    def button_window_clicked(self, widget):
-        # check if the window should be hidden while grabbing screenshot
-        if self.hide_check.get_active():
-            # hide the window to grab the screenshot without it
-            self.window.hide()
-
-        # wait until the window is completely hidden
-        while gtk.events_pending():
-            gtk.main_iteration()
-
-        # grab the screenshot
-        self.grab_screenshot("-s")
-
-        # show the window
-        self.window.set_position(gtk.WIN_POS_CENTER)
-        self.window.show_all()
-
-        # create and show a preview of the grabbed screenshot
-        self.show_preview()
-
-        # now, there is a screenshot, so the "save as" function can be enabled
-        # (hint: line 74)
-        self.button_saveas.set_sensitive(True)
-
-    #
-    #---- button_select_area_clicked  :grab a screenshot of a selected area
-    #
-    def button_select_area_clicked(self, widget):
+    def button_select_area_or_window_clicked(self, widget):
         # check if the window should be hidden while grabbing screenshot
         if self.hide_check.get_active():
             # hide the window to grab the screenshot without it
