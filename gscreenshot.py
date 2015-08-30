@@ -25,6 +25,8 @@ import string
 import threading
 from time import sleep
 
+from pkg_resources import resource_string
+
 
 class main_window(threading.Thread):
 
@@ -43,9 +45,7 @@ class main_window(threading.Thread):
         self.defaultPath = "/home/" + userName.read().rstrip()
 
 
-        # set the glade file
-        self.gladefile = "resources/gui/glade/main.glade"
-        self.builder.add_from_file(self.gladefile)
+        self.builder.add_from_string(resource_string('resources.gui.glade', 'main.glade').decode("UTF-8"))
 
         self.window = self.builder.get_object('window_main')
 
@@ -303,8 +303,7 @@ class about_dialog:
         # set the glade file
         self.builder = gtk.Builder()
 
-        self.gladefile = "resources/gui/glade/about.glade"
-        self.builder.add_from_file(self.gladefile)
+        self.builder.add_from_string(resource_string('resources.gui.glade', 'about.glade').decode("UTF-8"))
 
         # create the "about" window
         self.window = self.builder.get_object("window_about")
