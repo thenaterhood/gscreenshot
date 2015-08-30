@@ -44,7 +44,7 @@ class main_window(threading.Thread):
 
 
         # set the glade file
-        self.gladefile = "gscreenshot_main/gscreenshot_main.glade"
+        self.gladefile = "resources/gui/glade/main.glade"
         self.builder.add_from_file(self.gladefile)
 
         self.window = self.builder.get_object('window_main')
@@ -303,7 +303,7 @@ class about_dialog:
         # set the glade file
         self.builder = gtk.Builder()
 
-        self.gladefile = "gscreenshot_about/gscreenshot_about.glade"
+        self.gladefile = "resources/gui/glade/about.glade"
         self.builder.add_from_file(self.gladefile)
 
         # create the "about" window

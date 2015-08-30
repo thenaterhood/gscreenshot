@@ -46,5 +46,5 @@ package() {
         mkdir -p $pkgdir/usr/bin
         mv $srcdir/gscreenshot-master/gscreenshot $pkgdir/usr/bin/
         chmod +x $pkgdir/usr/bin/gscreenshot
-	cp -r $srcdir/gscreenshot-master/* $pkgdir/usr/share/gscreenshot/
+	cp -r $srcdir/gscreenshot-master/resources $pkgdir/usr/share/gscreenshot/
 }
