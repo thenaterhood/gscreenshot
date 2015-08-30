@@ -47,4 +47,5 @@ package() {
         mv $srcdir/gscreenshot-master/gscreenshot $pkgdir/usr/bin/
         chmod +x $pkgdir/usr/bin/gscreenshot
 	cp -r $srcdir/gscreenshot-master/resources $pkgdir/usr/share/gscreenshot/
+        cp $srcdir/gscreenshot-master/gscreenshot.py $pkgdir/usr/share/gscreenshot/
 }
