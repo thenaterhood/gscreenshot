@@ -55,8 +55,8 @@ class main_window(threading.Thread):
         self.window.set_position(gtk.WIN_POS_CENTER)
 
         # create a signal dictionary and connect it to the handler functions
-        dic = {"on_window_main_destroy": self.quit, "on_button_all_clicked": self.button_all_clicked, "on_button_selectarea_window_clicked": self.button_window_clicked, "on_button_selectarea_window_clicked":
-               self.button_select_area_clicked, "on_button_saveas_clicked": self.button_saveas_clicked, "on_button_about_clicked": self.button_about_clicked, "on_button_quit_clicked": self.button_quit_clicked}
+        dic = {"on_window_main_destroy": self.quit, "on_button_all_clicked": self.button_all_clicked, "on_button_window_clicked": self.button_select_area_or_window_clicked, "on_button_selectarea_clicked":
+               self.button_select_area_or_window_clicked, "on_button_saveas_clicked": self.button_saveas_clicked, "on_button_about_clicked": self.button_about_clicked, "on_button_quit_clicked": self.button_quit_clicked}
 
         self.builder.connect_signals(dic)
 
