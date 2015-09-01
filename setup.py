@@ -31,8 +31,13 @@ setup(name='gscreenshot',
     package_dir={'':'src'},
     packages=[
         'gscreenshot',
-        'gscreenshot.resources'
+        'gscreenshot.resources',
+        'gscreenshot.resources.gui',
+        'gscreenshot.resources.gui.glade'
         ],
-    data_files=data_files
+    data_files=data_files,
+    package_data={
+        '': ['*.glade']
+        }
     )
 
