@@ -11,7 +11,8 @@ groups=()
 depends=("python3"
         "python-pillow"
         "scrot"
-        "gtk3")
+        "gtk3"
+        "python-setuptools")
 makedepends=("unzip")
 checkdepends=()
 optdepends=()
@@ -41,11 +42,7 @@ check() {
 }
 
 package() {
-
-        mkdir -p $pkgdir/usr/share/gscreenshot
-        mkdir -p $pkgdir/usr/bin
-        mv $srcdir/gscreenshot-master/gscreenshot $pkgdir/usr/bin/
-        chmod +x $pkgdir/usr/bin/gscreenshot
-	cp -r $srcdir/gscreenshot-master/resources $pkgdir/usr/share/gscreenshot/
-        cp $srcdir/gscreenshot-master/gscreenshot.py $pkgdir/usr/share/gscreenshot/
+        cd $srcdir/gscreenshot-master
+        python setup.py install --root="$pkgdir/" --optimize=1
+        chmod +x "$pkgdir/gscreenshot/usr/bin/gscreenshot"
 }

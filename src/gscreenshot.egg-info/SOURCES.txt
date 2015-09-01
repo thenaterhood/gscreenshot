@@ -1,0 +1,9 @@
+setup.py
+src/gscreenshot/__init__.py
+src/gscreenshot/gscreenshot.py
+src/gscreenshot.egg-info/PKG-INFO
+src/gscreenshot.egg-info/SOURCES.txt
+src/gscreenshot.egg-info/dependency_links.txt
+src/gscreenshot.egg-info/requires.txt
+src/gscreenshot.egg-info/top_level.txt
+src/gscreenshot/resources/__init__.py

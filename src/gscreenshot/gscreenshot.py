@@ -336,10 +336,11 @@ class replace_dialog(threading.Thread):
         self.dialog.show_all()
 
 
+def main():
+    # create the main_window object and window
+    gscreenshot = main_window()
+    gtk.main()
 #-------------------------------------------------------------------------
 
 if __name__ == "__main__":
-
-    # create the main_window object (and window)
-    gscreenshot = main_window()
-    gtk.main()
+    main()
