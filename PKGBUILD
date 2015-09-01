@@ -42,7 +42,8 @@ check() {
 }
 
 package() {
+        echo $pkgdir
         cd $srcdir/gscreenshot-master
         python setup.py install --root="$pkgdir/" --optimize=1
-        chmod +x "$pkgdir/gscreenshot/usr/bin/gscreenshot"
+        chmod +x "$pkgdir/usr/bin/gscreenshot"
 }

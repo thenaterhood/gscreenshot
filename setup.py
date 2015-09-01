@@ -15,16 +15,16 @@ test_requires = [
     ]
 
 data_files=[
-    ('bin/gscreenshot', ['dist/bin/gscreenshot'])
+    ('bin/', ['dist/bin/gscreenshot'])
     ]
 
 
 setup(name='gscreenshot',
     version='2.0.0',
-    description='Minimalist network monitoring tool',
+    description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
-    url='https://github.com/thenaterhood/heartbeat/archive/master.zip',
+    url='https://github.com/thenaterhood/gscreenshot/archive/master.zip',
     install_requires=install_requires,
     tests_require=test_requires,
     test_suite='nose.collector',
