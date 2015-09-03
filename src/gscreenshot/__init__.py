@@ -276,12 +276,12 @@ class main_window(threading.Thread):
     def save_file(self, actual_file):
 
         actual_file_ext = os.path.splitext(actual_file)[1][1:]
-        im = Image.open(gscreenshot.get_temp_file_name())
+        im = Image.open(self.get_temp_file_name())
 
         if (actual_file_ext.lower()) == 'png':
             # if it is .png just copy it
             os.system(
-                "cp " + gscreenshot.get_temp_file_name() + " " + actual_file)
+                "cp " + self.get_temp_file_name() + " " + actual_file)
         else:
             supported_formats = (
                 'bmp', 'eps', 'gif', 'jpg', 'pcx', 'pdf', 'ppm', 'tiff')
