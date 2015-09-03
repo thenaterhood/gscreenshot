@@ -237,7 +237,7 @@ class main_window(threading.Thread):
     def save_file_handler(self, chooser):
 
         # save the last path into the defaultPath variable
-        gscreenshot.defaultPath = chooser.get_current_folder()
+        self.defaultPath = chooser.get_current_folder()
 
         # resolve a selected file and it's extension
         self.actualFile = chooser.get_filename()
