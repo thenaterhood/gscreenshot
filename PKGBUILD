@@ -12,7 +12,8 @@ depends=("python3"
         "python-pillow"
         "scrot"
         "gtk3"
-        "python-setuptools")
+        "python-setuptools"
+        "python-gobject")
 makedepends=("unzip")
 checkdepends=()
 optdepends=()

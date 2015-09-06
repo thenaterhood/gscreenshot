@@ -6,7 +6,8 @@ import os
 
 install_requires = [
     'pillow',
-    'pygtk'
+    'pygtk',
+    'pygobject'
     ]
 
 test_requires = [
