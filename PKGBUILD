@@ -14,7 +14,8 @@ depends=("python3"
         "gtk3"
         "python-setuptools"
         "python-gobject")
-makedepends=("unzip")
+makedepends=("unzip"
+        "fakeroot")
 checkdepends=()
 optdepends=()
 provides=()
