@@ -21,7 +21,7 @@ data_files=[
 
 
 setup(name='gscreenshot',
-    version='2.0.0',
+    version='2.0.1',
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
