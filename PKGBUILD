@@ -1,9 +1,12 @@
-# Maintainer: Nate Levesque <public at thenaterhood dawt com>
+# Maintainer:  Nate Levesque <public at thenaterhood dot com>
+# Contributor: TDY <tdy@archlinux.info>
+# Contributor: Matej Horváth <matej.horvath@gmail.com>
+
 pkgname=gscreenshot
 pkgver=2.0.0
 pkgrel=1
 epoch=
-pkgdesc="A minimal GTK frontend for the scrot screenshooter"
+pkgdesc="A GUI front-end for scrot"
 arch=('any')
 url="https://github.com/thenaterhood/gscreenshot"
 license=('GPL')
@@ -25,14 +28,14 @@ backup=()
 options=()
 install=
 changelog=
-source=("https://github.com/thenaterhood/gscreenshot/archive/master.zip")
-noextract=("master.zip")
-md5sums=('SKIP')
+source=("https://github.com/thenaterhood/gscreenshot/archive/v$pkgver.zip")
+noextract=("v$pkgver.zip")
+md5sums=('fb2e4a7683b41318ff649d98e0506c6f')
 validpgpkeys=()
 
 prepare() {
-        unzip $srcdir/master.zip
-        cd $srcdir/gscreenshot-master
+        unzip $srcdir/v$pkgver.zip
+        cd $srcdir/gscreenshot-$pkgver
 }
 
 build() {
@@ -45,7 +48,11 @@ check() {
 
 package() {
         echo $pkgdir
-        cd $srcdir/gscreenshot-master
+        cd $srcdir/gscreenshot-$pkgver
         python setup.py install --root="$pkgdir/" --optimize=1
         chmod +x "$pkgdir/usr/bin/gscreenshot"
+        install -Dm644 dist/$pkgname.desktop \
+            "$pkgdir/usr/share/applications/$pkgname.desktop"
+        install -Dm644 dist/black-white_2-Style-applets-screenshooter.png \
+            "$pkgdir/usr/share/pixmaps/$pkgname.png"
 }
