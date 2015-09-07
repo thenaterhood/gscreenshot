@@ -312,7 +312,7 @@ class about_dialog:
 
     def close(self):
         # while closing the "about" dialog, make the main window sensitive
-        gscreenshot.window.set_sensitive(True)
+        main_window.window.set_sensitive(True)
         self.window.destroy()
 
 
