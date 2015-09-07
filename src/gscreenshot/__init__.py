@@ -165,7 +165,7 @@ class main_window(threading.Thread):
     def button_about_clicked(self, widget):
         # make the main window unsensitive while viewing the "about"
         # information
-        gscreenshot.window.set_sensitive(False)
+        self.window.set_sensitive(False)
 
         # send the "about" dialog object a request to create it's window
         self.about.create()
