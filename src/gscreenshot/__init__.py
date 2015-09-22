@@ -138,29 +138,12 @@ class main_window(threading.Thread):
         # make the main window unsensitive while saving your image
         self.window.set_sensitive(False)
 
-        chooser = gtk.FileChooserDialog(title=None, action=gtk.FILE_CHOOSER_ACTION_SAVE,
-                                        buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+        im = Image.open(self.get_temp_file_name())
 
-        response = chooser.run()
+        save_handler = FileSaveHandler()
+        save_handler.run(im)
 
-        if (response == gtk.RESPONSE_OK):
-            self.save_file_handler(chooser)
-        elif (response == gtk.RESPONSE_CANCEL):
-            pass
-
-        chooser.destroy()
         self.window.set_sensitive(True)
-
-        # send the "save as" dialog object a request to create it's window
-        # self.save_as_dialog.create()
-
-        # set the last path in the "save as" dialog
-        # (very useful if you want to grab more screenshots into the same directory -
-        # - you don't need to there from $HOME again and again)
-        # self.save_as_dialog.window.set_current_folder(self.defaultPath)
-
-        # place the "save as" dialog into the center of the screen
-        # self.save_as_dialog.window.set_position(gtk.WIN_POS_CENTER)
 
     #
     #---- button_about_clicked  :show the "about" dialog
@@ -256,86 +239,75 @@ class main_window(threading.Thread):
         # view the previewPixbuf in the image_preview widget
         self.image_preview.set_from_pixbuf(previewPixbuf)
 
-    def save_file_handler(self, chooser):
+class FileSaveHandler():
 
-        # save the last path into the defaultPath variable
-        self.defaultPath = chooser.get_current_folder()
+    def __init__(self):
+        pass
 
-        # resolve a selected file and it's extension
-        self.actualFile = chooser.get_filename()
+    def run(self, image):
+        filename = self.request_file()
 
-        # if there's a file selected, save (copy) the temporary screenshot into the selected directory
-        # with the selected file name
-        if self.actualFile != None:
+        if filename is None:
+            return
 
-            self.actualSplit = os.path.split(self.actualFile)[1]
-            self.actualDir = os.path.basename(chooser.get_current_folder())
-
-            if os.path.isfile(self.actualFile):
-                # if the file exists ask the user using the replace dialog if
-                # to replace the image
-                chooser.set_sensitive(False)
-
-                # create the replace dialog object and run it
-                replace_dialog_instance = replace_dialog(
-                    self.actualSplit, self.actualDir)
-                result = replace_dialog_instance.dialog.run()
-
-                chooser.set_sensitive(True)
-
-                # destroy the dialog window and delete the
-                # replace_dialog_instance object
-                replace_dialog_instance.dialog.destroy()
-                del replace_dialog_instance
-
-            if not os.path.isfile(self.actualFile) or result == 1:
-                # if the file doesn't exist or it's allowed to replace it, save
-                # it
-
-                self.save_file(self.actualFile)
-                # make the "main" window sensitive
-
-    def save_file(self, actual_file):
-
-        actual_file_ext = os.path.splitext(actual_file)[1][1:]
-        im = Image.open(self.get_temp_file_name())
-
-        if (actual_file_ext.lower()) == 'png':
-            # if it is .png just copy it
-            os.system(
-                "cp " + self.get_temp_file_name() + " " + actual_file)
+        if os.path.isfile(filename):
+            replace = self.confirm_replace(filename)
+            if (replace):
+                self.save_file(filename, image)
+            else:
+                pass
         else:
-            supported_formats = (
-                'bmp', 'eps', 'gif', 'jpg', 'pcx', 'pdf', 'ppm', 'tiff')
-            for i in supported_formats:
-                # if it's supported convert it
-                if (i == actual_file_ext.lower()):
-                    # if it's jpeg, change the descriptor
-                    if i == 'jpg':
-                        i = 'jpeg'
-                    i = string.upper(i)
-                    im.save(actual_file, i)
-                    break
-        print(actual_file)
+            self.save_file(filename, image)
 
-class replace_dialog(gtk.Dialog):
-    #
-    #---- create the "replace" dialog window and make the main and "save as" window unsensitive
-    #
 
-    def __init__(self, file_name, dir_name):
-        message = "A file named \"" + file_name + \
-            "\" already exists.  Do you\nwant to replace it?"
-        self.dialog = gtk.MessageDialog(None,
+    def confirm_replace(self, filename):
+        message = "A file named " + filename + " already exists.\n\
+                Do you want to replace it?"
+
+        confirm_dialog = gtk.MessageDialog(None,
                                         gtk.DIALOG_MODAL,
                                         gtk.MESSAGE_QUESTION,
                                         gtk.BUTTONS_NONE,
                                         message)
-        self.dialog.add_buttons(gtk.STOCK_CANCEL, 0, gtk.STOCK_OK, 1)
-        self.dialog.format_secondary_text(
-            "The file already exists in \"" + dir_name + "\".  Replacing it will overwrite its contents.")
-        self.dialog.show_all()
+        confirm_dialog.add_buttons(gtk.STOCK_CANCEL, 0, gtk.STOCK_OK, 1)
+        confirm_dialog.format_secondary_text(
+                "The file already exists. Replacing it will overwrite its contents")
+        response = confirm_dialog.run()
+        confirm_dialog.destroy()
 
+        if (response == 1):
+            return True
+        else:
+            return False
+
+    def request_file(self):
+        chooser = gtk.FileChooserDialog(title=None, action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                                        buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_OPEN, gtk.RESPONSE_OK))
+
+        response = chooser.run()
+
+        if (response == gtk.RESPONSE_OK):
+            return_value = chooser.get_filename()
+        elif (response == gtk.RESPONSE_CANCEL):
+            return_value = None
+
+        chooser.destroy()
+        return return_value
+
+    def save_file(self, filename, im):
+        actual_file_ext = os.path.splitext(filename)[1][1:]
+
+        supported_formats = (
+            'bmp', 'eps', 'gif', 'jpg', 'pcx', 'pdf', 'ppm', 'tiff', 'png')
+        for i in supported_formats:
+            # if it's supported convert it
+            if (i == actual_file_ext.lower()):
+                # if it's jpeg, change the descriptor
+                if i == 'jpg':
+                    i = 'jpeg'
+                i = i.upper()
+                im.save(filename, i)
+                break
 
 def main():
     # create the main_window object and window
