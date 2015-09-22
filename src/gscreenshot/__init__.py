@@ -44,8 +44,8 @@ class main_window(threading.Thread):
         userName = os.popen("echo $USER")
         self.defaultPath = "/home/" + userName.read().rstrip()
 
-
-        self.builder.add_from_string(resource_string('gscreenshot.resources.gui.glade', 'main.glade').decode("UTF-8"))
+        self.builder.add_from_string(resource_string(
+            'gscreenshot.resources.gui.glade', 'main.glade').decode("UTF-8"))
 
         self.window = self.builder.get_object('window_main')
 
@@ -56,13 +56,13 @@ class main_window(threading.Thread):
 
         # create a signal dictionary and connect it to the handler functions
         dic = {
-                "on_window_main_destroy": self.quit,
-                "on_button_all_clicked": self.button_all_clicked,
-                "on_button_window_clicked": self.button_select_area_or_window_clicked,
-                "on_button_selectarea_clicked": self.button_select_area_or_window_clicked,
-                "on_button_saveas_clicked": self.button_saveas_clicked,
-                "on_button_about_clicked": self.button_about_clicked,
-                "on_button_quit_clicked": self.button_quit_clicked}
+            "on_window_main_destroy": self.quit,
+            "on_button_all_clicked": self.button_all_clicked,
+            "on_button_window_clicked": self.button_select_area_or_window_clicked,
+            "on_button_selectarea_clicked": self.button_select_area_or_window_clicked,
+            "on_button_saveas_clicked": self.button_saveas_clicked,
+            "on_button_about_clicked": self.button_about_clicked,
+            "on_button_quit_clicked": self.button_quit_clicked}
 
         self.builder.connect_signals(dic)
 
@@ -157,22 +157,22 @@ class main_window(threading.Thread):
         about = gtk.AboutDialog()
 
         authors = [
-                "Nate Levesque <public@thenaterhood.com>",
-                "Original Author (2006)",
-                "matej.horvath <matej.horvath@gmail.com>"
-                ]
+            "Nate Levesque <public@thenaterhood.com>",
+            "Original Author (2006)",
+            "matej.horvath <matej.horvath@gmail.com>"
+        ]
         about.set_authors(authors)
         about.set_comments("A simple GUI frontend for scrot")
         about.set_website("https://github.com/thenaterhood/gscreenshot")
         about.set_website_label("github.com/thenaterhood/gscreenshot")
         about.set_program_name("gscreenshot")
         about.set_title("About gscreenshot")
-        about.set_license(resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
+        about.set_license(
+            resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
         about.set_logo_icon_name("screenshot")
         about.connect("response", self.on_about_close)
 
         about.show()
-
 
     def on_about_close(self, action, parameter):
         action.destroy()
@@ -239,6 +239,7 @@ class main_window(threading.Thread):
         # view the previewPixbuf in the image_preview widget
         self.image_preview.set_from_pixbuf(previewPixbuf)
 
+
 class FileSaveHandler():
 
     def __init__(self):
@@ -250,28 +251,24 @@ class FileSaveHandler():
         if filename is None:
             return
 
-        if os.path.isfile(filename):
-            replace = self.confirm_replace(filename)
-            if (replace):
-                self.save_file(filename, image)
-            else:
-                pass
-        else:
-            self.save_file(filename, image)
+        while os.path.isfile(filename) and not self.confirm_replace(filename):
+            if (filename is None):
+                return
 
+        self.save_file(filename, image)
 
     def confirm_replace(self, filename):
         message = "A file named " + filename + " already exists.\n\
                 Do you want to replace it?"
 
         confirm_dialog = gtk.MessageDialog(None,
-                                        gtk.DIALOG_MODAL,
-                                        gtk.MESSAGE_QUESTION,
-                                        gtk.BUTTONS_NONE,
-                                        message)
+                                           gtk.DIALOG_MODAL,
+                                           gtk.MESSAGE_QUESTION,
+                                           gtk.BUTTONS_NONE,
+                                           message)
         confirm_dialog.add_buttons(gtk.STOCK_CANCEL, 0, gtk.STOCK_OK, 1)
         confirm_dialog.format_secondary_text(
-                "The file already exists. Replacing it will overwrite its contents")
+            "The file already exists. Replacing it will overwrite its contents")
         response = confirm_dialog.run()
         confirm_dialog.destroy()
 
@@ -308,6 +305,7 @@ class FileSaveHandler():
                 i = i.upper()
                 im.save(filename, i)
                 break
+
 
 def main():
     # create the main_window object and window
