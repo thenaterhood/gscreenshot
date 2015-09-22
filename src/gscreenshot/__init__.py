@@ -177,7 +177,7 @@ class main_window(threading.Thread):
         about.set_program_name("gscreenshot")
         about.set_title("About gscreenshot")
         about.set_license(resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
-
+        about.set_logo_icon_name("screenshot")
         about.connect("response", self.on_about_close)
 
         about.show()
