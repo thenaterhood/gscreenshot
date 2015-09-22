@@ -69,9 +69,6 @@ class main_window(threading.Thread):
         self.grab_screenshot("")
         self.show_preview()
 
-        # create the "about" dialog object
-        self.about = about_dialog()
-
     #--------------------------------------------
     # signal handlers
     #--------------------------------------------
@@ -168,10 +165,27 @@ class main_window(threading.Thread):
         self.window.set_sensitive(False)
 
         # send the "about" dialog object a request to create it's window
-        self.about.create()
+        about = gtk.AboutDialog()
 
-        # place the "about" dialog into the center of the screen
-        self.about.window.set_position(gtk.WIN_POS_CENTER)
+        authors = [
+                "Nate Levesque <public@thenaterhood.com>",
+                "matej.horvath"
+                ]
+        about.set_authors(authors)
+        about.set_website("https://github.com/thenaterhood/gscreenshot")
+        about.set_website_label("Website: github.com/thenaterhood/gscreenshot")
+        about.set_program_name("gscreenshot")
+        about.set_title("About gscreenshot")
+        about.set_license(resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
+
+        about.connect("response", self.on_about_close)
+
+        about.show()
+
+
+    def on_about_close(self, action, parameter):
+        action.destroy()
+        self.window.set_sensitive(True)
 
     #
     #---- button_quit_clicked  :quit the application
@@ -295,26 +309,6 @@ class main_window(threading.Thread):
                     im.save(actual_file, i)
                     break
         print(actual_file)
-
-
-class about_dialog:
-
-    def create(self):
-        # set the glade file
-        self.builder = gtk.Builder()
-
-        self.builder.add_from_string(resource_string('gscreenshot.resources.gui.glade', 'about.glade').decode("UTF-8"))
-
-        # create the "about" window
-        self.window = self.builder.get_object("window_about")
-        self.window.set_name("gscreenshot")
-        self.window.connect("response", lambda d, r: self.close())
-
-    def close(self):
-        # while closing the "about" dialog, make the main window sensitive
-        main_window.window.set_sensitive(True)
-        self.window.destroy()
-
 
 class replace_dialog(threading.Thread):
     #

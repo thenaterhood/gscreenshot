@@ -6,7 +6,8 @@ import os
 
 install_requires = [
     'pillow',
-    'pygtk',
+    # This currently throws an error. Install pygtk via your package manager.
+    #'pygtk',
     'pygobject'
     ]
 
@@ -21,7 +22,7 @@ data_files=[
 
 
 setup(name='gscreenshot',
-    version='2.0.1',
+    version='2.0.2',
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
@@ -38,7 +39,7 @@ setup(name='gscreenshot',
         ],
     data_files=data_files,
     package_data={
-        '': ['*.glade']
+        '': ['*.glade', 'LICENSE']
         }
     )
 
