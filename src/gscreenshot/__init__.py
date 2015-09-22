@@ -169,7 +169,8 @@ class main_window(threading.Thread):
 
         authors = [
                 "Nate Levesque <public@thenaterhood.com>",
-                "matej.horvath"
+                "Original Author (2006)",
+                "matej.horvath <mateg.horvath@gmail.com>"
                 ]
         about.set_authors(authors)
         about.set_website("https://github.com/thenaterhood/gscreenshot")
