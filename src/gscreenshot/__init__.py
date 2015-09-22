@@ -55,8 +55,14 @@ class main_window(threading.Thread):
         self.window.set_position(gtk.WIN_POS_CENTER)
 
         # create a signal dictionary and connect it to the handler functions
-        dic = {"on_window_main_destroy": self.quit, "on_button_all_clicked": self.button_all_clicked, "on_button_window_clicked": self.button_select_area_or_window_clicked, "on_button_selectarea_clicked":
-               self.button_select_area_or_window_clicked, "on_button_saveas_clicked": self.button_saveas_clicked, "on_button_about_clicked": self.button_about_clicked, "on_button_quit_clicked": self.button_quit_clicked}
+        dic = {
+                "on_window_main_destroy": self.quit,
+                "on_button_all_clicked": self.button_all_clicked,
+                "on_button_window_clicked": self.button_select_area_or_window_clicked,
+                "on_button_selectarea_clicked": self.button_select_area_or_window_clicked,
+                "on_button_saveas_clicked": self.button_saveas_clicked,
+                "on_button_about_clicked": self.button_about_clicked,
+                "on_button_quit_clicked": self.button_quit_clicked}
 
         self.builder.connect_signals(dic)
 
@@ -312,13 +318,12 @@ class main_window(threading.Thread):
                     break
         print(actual_file)
 
-class replace_dialog(threading.Thread):
+class replace_dialog(gtk.Dialog):
     #
     #---- create the "replace" dialog window and make the main and "save as" window unsensitive
     #
 
     def __init__(self, file_name, dir_name):
-        buttons = gtk.BUTTONS_CANCEL, 0, "Replace", 1
         message = "A file named \"" + file_name + \
             "\" already exists.  Do you\nwant to replace it?"
         self.dialog = gtk.MessageDialog(None,
