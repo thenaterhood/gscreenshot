@@ -176,7 +176,7 @@ class main_window(threading.Thread):
         authors = [
                 "Nate Levesque <public@thenaterhood.com>",
                 "Original Author (2006)",
-                "matej.horvath <mateg.horvath@gmail.com>"
+                "matej.horvath <matej.horvath@gmail.com>"
                 ]
         about.set_authors(authors)
         about.set_comments("A simple GUI frontend for scrot")
