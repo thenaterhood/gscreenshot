@@ -173,8 +173,9 @@ class main_window(threading.Thread):
                 "matej.horvath <mateg.horvath@gmail.com>"
                 ]
         about.set_authors(authors)
+        about.set_comments("A simple GUI frontend for scrot")
         about.set_website("https://github.com/thenaterhood/gscreenshot")
-        about.set_website_label("Website: github.com/thenaterhood/gscreenshot")
+        about.set_website_label("github.com/thenaterhood/gscreenshot")
         about.set_program_name("gscreenshot")
         about.set_title("About gscreenshot")
         about.set_license(resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
