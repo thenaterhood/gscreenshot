@@ -251,9 +251,12 @@ class FileSaveHandler():
         if filename is None:
             return
 
-        while os.path.isfile(filename) and not self.confirm_replace(filename):
-            if (filename is None):
-                return
+        if os.path.isfile(filename):
+            replace = self.confirm_replace(filename)
+            if (replace):
+                self.save_file(filename, image)
+            else:
+                pass
 
         self.save_file(filename, image)
 
