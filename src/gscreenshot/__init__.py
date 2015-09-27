@@ -24,6 +24,8 @@ import os.path
 import string
 import threading
 from time import sleep
+import subprocess
+import tempfile
 
 from pkg_resources import resource_string
 
@@ -39,10 +41,6 @@ class main_window(threading.Thread):
         # find/create the /tmp file name
         self.imageName = self.get_temp_file_name()
         self.builder = gtk.Builder()
-
-        # resolve the username to set the default "Save As" path
-        userName = os.popen("echo $USER")
-        self.defaultPath = "/home/" + userName.read().rstrip()
 
         self.builder.add_from_string(resource_string(
             'gscreenshot.resources.gui.glade', 'main.glade').decode("UTF-8"))
@@ -72,7 +70,7 @@ class main_window(threading.Thread):
         self.delay_setter = self.builder.get_object("spinbutton1")
         self.button_saveas = self.builder.get_object("button_saveas")
 
-        self.grab_screenshot("")
+        self.grab_screenshot()
         self.show_preview()
 
     #--------------------------------------------
@@ -94,7 +92,7 @@ class main_window(threading.Thread):
 
         # grab the screenshot
         sleep(0.2)
-        self.grab_screenshot("")
+        self.grab_screenshot()
 
         # show the window
         self.window.set_position(gtk.WIN_POS_CENTER)
@@ -118,7 +116,7 @@ class main_window(threading.Thread):
             gtk.main_iteration()
 
         # grab the screenshot
-        self.grab_screenshot("-s")
+        self.grab_screenshot(["-s"])
 
         # show the window
         self.window.set_position(gtk.WIN_POS_CENTER)
@@ -197,12 +195,14 @@ class main_window(threading.Thread):
 
     def get_temp_file_name(self):
         # create a unique image file name based on the application PID
-        imageName = "/tmp/gscreenshot_" + str(os.getpid()) + ".png"
+        imageName = os.path.join(
+                tempfile.gettempdir(),
+                str(os.getpid()) + ".png")
 
         # return the result
         return imageName
 
-    def grab_screenshot(self, commandParameters):
+    def grab_screenshot(self, commandParameters=None):
         # remove the temporary file ( in /tmp) from the past
         try:
             os.remove(self.imageName)
@@ -213,10 +213,14 @@ class main_window(threading.Thread):
         # repr(delay) - converts integer to a string
         delay = self.delay_setter.get_value()
 
-        # grab the screenshot with scrot to the /tmp directory
-        os.system("scrot " + " -d " + repr(delay) + " " +
-                  commandParameters + " " + self.imageName)
+        command = ['scrot', '-d', repr(delay)]
+        if (commandParameters != None):
+            command = command + commandParameters
 
+        command.append(self.imageName)
+
+        # grab the screenshot with scrot to the /tmp directory
+        subprocess.check_call(command)
         # change it's permissions
         os.chmod(self.imageName, 0o600)
 
