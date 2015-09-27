@@ -12,22 +12,21 @@
 # - Further changes will be noted in release notes
 #--------------------------------------------
 
-import sys
-import os
+
 from gi import pygtkcompat
+
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
 import gtk
+import os
+from pkg_resources import resource_string
 from PIL import Image
-import os.path
-import string
 import threading
 from time import sleep
 import subprocess
+import sys
 import tempfile
-
-from pkg_resources import resource_string
 
 
 class main_window(threading.Thread):
