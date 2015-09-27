@@ -251,38 +251,13 @@ class FileSaveHandler():
         if filename is None:
             return
 
-        if os.path.isfile(filename):
-            replace = self.confirm_replace(filename)
-            if (replace):
-                self.save_file(filename, image)
-            else:
-                pass
-
         self.save_file(filename, image)
-
-    def confirm_replace(self, filename):
-        message = "A file named " + filename + " already exists.\n\
-                Do you want to replace it?"
-
-        confirm_dialog = gtk.MessageDialog(None,
-                                           gtk.DIALOG_MODAL,
-                                           gtk.MESSAGE_QUESTION,
-                                           gtk.BUTTONS_NONE,
-                                           message)
-        confirm_dialog.add_buttons(gtk.STOCK_CANCEL, 0, gtk.STOCK_OK, 1)
-        confirm_dialog.format_secondary_text(
-            "The file already exists. Replacing it will overwrite its contents")
-        response = confirm_dialog.run()
-        confirm_dialog.destroy()
-
-        if (response == 1):
-            return True
-        else:
-            return False
 
     def request_file(self):
         chooser = gtk.FileChooserDialog(title=None, action=gtk.FILE_CHOOSER_ACTION_SAVE,
                                         buttons=(gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL, gtk.STOCK_SAVE, gtk.RESPONSE_OK))
+
+        chooser.set_do_overwrite_confirmation(True)
 
         response = chooser.run()
 
