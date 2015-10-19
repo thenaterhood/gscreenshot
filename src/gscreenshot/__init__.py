@@ -183,10 +183,6 @@ class main_window(threading.Thread):
         self.quit(widget)
 
     def quit(self, widget):
-        try:
-            os.remove(self.imageName)
-        except:
-            pass
         sys.exit(0)
 
     #--------------------------------------------
