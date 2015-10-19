@@ -11,9 +11,10 @@
 # - Updated to use modern libraries and formats
 # - Further changes will be noted in release notes
 #--------------------------------------------
-
+import io
 
 from gi import pygtkcompat
+from gi.repository import GdkPixbuf
 
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
@@ -38,8 +39,8 @@ class main_window(threading.Thread):
     def __init__(self):
 
         # find/create the /tmp file name
-        self.imageName = self.get_temp_file_name()
         self.builder = gtk.Builder()
+        self.scrot = Scrot()
 
         self.builder.add_from_string(resource_string(
             'gscreenshot.resources.gui.glade', 'main.glade').decode("UTF-8"))
@@ -69,7 +70,7 @@ class main_window(threading.Thread):
         self.delay_setter = self.builder.get_object("spinbutton1")
         self.button_saveas = self.builder.get_object("button_saveas")
 
-        self.grab_screenshot()
+        self.scrot.grab_fullscreen()
         self.show_preview()
 
     #--------------------------------------------
@@ -91,7 +92,7 @@ class main_window(threading.Thread):
 
         # grab the screenshot
         sleep(0.2)
-        self.grab_screenshot()
+        self.scrot.grab_fullscreen()
 
         # show the window
         self.window.set_position(gtk.WIN_POS_CENTER)
@@ -115,7 +116,7 @@ class main_window(threading.Thread):
             gtk.main_iteration()
 
         # grab the screenshot
-        self.grab_screenshot(["-s"])
+        self.scrot.grab_selection()
 
         # show the window
         self.window.set_position(gtk.WIN_POS_CENTER)
@@ -135,7 +136,7 @@ class main_window(threading.Thread):
         # make the main window unsensitive while saving your image
         self.window.set_sensitive(False)
 
-        im = Image.open(self.get_temp_file_name())
+        im = self.scrot.get_image()
 
         save_handler = FileSaveHandler()
         save_handler.run(im)
@@ -191,41 +192,20 @@ class main_window(threading.Thread):
     #--------------------------------------------
     # other functions
     #--------------------------------------------
-
-    def get_temp_file_name(self):
-        # create a unique image file name based on the application PID
-        imageName = os.path.join(
-                tempfile.gettempdir(),
-                str(os.getpid()) + ".png")
-
-        # return the result
-        return imageName
-
-    def grab_screenshot(self, commandParameters=None):
-        # remove the temporary file ( in /tmp) from the past
-        try:
-            os.remove(self.imageName)
-        except:
-            print("no temporary file deleted - nothing found")
-
-        # resolve the delay_setter+1 sec.  delay
-        # repr(delay) - converts integer to a string
-        delay = self.delay_setter.get_value()
-
-        command = ['scrot', '-d', repr(delay)]
-        if (commandParameters != None):
-            command = command + commandParameters
-
-        command.append(self.imageName)
-
-        # grab the screenshot with scrot to the /tmp directory
-        subprocess.check_call(command)
-        # change it's permissions
-        os.chmod(self.imageName, 0o600)
+    def _image_to_pixbuf(self, image):
+         fd = io.BytesIO()
+         image.save(fd, "ppm")
+         contents = fd.getvalue()
+         fd.close()
+         loader = gtk.gdk.PixbufLoader("pnm")
+         loader.write(contents)
+         pixbuf = loader.get_pixbuf()
+         loader.close()
+         return pixbuf
 
     def show_preview(self):
         # create an image buffer (pixbuf) and insert the grabbed image
-        previewPixbuf = gtk.gdk.pixbuf_new_from_file(self.imageName)
+        previewPixbuf = self._image_to_pixbuf(self.scrot.get_image())
 
         # resolve the preview image width and height
         previewHeight = previewPixbuf.get_height() / 4
@@ -242,6 +222,35 @@ class main_window(threading.Thread):
         # view the previewPixbuf in the image_preview widget
         self.image_preview.set_from_pixbuf(previewPixbuf)
 
+class Scrot():
+
+    __slots__ = ('image', 'tempfile')
+
+    def __init__(self):
+        self.image = None
+        self.tempfile = os.path.join(
+                tempfile.gettempdir(),
+                str(os.getpid()) + ".png"
+                )
+
+    def get_image(self):
+        return self.image
+
+    def grab_fullscreen(self, delay=0):
+        self._call_scrot(['-d', str(delay)])
+
+    def grab_selection(self, delay=0):
+        self._call_scrot(['-d', str(delay), '-s'])
+
+    def grab_window(self, delay=0):
+        self.grab_selection(delay)
+
+    def _call_scrot(self, params=[]):
+        params = ['scrot', self.tempfile] + params
+        subprocess.check_output(params)
+
+        self.image = Image.open(self.tempfile)
+        os.unlink(self.tempfile)
 
 class FileSaveHandler():
 
