@@ -2,3 +2,5 @@
 *.gladep
 *.pyc
 __pycache__
+*.*~
+.settings
