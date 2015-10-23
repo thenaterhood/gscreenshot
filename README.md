@@ -1,6 +1,7 @@
 gscreenshot
 ===============
 [![Code Climate](https://codeclimate.com/github/thenaterhood/gscreenshot/badges/gpa.svg)](https://codeclimate.com/github/thenaterhood/gscreenshot)
+[![Code Health](https://landscape.io/github/thenaterhood/gscreenshot/master/landscape.svg?style=flat)](https://landscape.io/github/thenaterhood/gscreenshot/master)
 
 [Available in the Archlinux User Repository](https://aur.archlinux.org/packages/gscreenshot/)
 
