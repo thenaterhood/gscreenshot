@@ -12,9 +12,7 @@
 # - Further changes will be noted in release notes
 #--------------------------------------------
 import io
-
 from gi import pygtkcompat
-from gi.repository import GdkPixbuf
 
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
@@ -218,7 +216,7 @@ class main_window(threading.Thread):
         # view the previewPixbuf in the image_preview widget
         self.image_preview.set_from_pixbuf(previewPixbuf)
 
-class Scrot():
+class Scrot(object):
 
     __slots__ = ('image', 'tempfile')
 
@@ -241,14 +239,20 @@ class Scrot():
     def grab_window(self, delay=0):
         self.grab_selection(delay)
 
-    def _call_scrot(self, params=[]):
+    def _call_scrot(self, params=None):
+
+        # This is safer than passing an empty
+        # list as a default value
+        if params is None:
+            params = []
+
         params = ['scrot', self.tempfile] + params
         subprocess.check_output(params)
 
         self.image = Image.open(self.tempfile)
         os.unlink(self.tempfile)
 
-class FileSaveHandler():
+class FileSaveHandler(object):
 
     def __init__(self):
         pass
