@@ -36,7 +36,6 @@ class main_window(threading.Thread):
 
     def __init__(self):
 
-        # find/create the /tmp file name
         self.builder = gtk.Builder()
         self.scrot = Scrot()
 
@@ -44,8 +43,6 @@ class main_window(threading.Thread):
             'gscreenshot.resources.gui.glade', 'main.glade').decode("UTF-8"))
 
         self.window = self.builder.get_object('window_main')
-
-        # create the main window
 
         # show the (main) window in the center of the screen
         self.window.set_position(gtk.WIN_POS_CENTER)
@@ -99,10 +96,6 @@ class main_window(threading.Thread):
         # create and show a preview of the grabbed screenshot
         self.show_preview()
 
-        # now, there is a screenshot, so the "save as" function can be enabled
-        # (hint: line 74)
-        self.button_saveas.set_sensitive(True)
-
     def button_select_area_or_window_clicked(self, widget):
         # check if the window should be hidden while grabbing screenshot
         if self.hide_check.get_active():
@@ -122,10 +115,6 @@ class main_window(threading.Thread):
 
         # create and show a preview of the grabbed screenshot
         self.show_preview()
-
-        # now, there is a screenshot, so the "save as" function can be enabled
-        # (hint: line 74)
-        self.button_saveas.set_sensitive(True)
 
     #
     #---- button_saveas_clicked  :save the grabbed screenshot
