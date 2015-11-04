@@ -187,15 +187,15 @@ class main_window(threading.Thread):
     # other functions
     #--------------------------------------------
     def _image_to_pixbuf(self, image):
-         fd = io.BytesIO()
-         image.save(fd, "ppm")
-         contents = fd.getvalue()
-         fd.close()
-         loader = gtk.gdk.PixbufLoader("pnm")
-         loader.write(contents)
-         pixbuf = loader.get_pixbuf()
-         loader.close()
-         return pixbuf
+        fd = io.BytesIO()
+        image.save(fd, "ppm")
+        contents = fd.getvalue()
+        fd.close()
+        loader = gtk.gdk.PixbufLoader("pnm")
+        loader.write(contents)
+        pixbuf = loader.get_pixbuf()
+        loader.close()
+        return pixbuf
 
     def show_preview(self):
         # create an image buffer (pixbuf) and insert the grabbed image
