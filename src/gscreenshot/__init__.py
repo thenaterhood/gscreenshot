@@ -190,9 +190,12 @@ class main_window(threading.Thread):
         # create an image buffer (pixbuf) and insert the grabbed image
         previewPixbuf = self._image_to_pixbuf(self.scrot.get_image())
 
+        allocation = self.image_preview.get_allocation()
         # resolve the preview image width and height
-        previewHeight = previewPixbuf.get_height() / 4
-        previewWidth = previewPixbuf.get_width() / 4
+        imageHeight = previewPixbuf.get_height()
+        imageWidth = previewPixbuf.get_width()
+        previewHeight = allocation.height
+        previewWidth = allocation.width
 
         # resize the previewPixbuf to previewWidth, previewHeight
         previewPixbuf = previewPixbuf.scale_simple(
