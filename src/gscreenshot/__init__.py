@@ -194,8 +194,12 @@ class main_window(threading.Thread):
         # resolve the preview image width and height
         imageHeight = previewPixbuf.get_height()
         imageWidth = previewPixbuf.get_width()
-        previewHeight = allocation.height
-        previewWidth = allocation.width
+
+        resize_ratio = min(allocation.height/imageHeight, allocation.width/imageWidth)
+        previewHeight = imageHeight * resize_ratio
+        previewWidth = imageWidth * resize_ratio
+
+        previewHeight = max(allocation.height, previewHeight)
 
         # resize the previewPixbuf to previewWidth, previewHeight
         previewPixbuf = previewPixbuf.scale_simple(
