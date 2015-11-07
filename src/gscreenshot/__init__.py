@@ -286,20 +286,16 @@ class FileSaveHandler(object):
         return return_value
 
     def save_file(self, filename, im):
-        actual_file_ext = os.path.splitext(filename)[1][1:]
+        actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 
-        supported_formats = (
-            'bmp', 'eps', 'gif', 'jpg', 'pcx', 'pdf', 'ppm', 'tiff', 'png')
-        for i in supported_formats:
-            # if it's supported convert it
-            if (i == actual_file_ext.lower()):
-                # if it's jpeg, change the descriptor
-                if i == 'jpg':
-                    i = 'jpeg'
-                i = i.upper()
-                im.save(filename, i)
-                break
+        if actual_file_ext == 'jpg':
+            actual_file_ext = 'jpeg'
 
+        supported_formats = [
+            'bmp', 'eps', 'gif', 'jpeg', 'pcx', 'pdf', 'ppm', 'tiff', 'png']
+
+        if actual_file_ext in supported_formats:
+            im.save(filename, actual_file_ext.upper())
 
 def main():
     # create the main_window object and window
