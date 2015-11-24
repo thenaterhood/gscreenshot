@@ -22,7 +22,7 @@ data_files=[
 
 
 setup(name='gscreenshot',
-    version='2.0.2',
+    version='2.3.0',
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',

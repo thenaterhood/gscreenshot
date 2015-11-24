@@ -16,6 +16,22 @@ still up and running.
 
 gscreenshot is licensed under the GPL.
 
+Usage
+===============
+gscreenshot takes screenshots! Run it manually or bind it to a keystroke.
+
+Buttons
+
+* "Selection" allows you to drag-select an area to screenshot
+* "Window" allows you to click a window to screenshot
+* "All" takes a screenshot of the entire screen.
+* "Save" brings up the file save dialog to save your screenshot
+
+Keyboard shortcuts
+
+* Control+S opens the save dialog
+* Escape quits the application
+
 Requirements
 ===============
 * Python 3
