@@ -17,6 +17,7 @@ from gi import pygtkcompat
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
+from gi.repository import Gdk
 import gtk
 import os
 from pkg_resources import resource_string
@@ -59,6 +60,12 @@ class main_window(threading.Thread):
 
         self.builder.connect_signals(dic)
 
+        accel = gtk.AccelGroup()
+        accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK, 0, self.button_saveas_clicked)
+        self.window.add_accel_group(accel)
+
+        self.window.connect("key-press-event", self.handle_keypress)
+
         # create objects from selected widgets in the main window
         self.image_preview = self.builder.get_object("image1")
         self.hide_check = self.builder.get_object("checkbutton1")
@@ -71,6 +78,19 @@ class main_window(threading.Thread):
     #--------------------------------------------
     # signal handlers
     #--------------------------------------------
+
+    def handle_keypress(self, widget=None, event=None, data=None):
+        """
+        This method handles individual keypresses. These are
+        handled separately from accelerators (which include
+        modifiers).
+        """
+        shortcuts = {
+                gtk.gdk.keyval_to_lower(gtk.gdk.keyval_from_name('Escape')): self.button_quit_clicked
+                }
+
+        if event.keyval in shortcuts:
+            shortcuts[event.keyval]()
 
     #
     #---- button_all_clicked  :grab a screenshot of the whole screen
@@ -119,7 +139,7 @@ class main_window(threading.Thread):
     #
     #---- button_saveas_clicked  :save the grabbed screenshot
     #
-    def button_saveas_clicked(self, widget):
+    def button_saveas_clicked(self, *args):
         # make the main window unsensitive while saving your image
         self.window.set_sensitive(False)
 
@@ -166,7 +186,7 @@ class main_window(threading.Thread):
     #
     #---- button_quit_clicked  :quit the application
     #
-    def button_quit_clicked(self, widget):
+    def button_quit_clicked(self, widget=None):
         self.quit(widget)
 
     def quit(self, widget):
