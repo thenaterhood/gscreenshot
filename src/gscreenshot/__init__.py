@@ -18,7 +18,7 @@ pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
 from gi.repository import Gdk
-import gtk
+from gi.repository import Gtk as gtk
 import os
 from pkg_resources import resource_string
 from PIL import Image
