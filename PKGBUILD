@@ -3,7 +3,7 @@
 # Contributor: Matej Horváth <matej.horvath@gmail.com>
 
 pkgname=gscreenshot
-pkgver=2.0.1
+pkgver=2.3.1
 pkgrel=1
 epoch=
 pkgdesc="A GUI front-end for scrot"
@@ -50,7 +50,6 @@ package() {
         echo $pkgdir
         cd $srcdir/gscreenshot-$pkgver
         python setup.py install --root="$pkgdir/" --optimize=1
-        chmod +x "$pkgdir/usr/bin/gscreenshot"
         install -Dm644 dist/$pkgname.desktop \
             "$pkgdir/usr/share/applications/$pkgname.desktop"
         install -Dm644 dist/black-white_2-Style-applets-screenshooter.png \

@@ -16,19 +16,22 @@ test_requires = [
     'mock'
     ]
 
-data_files=[
-    ('bin/', ['dist/bin/gscreenshot'])
-    ]
+data_files=[]
 
 
 setup(name='gscreenshot',
-    version='2.3.0',
+    version='2.3.1',
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
     url='https://github.com/thenaterhood/gscreenshot/archive/master.zip',
     install_requires=install_requires,
     tests_require=test_requires,
+    entry_points={
+        'gui_scripts': [
+            'gscreenshot = gscreenshot:main'
+        ]
+    },
     test_suite='nose.collector',
     package_dir={'':'src'},
     packages=[
@@ -42,4 +45,3 @@ setup(name='gscreenshot',
         '': ['*.glade', 'LICENSE']
         }
     )
-
