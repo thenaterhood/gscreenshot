@@ -17,8 +17,9 @@ test_requires = [
     ]
 
 data_files =[
-        ('share/applications', ['dist/gscreenshot.desktop']),
-        ('share/pixmaps', ['dist/gscreenshot.png'])
+        ('share/applications', ['dist/desktop/gscreenshot.desktop']),
+        ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
+        ('share/menu', ['dist/menu/gscreenshot'])
         ]
 
 

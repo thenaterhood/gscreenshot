@@ -1,0 +1,1 @@
+?package(gscreenshot):needs="X11" section="Applications/Graphics"        title="Gscreenshot" command="/usr/bin/gscreenshot" icon="gscreenshot"
