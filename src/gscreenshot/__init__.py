@@ -216,10 +216,13 @@ class main_window(threading.Thread):
         imageWidth = previewPixbuf.get_width()
 
         resize_ratio = min(allocation.height/imageHeight, allocation.width/imageWidth)
+
         previewHeight = imageHeight * resize_ratio
         previewWidth = imageWidth * resize_ratio
 
         previewHeight = max(allocation.height, previewHeight)
+        # Not required on python3, but resolves a bug in python2
+        previewWidth = max(allocation.width, previewWidth)
 
         # resize the previewPixbuf to previewWidth, previewHeight
         previewPixbuf = previewPixbuf.scale_simple(
