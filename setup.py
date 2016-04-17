@@ -16,7 +16,10 @@ test_requires = [
     'mock'
     ]
 
-data_files=[]
+data_files =[
+        ('share/applications', ['dist/gscreenshot.desktop']),
+        ('share/pixmaps', ['dist/gscreenshot.png'])
+        ]
 
 
 setup(name='gscreenshot',
