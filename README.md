@@ -30,6 +30,7 @@ Buttons
 Keyboard shortcuts
 
 * Control+S opens the save dialog
+* Control+C copies the screenshot to the clipboard
 * Escape quits the application
 
 Requirements
@@ -38,9 +39,14 @@ Requirements
 * Scrot
 * python-pillow
 * python-gobject
+* Setuptools
 
 Development Requirements
 ==============
 The above, plus:
 * Glade
+
+Installation
+==============
+* Run the included setup.py script: `sudo python setup.py install`
 
