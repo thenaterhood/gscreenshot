@@ -107,7 +107,7 @@ class main_window(threading.Thread):
 
         # grab the screenshot
         sleep(0.2)
-        self.scrot.grab_fullscreen()
+        self.scrot.grab_fullscreen(self.delay_setter.get_value())
 
         # show the window
         self.window.set_position(gtk.WIN_POS_CENTER)
@@ -127,7 +127,7 @@ class main_window(threading.Thread):
             gtk.main_iteration()
 
         # grab the screenshot
-        self.scrot.grab_selection()
+        self.scrot.grab_selection(self.delay_setter.get_value())
 
         # show the window
         self.window.set_position(gtk.WIN_POS_CENTER)
