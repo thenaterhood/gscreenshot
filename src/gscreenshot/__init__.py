@@ -62,6 +62,7 @@ class main_window(threading.Thread):
 
         accel = gtk.AccelGroup()
         accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK, 0, self.button_saveas_clicked)
+        accel.connect(Gdk.keyval_from_name('C'), Gdk.ModifierType.CONTROL_MASK, 0, self.handle_copy_action)
         self.window.add_accel_group(accel)
 
         self.window.connect("key-press-event", self.handle_keypress)
@@ -149,6 +150,18 @@ class main_window(threading.Thread):
         save_handler.run(im)
 
         self.window.set_sensitive(True)
+
+    def handle_copy_action(self, *args):
+        """
+        Copy the current screenshot to the clipboard
+        """
+
+        clipboard = gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        img = self.scrot.get_image()
+        pixbuf = self._image_to_pixbuf(img)
+        print(pixbuf)
+        clipboard.set_image(pixbuf)
+        clipboard.store()
 
     #
     #---- button_about_clicked  :show the "about" dialog
