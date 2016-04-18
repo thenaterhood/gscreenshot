@@ -27,6 +27,7 @@ from time import sleep
 import subprocess
 import sys
 import tempfile
+from datetime import datetime
 
 
 class main_window(threading.Thread):
@@ -309,6 +310,7 @@ class FileSaveHandler(object):
                     )
                 )
 
+        chooser.set_current_name(self._build_filename())
         chooser.set_do_overwrite_confirmation(True)
 
         response = chooser.run()
@@ -320,6 +322,10 @@ class FileSaveHandler(object):
 
         chooser.destroy()
         return return_value
+
+    def _build_filename(self):
+        d = datetime.now()
+        return datetime.strftime(d, "gscreenshot_%Y-%m-%d-%H%m%S.png")
 
     def save_file(self, filename, im):
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
