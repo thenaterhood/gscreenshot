@@ -81,7 +81,7 @@ class main_window(threading.Thread):
     # signal handlers
     #--------------------------------------------
 
-    def handle_keypress(self, widget=None, event=None, data=None):
+    def handle_keypress(self, widget=None, event=None, *args):
         """
         This method handles individual keypresses. These are
         handled separately from accelerators (which include
@@ -97,7 +97,7 @@ class main_window(threading.Thread):
     #
     #---- button_all_clicked  :grab a screenshot of the whole screen
     #
-    def button_all_clicked(self, widget):
+    def button_all_clicked(self, *args):
         # check if the window should be hidden while grabbing screenshot
         if self.hide_check.get_active():
             # hide the window to grab the screenshot without it
@@ -118,7 +118,7 @@ class main_window(threading.Thread):
         # create and show a preview of the grabbed screenshot
         self.show_preview()
 
-    def button_select_area_or_window_clicked(self, widget):
+    def button_select_area_or_window_clicked(self, *args):
         # check if the window should be hidden while grabbing screenshot
         if self.hide_check.get_active():
             # hide the window to grab the screenshot without it
@@ -167,7 +167,7 @@ class main_window(threading.Thread):
     #
     #---- button_about_clicked  :show the "about" dialog
     #
-    def button_about_clicked(self, widget):
+    def button_about_clicked(self, *args):
         # make the main window unsensitive while viewing the "about"
         # information
         self.window.set_sensitive(False)
@@ -193,7 +193,7 @@ class main_window(threading.Thread):
 
         about.show()
 
-    def on_about_close(self, action, parameter):
+    def on_about_close(self, action, *args):
         action.destroy()
         self.window.set_sensitive(True)
 
