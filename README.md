@@ -1,5 +1,5 @@
-gscreenshot
-===============
+# gscreenshot
+
 [![Code Climate](https://codeclimate.com/github/thenaterhood/gscreenshot/badges/gpa.svg)](https://codeclimate.com/github/thenaterhood/gscreenshot)
 [![Code Health](https://landscape.io/github/thenaterhood/gscreenshot/master/landscape.svg?style=flat)](https://landscape.io/github/thenaterhood/gscreenshot/master)
 
@@ -16,8 +16,7 @@ still up and running.
 
 gscreenshot is licensed under the GPL.
 
-Usage
-===============
+## Usage
 gscreenshot takes screenshots! Run it manually or bind it to a keystroke.
 
 Buttons
@@ -33,20 +32,17 @@ Keyboard shortcuts
 * Control+C copies the screenshot to the clipboard
 * Escape quits the application
 
-Requirements
-===============
+## Requirements
 * Python 3
 * Scrot
 * python-pillow
 * python-gobject
 * Setuptools
 
-Development Requirements
-==============
+## Development Requirements
 The above, plus:
 * Glade
 
-Installation
-==============
+## Installation
 * Run the included setup.py script: `sudo python setup.py install`
 
