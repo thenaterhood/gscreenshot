@@ -32,6 +32,23 @@ Keyboard shortcuts
 * Control+C copies the screenshot to the clipboard
 * Escape quits the application
 
+## Contributing
+Find a problem? Have something to add? Just think gscreenshot is super
+cool? gscreenshot accepts contributions!
+
+### Contributing Code
+Please base pull requests off of and open pull requests against the
+'dev' branch. 'master' is reserved for stable code. You may be asked to
+rebase your code against the latest version of the 'dev' branch if
+there's been a flurry of activity before your contribution.
+
+Pull requests may not be merged right away! Don't take offense,
+sometimes it just takes a little while to get to them.
+
+### Opening Issues
+Don't worry about categorizing your issue properly, it'll get taken
+care of on this end.
+
 ## Requirements
 * Python 3
 * Scrot
