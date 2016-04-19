@@ -14,6 +14,20 @@ Version: 3.0.1
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkMenu" id="menu_saveas_additional_actions">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkImageMenuItem">
+        <property name="label">gtk-copy</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_button_copy_clicked" swapped="no"/>
+      </object>
+    </child>
+  </object>
   <object class="GtkWindow" id="window_main">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -26,46 +40,13 @@ Version: 3.0.1
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkOverlay">
+          <object class="GtkImage" id="image1">
+            <property name="width_request">225</property>
+            <property name="height_request">200</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <child>
-              <object class="GtkImage" id="image1">
-                <property name="width_request">225</property>
-                <property name="height_request">200</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
-              </object>
-              <packing>
-                <property name="index">-1</property>
-              </packing>
-            </child>
-            <child type="overlay">
-              <object class="GtkButtonBox">
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="valign">start</property>
-                <property name="layout_style">start</property>
-                <child>
-                  <object class="GtkButton">
-                    <property name="label">gtk-copy</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">True</property>
-                    <property name="opacity">0.73999999999999999</property>
-                    <property name="use_stock">True</property>
-                    <signal name="clicked" handler="on_button_copy_clicked" swapped="no"/>
-                  </object>
-                  <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
-                    <property name="position">0</property>
-                  </packing>
-                </child>
-              </object>
-            </child>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -233,6 +214,7 @@ Version: 3.0.1
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">0</property>
+                    <property name="non_homogeneous">True</property>
                   </packing>
                 </child>
               </object>
@@ -247,20 +229,56 @@ Version: 3.0.1
                 <property name="can_focus">False</property>
                 <property name="layout_style">spread</property>
                 <child>
-                  <object class="GtkButton" id="button_saveas">
-                    <property name="label">gtk-save-as</property>
+                  <object class="GtkButtonBox">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="receives_default">False</property>
-                    <property name="border_width">5</property>
-                    <property name="use_underline">True</property>
-                    <property name="use_stock">True</property>
-                    <signal name="clicked" handler="on_button_saveas_clicked" swapped="no"/>
+                    <property name="can_focus">False</property>
+                    <property name="layout_style">start</property>
+                    <child>
+                      <object class="GtkButton" id="button_saveas">
+                        <property name="label">gtk-save-as</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="clicked" handler="on_button_saveas_clicked" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                        <property name="secondary">True</property>
+                        <property name="non_homogeneous">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkMenuButton">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="focus_on_click">False</property>
+                        <property name="receives_default">True</property>
+                        <property name="halign">start</property>
+                        <property name="popup">menu_saveas_additional_actions</property>
+                        <property name="use_popover">False</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="pack_type">end</property>
+                        <property name="position">1</property>
+                        <property name="secondary">True</property>
+                        <property name="non_homogeneous">True</property>
+                      </packing>
+                    </child>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">0</property>
+                    <property name="non_homogeneous">True</property>
                   </packing>
                 </child>
                 <child>
@@ -278,6 +296,7 @@ Version: 3.0.1
                     <property name="expand">True</property>
                     <property name="fill">True</property>
                     <property name="position">1</property>
+                    <property name="non_homogeneous">True</property>
                   </packing>
                 </child>
               </object>
@@ -288,7 +307,7 @@ Version: 3.0.1
             </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
             <property name="position">5</property>
           </packing>
