@@ -8,7 +8,7 @@ Version: 3.0.1
 
 -->
 <interface>
-  <requires lib="gtk+" version="3.2"/>
+  <requires lib="gtk+" version="3.6"/>
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
@@ -31,10 +31,12 @@ Version: 3.0.1
             <property name="height_request">200</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
           </object>
           <packing>
-            <property name="expand">True</property>
-            <property name="fill">True</property>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
             <property name="padding">6</property>
             <property name="position">0</property>
           </packing>
@@ -97,7 +99,7 @@ Version: 3.0.1
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="layout_style">start</property>
+                <property name="layout_style">spread</property>
                 <child>
                   <object class="GtkCheckButton" id="checkbutton1">
                     <property name="label" translatable="yes">Hide gscreenshot Window</property>
@@ -106,13 +108,13 @@ Version: 3.0.1
                     <property name="receives_default">False</property>
                     <property name="margin_left">3</property>
                     <property name="use_underline">True</property>
-                    <property name="image_position">right</property>
+                    <property name="image_position">bottom</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
-                    <property name="expand">True</property>
-                    <property name="fill">True</property>
+                    <property name="expand">False</property>
+                    <property name="fill">False</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -167,8 +169,9 @@ Version: 3.0.1
             </child>
           </object>
           <packing>
-            <property name="expand">False</property>
+            <property name="expand">True</property>
             <property name="fill">True</property>
+            <property name="padding">4</property>
             <property name="position">4</property>
           </packing>
         </child>
