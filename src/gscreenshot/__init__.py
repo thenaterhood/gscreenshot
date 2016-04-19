@@ -57,7 +57,8 @@ class main_window(threading.Thread):
             "on_button_selectarea_clicked": self.button_select_area_or_window_clicked,
             "on_button_saveas_clicked": self.button_saveas_clicked,
             "on_button_about_clicked": self.button_about_clicked,
-            "on_button_quit_clicked": self.button_quit_clicked}
+            "on_button_quit_clicked": self.button_quit_clicked,
+            "on_button_copy_clicked": self.handle_copy_action}
 
         self.builder.connect_signals(dic)
 
