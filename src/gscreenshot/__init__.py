@@ -317,7 +317,7 @@ class FileSaveHandler(object):
 
         if (response == gtk.RESPONSE_OK):
             return_value = chooser.get_filename()
-        elif (response == gtk.RESPONSE_CANCEL):
+        else:
             return_value = None
 
         chooser.destroy()
