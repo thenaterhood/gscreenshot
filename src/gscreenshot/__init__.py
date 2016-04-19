@@ -325,7 +325,7 @@ class FileSaveHandler(object):
 
     def _build_filename(self):
         d = datetime.now()
-        return datetime.strftime(d, "gscreenshot_%Y-%m-%d-%H%m%S.png")
+        return datetime.strftime(d, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
     def save_file(self, filename, im):
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
