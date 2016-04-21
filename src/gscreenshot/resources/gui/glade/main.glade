@@ -63,7 +63,7 @@ Version: 3.0.1
             <property name="margin_left">5</property>
             <property name="margin_top">6</property>
             <property name="margin_bottom">6</property>
-            <property name="label" translatable="yes">Take Screenshot of...</property>
+            <property name="label" translatable="yes">Take screenshot of...</property>
             <attributes>
               <attribute name="weight" value="heavy"/>
             </attributes>
@@ -212,7 +212,6 @@ Version: 3.0.1
                   <object class="GtkSpinButton" id="spinbutton1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="margin_left">17</property>
                     <property name="caps_lock_warning">False</property>
                     <property name="input_purpose">number</property>
                     <property name="adjustment">adjustment1</property>
