@@ -292,12 +292,16 @@ class FileSaveHandler(object):
         pass
 
     def run(self, image):
-        filename = self.request_file()
 
-        if filename is None:
-            return
+        success = False
 
-        self.save_file(filename, image)
+        while not success:
+            filename = self.request_file()
+
+            if filename is None:
+                return
+
+            success = self.save_file(filename, image)
 
     def request_file(self):
         chooser = gtk.FileChooserDialog(
@@ -339,6 +343,9 @@ class FileSaveHandler(object):
 
         if actual_file_ext in supported_formats:
             im.save(filename, actual_file_ext.upper())
+            return True
+        else:
+            return False
 
 def main():
     # create the main_window object and window
