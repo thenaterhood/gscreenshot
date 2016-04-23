@@ -12,7 +12,7 @@ from pkg_resources import resource_string
 from time import sleep
 
 
-class GscreenshotWindow():
+class GscreenshotWindow(object):
 
     #--------------------------------------------
     # initialization
