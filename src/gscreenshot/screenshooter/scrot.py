@@ -1,9 +1,8 @@
+import os
 import subprocess
 import tempfile
-import subprocess
-from time import sleep
 from PIL import Image
-import os
+
 
 class Scrot(object):
     """

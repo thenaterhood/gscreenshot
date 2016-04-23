@@ -234,8 +234,6 @@ class FileSaveDialog(object):
 
     def run(self):
 
-        success = False
-
         filename = self.request_file()
 
         return filename
@@ -270,7 +268,7 @@ class FileSaveDialog(object):
 def main():
     # create the main_window object and window
     app = Gscreenshot()
-    window = GscreenshotWindow(app)
+    GscreenshotWindow(app)
     gtk.main()
 #-------------------------------------------------------------------------
 
