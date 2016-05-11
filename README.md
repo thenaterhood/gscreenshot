@@ -3,7 +3,6 @@
 [![Code Climate](https://codeclimate.com/github/thenaterhood/gscreenshot/badges/gpa.svg)](https://codeclimate.com/github/thenaterhood/gscreenshot)
 [![Code Health](https://landscape.io/github/thenaterhood/gscreenshot/master/landscape.svg?style=flat)](https://landscape.io/github/thenaterhood/gscreenshot/master)
 
-[Available in the Archlinux User Repository](https://aur.archlinux.org/packages/gscreenshot/)
 
 gscreenshot is a gtk frontend for scrot, an application for taking screenshots,
 written in python and pygtk. This is a fork of the original project (last
@@ -16,6 +15,20 @@ still up and running.
 
 gscreenshot is licensed under the GPL.
 
+## Installation
+
+ArchLinux and derivatives:
+[Available in the Archlinux User Repository](https://aur.archlinux.org/packages/gscreenshot/)
+
+SparkyLinux:
+Available in your distro's repositories. Run `sudo apt-get install gscreenshot`
+
+Other distros:
+1. Download the latest version from [here](https://github.com/thenaterhood/gscreenshot/releases/latest)
+2. Unzip or untar the file (depending which you downloaded)
+3. From the command line, navigate to the unzipped files and run
+`sudo python setup.py install`
+
 ## Usage
 gscreenshot takes screenshots! Run it manually or bind it to a keystroke.
 
@@ -23,7 +36,7 @@ Buttons
 
 * "Selection" allows you to drag-select an area to screenshot
 * "Window" allows you to click a window to screenshot
-* "All" takes a screenshot of the entire screen.
+* "Everything" takes a screenshot of the entire screen.
 * "Save" brings up the file save dialog to save your screenshot
 
 Keyboard shortcuts
@@ -50,6 +63,8 @@ Don't worry about categorizing your issue properly, it'll get taken
 care of on this end.
 
 ## Requirements
+_automatically installed by the setup script or your package manager_
+
 * Python 3
 * Scrot
 * python-pillow
@@ -59,7 +74,4 @@ care of on this end.
 ## Development Requirements
 The above, plus:
 * Glade
-
-## Installation
-* Run the included setup.py script: `sudo python setup.py install`
 
