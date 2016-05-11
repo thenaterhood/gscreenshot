@@ -24,6 +24,7 @@ SparkyLinux:
 Available in your distro's repositories. Run `sudo apt-get install gscreenshot`
 
 Other distros:
+
 1. Download the latest version from [here](https://github.com/thenaterhood/gscreenshot/releases/latest)
 2. Unzip or untar the file (depending which you downloaded)
 3. From the command line, navigate to the unzipped files and run
