@@ -1,5 +1,5 @@
 [Desktop Entry]
-Version=2.5.1
+Version=2.5.2
 Type=Application
 Name=gscreenshot
 Comment=A pygtk wrapper for the 'scrot' utility
