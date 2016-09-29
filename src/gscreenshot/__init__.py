@@ -15,6 +15,7 @@ import os
 import sys
 
 from datetime import datetime
+from PIL import Image
 from gscreenshot.screenshooter.scrot import Scrot
 
 
@@ -99,6 +100,15 @@ class Gscreenshot(object):
             ]
 
         return supported_formats
+
+    def get_thumbnail(self, width, height, image=None):
+        if image is None:
+            thumbnail = self.screenshooter.get_image().copy()
+        else:
+            thumbnail = image.copy()
+
+        thumbnail.thumbnail((width, height), Image.ANTIALIAS)
+        return thumbnail
 
     def get_time_filename(self):
         """
