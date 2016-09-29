@@ -166,7 +166,7 @@ class GscreenshotWindow(object):
         about.set_title("About gscreenshot")
         about.set_license(
             resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
-        about.set_logo_icon_name("screenshot")
+        about.set_logo_icon_name("gscreenshot")
         about.connect("response", self.on_about_close)
 
         about.show()
