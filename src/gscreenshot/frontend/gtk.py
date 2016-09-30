@@ -166,7 +166,7 @@ class GscreenshotWindow(object):
         about.set_title("About gscreenshot")
         about.set_license(
             resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
-        about.set_logo_icon_name("screenshot")
+        about.set_logo_icon_name("gscreenshot")
         about.connect("response", self.on_about_close)
 
         about.show()
@@ -203,26 +203,13 @@ class GscreenshotWindow(object):
         previewPixbuf = self._image_to_pixbuf(image)
 
         allocation = self.image_preview.get_allocation()
-        # resolve the preview image width and height
-        imageHeight = previewPixbuf.get_height()
-        imageWidth = previewPixbuf.get_width()
 
-        resize_ratio = min(allocation.height/imageHeight, allocation.width/imageWidth)
-
-        previewHeight = imageHeight * resize_ratio
-        previewWidth = imageWidth * resize_ratio
-
-        previewHeight = max(allocation.height, previewHeight)
-        # Not required on python3, but resolves a bug in python2
-        previewWidth = max(allocation.width, previewWidth)
-
-        # resize the previewPixbuf to previewWidth, previewHeight
-        previewPixbuf = previewPixbuf.scale_simple(
-            previewWidth, previewHeight, gtk.gdk.INTERP_BILINEAR)
+        thumbnail = self.application.get_thumbnail(allocation.width, allocation.height, image)
+        previewPixbuf = self._image_to_pixbuf(thumbnail)
 
         # set the image_preview widget to the preview image size (previewWidth,
         # previewHeight)
-        self.image_preview.set_size_request(previewWidth, previewHeight)
+        self.image_preview.set_size_request(allocation.width, allocation.height)
 
         # view the previewPixbuf in the image_preview widget
         self.image_preview.set_from_pixbuf(previewPixbuf)

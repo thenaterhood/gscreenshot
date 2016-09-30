@@ -75,7 +75,7 @@ class Scrot(object):
         if params is None:
             params = []
 
-        params = ['scrot', self.tempfile] + params
+        params = ['scrot', '-z', self.tempfile] + params
         subprocess.check_output(params)
 
         self.image = Image.open(self.tempfile)
