@@ -200,6 +200,7 @@ class GscreenshotWindow(object):
 
     def show_preview(self, image):
         # create an image buffer (pixbuf) and insert the grabbed image
+        image = image.convert("RGB")
         previewPixbuf = self._image_to_pixbuf(image)
 
         allocation = self.image_preview.get_allocation()
