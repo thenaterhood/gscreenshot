@@ -18,9 +18,9 @@ class Scrot(Screenshooter):
 
         self._image = None
         self.tempfile = os.path.join(
-                tempfile.gettempdir(),
-                str(os.getpid()) + ".png"
-                )
+            tempfile.gettempdir(),
+            str(os.getpid()) + ".png"
+        )
 
     def grab_fullscreen(self, delay=0):
         """
@@ -97,11 +97,10 @@ class Scrot(Screenshooter):
 
         # (left, upper, right, lower)
         crop_box = (
-                int(slop_parsed['X']),
-                int(slop_parsed['Y']),
-                int(slop_parsed['X']) + int(slop_parsed['W']),
-                int(slop_parsed['Y']) + int(slop_parsed['H'])
-                )
+            int(slop_parsed['X']),
+            int(slop_parsed['Y']),
+            int(slop_parsed['X']) + int(slop_parsed['W']),
+            int(slop_parsed['Y']) + int(slop_parsed['H'])
+        )
 
         return crop_box
-
