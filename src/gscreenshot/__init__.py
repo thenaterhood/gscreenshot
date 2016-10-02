@@ -47,7 +47,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_fullscreen(delay)
-        return self.screenshooter.get_image()
+        return self.screenshooter.image
 
     def screenshot_selected(self, delay=0):
         """
@@ -62,7 +62,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_selection(delay)
-        return self.screenshooter.get_image()
+        return self.screenshooter.image
 
     def screenshot_window(self, delay=0):
         """
@@ -77,7 +77,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_window(delay)
-        return self.screenshooter.get_image()
+        return self.screenshooter.image
 
     def get_last_image(self):
         """
@@ -86,7 +86,7 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        return self.screenshooter.get_image()
+        return self.screenshooter.image
 
     def get_supported_formats(self):
         """
@@ -103,7 +103,7 @@ class Gscreenshot(object):
 
     def get_thumbnail(self, width, height, image=None):
         if image is None:
-            thumbnail = self.screenshooter.get_image().copy()
+            thumbnail = self.screenshooter.image.copy()
         else:
             thumbnail = image.copy()
 
@@ -133,7 +133,7 @@ class Gscreenshot(object):
             bool success
         """
 
-        image = self.screenshooter.get_image()
+        image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 
         if actual_file_ext == 'jpg':
