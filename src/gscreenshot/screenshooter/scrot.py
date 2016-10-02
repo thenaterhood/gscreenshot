@@ -47,7 +47,7 @@ class Scrot(Screenshooter):
             crop_box = self._get_boundary_interactive()
             self._call_scrot(['-d', str(delay)])
             self._image = self._image.crop(crop_box)
-        except FileNotFoundError:
+        except OSError:
             self._call_scrot(['-d', str(delay), '-s'])
 
     def grab_window(self, delay=0):
