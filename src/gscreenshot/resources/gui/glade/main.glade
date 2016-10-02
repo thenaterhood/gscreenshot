@@ -177,6 +177,7 @@ Version: 3.0.1
                     <property name="image_position">bottom</property>
                     <property name="active">True</property>
                     <property name="draw_indicator">True</property>
+                    <signal name="toggled" handler="hide_window_toggled" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -219,6 +220,7 @@ Version: 3.0.1
                     <property name="adjustment">adjustment1</property>
                     <property name="climb_rate">1</property>
                     <property name="numeric">True</property>
+                    <signal name="value-changed" handler="delay_value_changed" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
