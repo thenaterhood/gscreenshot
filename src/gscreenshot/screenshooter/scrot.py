@@ -45,8 +45,9 @@ class Scrot(Screenshooter):
 
         try:
             crop_box = self._get_boundary_interactive()
-            self._call_scrot(['-d', str(delay)])
-            self._image = self._image.crop(crop_box)
+            if crop_box is not None:
+                self._call_scrot(['-d', str(delay)])
+                self._image = self._image.crop(crop_box)
         except OSError:
             self._call_scrot(['-d', str(delay), '-s'])
 
@@ -75,17 +76,23 @@ class Scrot(Screenshooter):
             params = []
 
         params = ['scrot', '-z', self.tempfile] + params
-        subprocess.check_output(params)
-
-        self._image = Image.open(self.tempfile)
-        os.unlink(self.tempfile)
+        try:
+            subprocess.check_output(params)
+            self._image = Image.open(self.tempfile)
+            os.unlink(self.tempfile)
+        except subprocess.CalledProcessError:
+            pass
 
     def _get_boundary_interactive(self):
         """
         Calls slop and returns the boundary produced by
         slop
         """
-        proc_output = subprocess.check_output(['slop'])
+        try:
+            proc_output = subprocess.check_output(['slop', '--nodecoration'])
+        except subprocess.CalledProcessError:
+            return None
+
         slop_output = proc_output.decode("UTF-8").strip().split("\n")
 
         slop_parsed = {}
