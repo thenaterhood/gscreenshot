@@ -5,64 +5,39 @@ pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
 from gi.repository import Gdk
-from gi.repository import Gtk as gtk
+from gi.repository import Gtk
 from gscreenshot import Gscreenshot
 
 from pkg_resources import resource_string
 from time import sleep
 
 
-class GscreenshotWindow(object):
+class Controller(object):
 
-    #--------------------------------------------
-    # initialization
-    #--------------------------------------------
+    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview')
 
-    def __init__(self, application):
+    def __init__(self, application, builder):
+        self._app = application
+        self._window = builder.get_object('window_main')
+        self._preview = builder.get_object('image1')
+        self._delay = 0
+        self._hide = True
 
-        self.builder = gtk.Builder()
-        self.application = application
+        self._app.screenshot_full_display()
+        self._show_preview(self._app.get_last_image())
 
-        self.builder.add_from_string(resource_string(
-            'gscreenshot.resources.gui.glade', 'main.glade').decode("UTF-8"))
+    def take_screenshot(self, app_method):
+        if self._hide:
+            self._window.hide()
 
-        self.window = self.builder.get_object('window_main')
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
-        # show the (main) window in the center of the screen
-        self.window.set_position(gtk.WIN_POS_CENTER)
+        sleep(0.2)
+        screenshot = app_method(self._delay)
+        self._show_preview(screenshot)
 
-        # create a signal dictionary and connect it to the handler functions
-        dic = {
-            "on_window_main_destroy": self.quit,
-            "on_button_all_clicked": self.button_all_clicked,
-            "on_button_window_clicked": self.button_select_area_or_window_clicked,
-            "on_button_selectarea_clicked": self.button_select_area_or_window_clicked,
-            "on_button_saveas_clicked": self.button_saveas_clicked,
-            "on_button_about_clicked": self.button_about_clicked,
-            "on_button_quit_clicked": self.button_quit_clicked,
-            "on_button_copy_clicked": self.handle_copy_action}
-
-        self.builder.connect_signals(dic)
-
-        accel = gtk.AccelGroup()
-        accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK, 0, self.button_saveas_clicked)
-        accel.connect(Gdk.keyval_from_name('C'), Gdk.ModifierType.CONTROL_MASK, 0, self.handle_copy_action)
-        self.window.add_accel_group(accel)
-
-        self.window.connect("key-press-event", self.handle_keypress)
-
-        # create objects from selected widgets in the main window
-        self.image_preview = self.builder.get_object("image1")
-        self.hide_check = self.builder.get_object("checkbutton1")
-        self.delay_setter = self.builder.get_object("spinbutton1")
-        self.button_saveas = self.builder.get_object("button_saveas")
-
-        screenshot = self.application.screenshot_full_display()
-        self.show_preview(screenshot)
-
-    #--------------------------------------------
-    # signal handlers
-    #--------------------------------------------
+        self._window.show_all()
 
     def handle_keypress(self, widget=None, event=None, *args):
         """
@@ -71,87 +46,77 @@ class GscreenshotWindow(object):
         modifiers).
         """
         shortcuts = {
-                gtk.gdk.keyval_to_lower(gtk.gdk.keyval_from_name('Escape')): self.button_quit_clicked
+                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')): self.on_button_quit_clicked
                 }
 
         if event.keyval in shortcuts:
             shortcuts[event.keyval]()
 
-    def take_screenshot(self, hide, delay, app_method):
-        if hide:
-            self.window.hide()
+    def hide_window_toggled(self, widget):
+        self._hide = widget.get_active()
 
-        while gtk.events_pending():
-            gtk.main_iteration()
+    def delay_value_changed(self, widget):
+        self._delay = widget.get_value()
 
-        sleep(0.2)
-        screenshot = app_method(delay)
-        self.show_preview(screenshot)
-
-        self.window.show_all()
-
-    #
-    #---- button_all_clicked  :grab a screenshot of the whole screen
-    #
-    def button_all_clicked(self, *args):
+    def on_button_all_clicked(self, *args):
 
         self.take_screenshot(
-            self.hide_check.get_active(),
-            self.delay_setter.get_value(),
-            self.application.screenshot_full_display
+            self._app.screenshot_full_display
             )
 
-    def button_select_area_or_window_clicked(self, *args):
+    def on_button_window_clicked(self, *args):
+        self._button_select_area_or_window_clicked(args)
+
+    def on_button_selectarea_clicked(self, *args):
+        self._button_select_area_or_window_clicked(args)
+
+    def _button_select_area_or_window_clicked(self, *args):
 
         self.take_screenshot(
-            self.hide_check.get_active(),
-            self.delay_setter.get_value(),
-            self.application.screenshot_selected
+            self._app.screenshot_selected
             )
-    #
-    #---- button_saveas_clicked  :save the grabbed screenshot
-    #
-    def button_saveas_clicked(self, *args):
+
+    def on_button_saveas_clicked(self, *args):
         # make the main window unsensitive while saving your image
-        self.window.set_sensitive(False)
+        self._window.set_sensitive(False)
 
         self.handle_save_action()
 
-        self.window.set_sensitive(True)
+        self._window.set_sensitive(True)
 
     def handle_save_action(self):
         saved = False
         cancelled = False
-        save_dialog = FileSaveDialog(self.application.get_time_filename())
+        save_dialog = FileSaveDialog(
+                self._app.get_time_filename(),
+                self._window
+                )
 
         while not (saved or cancelled):
             fname = save_dialog.run()
             if fname is not None:
-                saved = self.application.save_last_image(fname)
+                saved = self._app.save_last_image(fname)
             else:
                 cancelled = True
 
-    def handle_copy_action(self, *args):
+    def on_button_copy_clicked(self, *args):
         """
         Copy the current screenshot to the clipboard
         """
-
-        clipboard = gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        img = self.application.get_last_image()
+        print(args)
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        img = self._app.get_last_image()
         pixbuf = self._image_to_pixbuf(img)
         clipboard.set_image(pixbuf)
         clipboard.store()
 
-    #
-    #---- button_about_clicked  :show the "about" dialog
-    #
-    def button_about_clicked(self, *args):
+    def on_button_about_clicked(self, *args):
         # make the main window unsensitive while viewing the "about"
         # information
-        self.window.set_sensitive(False)
+        self._window.set_sensitive(False)
 
         # send the "about" dialog object a request to create it's window
-        about = gtk.AboutDialog()
+        about = Gtk.AboutDialog(transient_for=self._window)
 
         authors = [
             "Nate Levesque <public@thenaterhood.com>",
@@ -173,51 +138,50 @@ class GscreenshotWindow(object):
 
     def on_about_close(self, action, *args):
         action.destroy()
-        self.window.set_sensitive(True)
+        self._window.set_sensitive(True)
 
-    #
-    #---- button_quit_clicked  :quit the application
-    #
-    def button_quit_clicked(self, widget=None):
+    def on_button_quit_clicked(self, widget=None):
+        self.quit(widget)
+
+    def on_window_main_destroy(self, widget=None):
         self.quit(widget)
 
     def quit(self, widget):
-        self.application.quit()
+        self._app.quit()
 
-    #--------------------------------------------
-    # other functions
-    #--------------------------------------------
     def _image_to_pixbuf(self, image):
         fd = io.BytesIO()
+        image = image.convert("RGB")
         image.save(fd, "ppm")
         contents = fd.getvalue()
         fd.close()
-        loader = gtk.gdk.PixbufLoader("pnm")
+        loader = Gtk.gdk.PixbufLoader("pnm")
         loader.write(contents)
         pixbuf = loader.get_pixbuf()
         loader.close()
         return pixbuf
 
-    def show_preview(self, image):
+    def _show_preview(self, image):
         # create an image buffer (pixbuf) and insert the grabbed image
         previewPixbuf = self._image_to_pixbuf(image)
 
-        allocation = self.image_preview.get_allocation()
+        allocation = self._preview.get_allocation()
 
-        thumbnail = self.application.get_thumbnail(allocation.width, allocation.height, image)
+        thumbnail = self._app.get_thumbnail(allocation.width, allocation.height, image)
         previewPixbuf = self._image_to_pixbuf(thumbnail)
 
         # set the image_preview widget to the preview image size (previewWidth,
         # previewHeight)
-        self.image_preview.set_size_request(allocation.width, allocation.height)
+        self._preview.set_size_request(allocation.width, allocation.height)
 
         # view the previewPixbuf in the image_preview widget
-        self.image_preview.set_from_pixbuf(previewPixbuf)
+        self._preview.set_from_pixbuf(previewPixbuf)
 
 class FileSaveDialog(object):
 
-    def __init__(self, default_filename=None):
+    def __init__(self, default_filename=None, parent=None):
         self.default_filename = default_filename
+        self.parent = parent
 
     def run(self):
 
@@ -226,14 +190,15 @@ class FileSaveDialog(object):
         return filename
 
     def request_file(self):
-        chooser = gtk.FileChooserDialog(
+        chooser = Gtk.FileChooserDialog(
+                transient_for=self.parent,
                 title=None,
-                action=gtk.FILE_CHOOSER_ACTION_SAVE,
+                action=Gtk.FILE_CHOOSER_ACTION_SAVE,
                 buttons=(
-                    gtk.STOCK_CANCEL,
-                    gtk.RESPONSE_CANCEL,
-                    gtk.STOCK_SAVE,
-                    gtk.RESPONSE_OK
+                    Gtk.STOCK_CANCEL,
+                    Gtk.RESPONSE_CANCEL,
+                    Gtk.STOCK_SAVE,
+                    Gtk.RESPONSE_OK
                     )
                 )
 
@@ -244,7 +209,7 @@ class FileSaveDialog(object):
 
         response = chooser.run()
 
-        if (response == gtk.RESPONSE_OK):
+        if (response == Gtk.RESPONSE_OK):
             return_value = chooser.get_filename()
         else:
             return_value = None
@@ -252,12 +217,31 @@ class FileSaveDialog(object):
         chooser.destroy()
         return return_value
 
+
 def main():
-    # create the main_window object and window
-    app = Gscreenshot()
-    GscreenshotWindow(app)
-    gtk.main()
-#-------------------------------------------------------------------------
+    builder = Gtk.Builder()
+    builder.add_from_string(resource_string(
+        'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
+
+    window = builder.get_object('window_main')
+    window.set_position(Gtk.WIN_POS_CENTER)
+
+    application = Gscreenshot()
+    handler = Controller(
+            application,
+            builder,
+            )
+
+    accel = Gtk.AccelGroup()
+    accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_saveas_clicked)
+    accel.connect(Gdk.keyval_from_name('C'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_copy_clicked)
+    window.add_accel_group(accel)
+    window.connect("key-press-event", handler.handle_keypress)
+
+    builder.connect_signals(handler)
+
+    window.show_all()
+    Gtk.main()
 
 if __name__ == "__main__":
     main()

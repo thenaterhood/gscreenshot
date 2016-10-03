@@ -66,11 +66,12 @@ care of on this end.
 ## Requirements
 _automatically installed by the setup script or your package manager_
 
-* Python 3
+* Python 2.7 or Python 3
 * Scrot
 * python-pillow
 * python-gobject
 * Setuptools
+* Slop (Optional; used for improved region and window selection)
 
 ## Development Requirements
 The above, plus:
