@@ -42,6 +42,7 @@ setup(name='gscreenshot',
         'gscreenshot',
         'gscreenshot.frontend',
         'gscreenshot.screenshooter',
+        'gscreenshot.selector',
         'gscreenshot.resources',
         'gscreenshot.resources.gui',
         'gscreenshot.resources.gui.glade'
