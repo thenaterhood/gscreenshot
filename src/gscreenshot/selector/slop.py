@@ -1,8 +1,7 @@
-import os
 import subprocess
 
 
-class Slop():
+class Slop(object):
 
     """
     Python class wrapper for the slop region selection tool
