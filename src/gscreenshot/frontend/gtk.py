@@ -241,7 +241,7 @@ def main():
 
     builder.connect_signals(handler)
 
-    with SignalHandler() as sh:
+    with SignalHandler():
         window.show_all()
         Gtk.main()
 
