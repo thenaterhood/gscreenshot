@@ -2,11 +2,13 @@ import os
 import subprocess
 import tempfile
 from PIL import Image
+from time import sleep
+
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.selector.slop import Slop
 
 
-class Scrot(Screenshooter):
+class Imlib2(Screenshooter):
 
     """
     Python class wrapper for the scrot screenshooter utility
@@ -31,7 +33,8 @@ class Scrot(Screenshooter):
         Parameters:
             int delay, in seconds
         """
-        self._call_scrot(['-d', str(delay)])
+        sleep(delay)
+        self._call_imlib_grab()
 
     def grab_selection(self, delay=0):
         """
@@ -44,14 +47,15 @@ class Scrot(Screenshooter):
         Parameters:
             int delay: seconds
         """
+        sleep(delay)
 
         try:
             crop_box = self.selector.region_select()
             if crop_box is not None:
-                self._call_scrot(['-d', str(delay)])
+                self._call_imlib_grab()
                 self._image = self._image.crop(crop_box)
         except OSError:
-            self._call_scrot(['-d', str(delay), '-s'])
+            self._call_imlib_grab()
 
     def grab_window(self, delay=0):
         """
@@ -63,7 +67,7 @@ class Scrot(Screenshooter):
         """
         self.grab_selection(delay)
 
-    def _call_scrot(self, params=None):
+    def _call_imlib_grab(self, params=None):
         """
         Performs a subprocess call to scrot with a given list of
         parameters.
@@ -77,7 +81,7 @@ class Scrot(Screenshooter):
         if params is None:
             params = []
 
-        params = ['scrot', '-z', self.tempfile] + params
+        params = ['imlib2_grab', self.tempfile] + params
         try:
             subprocess.check_output(params)
             self._image = Image.open(self.tempfile)

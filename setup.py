@@ -24,7 +24,7 @@ data_files =[
 
 
 setup(name='gscreenshot',
-    version='2.5.4',
+    version='2.5.5',
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
@@ -42,6 +42,7 @@ setup(name='gscreenshot',
         'gscreenshot',
         'gscreenshot.frontend',
         'gscreenshot.screenshooter',
+        'gscreenshot.selector',
         'gscreenshot.resources',
         'gscreenshot.resources.gui',
         'gscreenshot.resources.gui.glade'
