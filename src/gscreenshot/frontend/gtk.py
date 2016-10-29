@@ -7,6 +7,7 @@ pygtkcompat.enable_gtk(version='3.0')
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gscreenshot import Gscreenshot
+from gscreenshot.frontend import SignalHandler
 
 from pkg_resources import resource_string
 from time import sleep
@@ -240,8 +241,9 @@ def main():
 
     builder.connect_signals(handler)
 
-    window.show_all()
-    Gtk.main()
+    with SignalHandler() as sh:
+        window.show_all()
+        Gtk.main()
 
 if __name__ == "__main__":
     main()
