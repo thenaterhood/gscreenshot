@@ -29,6 +29,10 @@ class Controller(object):
 
     def take_screenshot(self, app_method):
         if self._hide:
+            # We set the opacity to 0 because hiding the window is
+            # subject to window closing effects, which can take long
+            # enough that the window will still appear in the screenshot
+            self._window.set_opacity(0)
             self._window.hide()
 
         while Gtk.events_pending():
@@ -38,6 +42,7 @@ class Controller(object):
         screenshot = app_method(self._delay)
         self._show_preview(screenshot)
 
+        self._window.set_opacity(1)
         self._window.show_all()
 
     def handle_keypress(self, widget=None, event=None, *args):
