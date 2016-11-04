@@ -29,6 +29,9 @@ class Controller(object):
 
     def take_screenshot(self, app_method):
         if self._hide:
+            # We set the opacity to 0 because hiding the window is
+            # subject to window closing effects, which can take long
+            # enough that the window will still appear in the screenshot
             self._window.set_opacity(0)
             self._window.hide()
 
