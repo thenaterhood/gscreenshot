@@ -28,7 +28,9 @@ Other distros:
 1. Download the latest version from [here](https://github.com/thenaterhood/gscreenshot/releases/latest)
 2. Unzip or untar the file (depending which you downloaded)
 3. From the command line, navigate to the unzipped files and run
-`sudo python setup.py install`
+`sudo pip install -e .` NOTE: you *can* install gscreenshot by running
+`sudo python setup.py install` but that method will not automatically handle
+dependencies for you.
 
 ## Usage
 gscreenshot takes screenshots! Run it manually or bind it to a keystroke.
