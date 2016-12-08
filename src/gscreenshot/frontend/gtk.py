@@ -95,6 +95,7 @@ class Controller(object):
         cancelled = False
         save_dialog = FileSaveDialog(
                 self._app.get_time_filename(),
+                self._app.get_last_save_directory(),
                 self._window
                 )
 
@@ -185,8 +186,9 @@ class Controller(object):
 
 class FileSaveDialog(object):
 
-    def __init__(self, default_filename=None, parent=None):
+    def __init__(self, default_filename=None, default_folder=None, parent=None):
         self.default_filename = default_filename
+        self.default_folder = default_folder
         self.parent = parent
 
     def run(self):
@@ -210,6 +212,9 @@ class FileSaveDialog(object):
 
         if self.default_filename is not None:
             chooser.set_current_name(self.default_filename)
+
+        if self.default_folder is not None:
+            chooser.set_current_folder(self.default_folder)
 
         chooser.set_do_overwrite_confirmation(True)
 
