@@ -33,6 +33,7 @@ class Gscreenshot(object):
             screenshooter = Scrot()
 
         self.screenshooter = screenshooter
+        self.last_save_directory = os.path.expanduser("~")
 
     def screenshot_full_display(self, delay=0):
         """
@@ -142,10 +143,14 @@ class Gscreenshot(object):
         supported_formats = self.get_supported_formats()
 
         if actual_file_ext in supported_formats:
+            self.last_save_directory = os.path.dirname(filename)
             image.save(filename, actual_file_ext.upper())
             return True
         else:
             return False
+
+    def get_last_save_directory(self):
+        return self.last_save_directory
 
     def quit(self):
         """

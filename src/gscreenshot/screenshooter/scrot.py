@@ -1,7 +1,7 @@
 import os
 import subprocess
 import tempfile
-from PIL import Image
+import PIL.Image
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.selector.slop import Slop
 
@@ -80,7 +80,7 @@ class Scrot(Screenshooter):
         params = ['scrot', '-z', self.tempfile] + params
         try:
             subprocess.check_output(params)
-            self._image = Image.open(self.tempfile)
+            self._image = PIL.Image.open(self.tempfile)
             os.unlink(self.tempfile)
         except subprocess.CalledProcessError:
             pass

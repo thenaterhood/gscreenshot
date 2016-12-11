@@ -1,7 +1,7 @@
 import os
 import subprocess
 import tempfile
-from PIL import Image
+import PIL.Image
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
@@ -84,7 +84,7 @@ class Imlib2(Screenshooter):
         params = ['imlib2_grab', self.tempfile] + params
         try:
             subprocess.check_output(params)
-            self._image = Image.open(self.tempfile)
+            self._image = PIL.Image.open(self.tempfile)
             os.unlink(self.tempfile)
         except subprocess.CalledProcessError:
             pass
