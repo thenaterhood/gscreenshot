@@ -121,7 +121,7 @@ class Gscreenshot(object):
         d = datetime.now()
         return datetime.strftime(d, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
-    def save_last_image(self, filename):
+    def save_last_image(self, filename = None):
         """
         Saves the last screenshot taken with a given filename.
         Returns a boolean for success or fail. A supported file
@@ -133,6 +133,9 @@ class Gscreenshot(object):
         Returns:
             bool success
         """
+
+        if (filename is None):
+            filename = self.get_time_filename()
 
         image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()

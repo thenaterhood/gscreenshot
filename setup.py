@@ -34,6 +34,9 @@ setup(name='gscreenshot',
     entry_points={
         'gui_scripts': [
             'gscreenshot = gscreenshot.frontend.gtk:main'
+        ],
+        'console_scripts': [
+            'gscreenshot-cli = gscreenshot.frontend.cli:main'
         ]
     },
     test_suite='nose.collector',
