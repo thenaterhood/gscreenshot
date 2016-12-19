@@ -1,10 +1,9 @@
 from gscreenshot import Gscreenshot
 from gscreenshot.frontend import SignalHandler
-from time import sleep
 
 import argparse
 
-def main():
+def run():
 
     gscreenshot = Gscreenshot()
     parser = argparse.ArgumentParser()
@@ -41,3 +40,7 @@ def main():
         gscreenshot.save_last_image(args.filename)
     else:
         gscreenshot.save_last_image()
+
+def main():
+    with SignalHandler():
+        run()
