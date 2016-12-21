@@ -125,19 +125,26 @@ class Controller(object):
         # send the "about" dialog object a request to create it's window
         about = Gtk.AboutDialog(transient_for=self._window)
 
-        authors = [
-            "Nate Levesque <public@thenaterhood.com>",
-            "Original Author (2006)",
-            "matej.horvath <matej.horvath@gmail.com>"
-        ]
+        authors = self._app.get_program_authors()
         about.set_authors(authors)
-        about.set_comments("A simple GUI frontend for scrot")
-        about.set_website("https://github.com/thenaterhood/gscreenshot")
-        about.set_website_label("github.com/thenaterhood/gscreenshot")
-        about.set_program_name("gscreenshot")
+
+        description = self._app.get_program_description()
+        about.set_comments(description)
+
+        website = self._app.get_program_website()
+        about.set_website(website)
+        about.set_website_label(website)
+
+        name = self._app.get_program_name()
+        about.set_program_name(name)
         about.set_title("About gscreenshot")
-        about.set_license(
-            resource_string('gscreenshot.resources', 'LICENSE').decode("UTF-8"))
+
+        license = self._app.get_program_license_text()
+        about.set_license(license)
+
+        version = self._app.get_program_version()
+        about.set_version(version)
+
         about.set_logo_icon_name("gscreenshot")
         about.connect("response", self.on_about_close)
 
