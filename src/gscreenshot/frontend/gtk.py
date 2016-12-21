@@ -139,8 +139,8 @@ class Controller(object):
         about.set_program_name(name)
         about.set_title("About gscreenshot")
 
-        license = self._app.get_program_license_text()
-        about.set_license(license)
+        license_text = self._app.get_program_license_text()
+        about.set_license(license_text)
 
         version = self._app.get_program_version()
         about.set_version(version)

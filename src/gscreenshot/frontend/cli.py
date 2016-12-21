@@ -44,7 +44,7 @@ def run():
         authors = gscreenshot.get_program_authors()
         website = gscreenshot.get_program_website()
         description = gscreenshot.get_program_description()
-        license = gscreenshot.get_program_license()
+        license_name = gscreenshot.get_program_license()
         name = gscreenshot.get_program_name()
         version = gscreenshot.get_program_version()
 
@@ -54,7 +54,7 @@ def run():
         print("Author(s)")
         print("\n".join(authors))
         print("")
-        print("Licensed as {0}".format(license))
+        print("Licensed as {0}".format(license_name))
         sys.exit(0)
 
     if (args.selection is not False):
