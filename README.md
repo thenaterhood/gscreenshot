@@ -33,7 +33,14 @@ Other distros:
 dependencies for you.
 
 ## Usage
-gscreenshot takes screenshots! Run it manually or bind it to a keystroke.
+gscreenshot takes screenshots! Run it manually or bind it to a keystroke. Both a graphical (gscreenshot) and CLI (gscreenshot-cli) interface are available.
+
+### Command Line
+Run `gscreenshot-cli --help` for instructions. The shell interface is
+non-interactive so it is suitable for use in scripts and pre-built
+calls.
+
+### Graphical
 
 Buttons
 
