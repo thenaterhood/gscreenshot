@@ -15,6 +15,8 @@ import os
 import sys
 
 from datetime import datetime
+from pkg_resources import resource_string
+from pkg_resources import require
 from PIL import Image
 from gscreenshot.screenshooter.scrot import Scrot
 
@@ -121,7 +123,7 @@ class Gscreenshot(object):
         d = datetime.now()
         return datetime.strftime(d, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
-    def save_last_image(self, filename):
+    def save_last_image(self, filename = None):
         """
         Saves the last screenshot taken with a given filename.
         Returns a boolean for success or fail. A supported file
@@ -133,6 +135,9 @@ class Gscreenshot(object):
         Returns:
             bool success
         """
+
+        if (filename is None):
+            filename = self.get_time_filename()
 
         image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
@@ -151,6 +156,39 @@ class Gscreenshot(object):
 
     def get_last_save_directory(self):
         return self.last_save_directory
+
+    def get_program_authors(self):
+        authors = [
+                "Nate Levesque <public@thenaterhood.com>",
+                "Original Author (2006)",
+                "matej.horvath <matej.horvath@gmail.com>"
+                ]
+
+        return authors
+
+    def get_program_description(self):
+
+        return "A simple screenshot tool"
+
+    def get_program_website(self):
+
+        return "https://github.com/thenaterhood/gscreenshot"
+
+    def get_program_name(self):
+
+        return "gscreenshot"
+
+    def get_program_license_text(self):
+
+        return resource_string('gscreenshot.resources', 'LICENSE').decode('UTF-8')
+
+    def get_program_license(self):
+
+        return "GPLv2"
+
+    def get_program_version(self):
+
+        return require("gscreenshot")[0].version
 
     def quit(self):
         """

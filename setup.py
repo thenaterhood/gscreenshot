@@ -24,7 +24,7 @@ data_files =[
 
 
 setup(name='gscreenshot',
-    version='2.5.7',
+    version='2.6.0',
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
@@ -34,6 +34,9 @@ setup(name='gscreenshot',
     entry_points={
         'gui_scripts': [
             'gscreenshot = gscreenshot.frontend.gtk:main'
+        ],
+        'console_scripts': [
+            'gscreenshot-cli = gscreenshot.frontend.cli:main'
         ]
     },
     test_suite='nose.collector',
