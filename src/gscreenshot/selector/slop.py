@@ -50,11 +50,13 @@ class Slop(object):
         slop
         """
         try:
-            proc_output = subprocess.check_output(['slop', '--nodecoration'])
+            # nodecorations=0 - this is the slop default, but there's a bug
+            # so skipping the "=0" causes a segfault.
+            proc_output = subprocess.check_output(['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'])
         except subprocess.CalledProcessError:
             return None
 
-        slop_output = proc_output.decode("UTF-8").strip().split("\n")
+        slop_output = proc_output.decode("UTF-8").strip().split(",")
 
         slop_parsed = {}
         # We iterate through the output so we're not reliant
