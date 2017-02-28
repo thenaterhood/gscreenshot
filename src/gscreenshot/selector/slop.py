@@ -50,7 +50,7 @@ class Slop(object):
         slop
         """
         try:
-            proc_output = subprocess.check_output(['slop', '--nodecoration'])
+            proc_output = subprocess.check_output(['slop', '--nodecorations'])
         except subprocess.CalledProcessError:
             return None
 
