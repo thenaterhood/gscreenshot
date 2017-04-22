@@ -1,4 +1,5 @@
 import subprocess
+from gscreenshot.selector import SelectionParseError, SelectionExecError
 
 
 class Slop(object):
@@ -54,7 +55,7 @@ class Slop(object):
             # so skipping the "=0" causes a segfault.
             proc_output = subprocess.check_output(['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'])
         except subprocess.CalledProcessError:
-            return None
+            raise SelectionExecError("Slop failed to return a selection")
 
         slop_output = proc_output.decode("UTF-8").strip().split(",")
 
@@ -66,11 +67,14 @@ class Slop(object):
             slop_parsed[spl[0]] = spl[1]
 
         # (left, upper, right, lower)
-        crop_box = (
-            int(slop_parsed['X']),
-            int(slop_parsed['Y']),
-            int(slop_parsed['X']) + int(slop_parsed['W']),
-            int(slop_parsed['Y']) + int(slop_parsed['H'])
-        )
+        try:
+            crop_box = (
+                int(slop_parsed['X']),
+                int(slop_parsed['Y']),
+                int(slop_parsed['X']) + int(slop_parsed['W']),
+                int(slop_parsed['Y']) + int(slop_parsed['H'])
+            )
+        except KeyError:
+            raise SelectionParseError("Unexpected slop output")
 
         return crop_box
