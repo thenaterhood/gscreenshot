@@ -18,12 +18,7 @@ class Imlib2(Screenshooter):
         """
         constructor
         """
-
-        self._image = None
-        self.tempfile = os.path.join(
-            tempfile.gettempdir(),
-            str(os.getpid()) + ".png"
-        )
+        Screenshooter.__init__(self)
         self.selector = Slop()
 
     def grab_fullscreen(self, delay=0):
@@ -35,37 +30,6 @@ class Imlib2(Screenshooter):
         """
         sleep(delay)
         self._call_imlib_grab()
-
-    def grab_selection(self, delay=0):
-        """
-        Takes an interactive screenshot of a selected area with a
-        given delay. This attempts to use slop to select an
-        area rather than using scrot's builtin selection as
-        scrot's builtin selection does not work well, but will
-        fall back on scrot's if slop is not available.
-
-        Parameters:
-            int delay: seconds
-        """
-        sleep(delay)
-
-        try:
-            crop_box = self.selector.region_select()
-            if crop_box is not None:
-                self._call_imlib_grab()
-                self._image = self._image.crop(crop_box)
-        except OSError:
-            self._call_imlib_grab()
-
-    def grab_window(self, delay=0):
-        """
-        Takes an interactive screenshot of a selected window with a
-        given delay
-
-        Parameters:
-            int delay: seconds
-        """
-        self.grab_selection(delay)
 
     def _call_imlib_grab(self, params=None):
         """
@@ -88,4 +52,3 @@ class Imlib2(Screenshooter):
             os.unlink(self.tempfile)
         except subprocess.CalledProcessError:
             pass
-
