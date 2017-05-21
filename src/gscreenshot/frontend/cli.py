@@ -3,6 +3,25 @@ from gscreenshot.frontend import SignalHandler
 
 import argparse
 import sys
+import os
+import tempfile
+import subprocess
+
+def xclip_image_file(imagefname):
+    params = [
+            'xclip',
+            '-i',
+            imagefname,
+            '-selection',
+            'clipboard',
+            '-t',
+            'image/png'
+            ]
+    try:
+        subprocess.Popen(params, close_fds=True, stdin=None, stdout=None, stderr=None)
+        return True
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
 
 def run():
 
@@ -10,33 +29,40 @@ def run():
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
-        '-d',
-        '--delay',
-        required=False,
-        default=0,
-        help="How many seconds to wait before taking the screenshot. Defaults to 0."
-        )
+            '-d',
+            '--delay',
+            required=False,
+            default=0,
+            help="How many seconds to wait before taking the screenshot. Defaults to 0."
+            )
     parser.add_argument(
-        '-f',
-        '--filename',
-        required=False,
-        default=False,
-        help="Where to store the screenshot file. Defaults to gscreenshot_<time>.png."
-        )
+            '-f',
+            '--filename',
+            required=False,
+            default=False,
+            help="Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy."
+            )
     parser.add_argument(
-        '-s',
-        '--selection',
-        required=False,
-        action='store_true',
-        help="Choose a window or select a region to screenshot."
-        )
+            '-c',
+            '--clip',
+            required=False,
+            action='store_true',
+            help="Copy the image to the clipboard. Requires xclip to be installed. This can be paired with -f to save and copy together."
+            )
     parser.add_argument(
-        '-V',
-        '--version',
-        required=False,
-        action='store_true',
-        help="Show information about gscreenshot"
-        )
+            '-s',
+            '--selection',
+            required=False,
+            action='store_true',
+            help="Choose a window or select a region to screenshot."
+            )
+    parser.add_argument(
+            '-V',
+            '--version',
+            required=False,
+            action='store_true',
+            help="Show information about gscreenshot"
+            )
 
     args = parser.parse_args()
 
@@ -64,8 +90,20 @@ def run():
 
     if (args.filename is not False):
         gscreenshot.save_last_image(args.filename)
-    else:
+    elif (args.clip is False):
         gscreenshot.save_last_image()
+
+    if (args.clip is not False):
+        tmp_file = os.path.join(
+                tempfile.gettempdir(),
+                'gscreenshot-cli-clip.png'
+                )
+        gscreenshot.save_last_image(tmp_file)
+        successful_clip = xclip_image_file(tmp_file)
+
+        if (not successful_clip):
+            print("Could not clip image! Xclip failed to run - is it installed?")
+            print("Your screenshot was saved to " + tmp_file)
 
 def main():
     with SignalHandler():

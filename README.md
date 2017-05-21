@@ -80,7 +80,10 @@ _automatically installed by the setup script or your package manager_
 * python-pillow
 * python-gobject
 * Setuptools
-* Slop (Optional; used for improved region and window selection)
+
+_Optional, but recommended_
+* Slop (used for improved region and window selection)
+* Xclip (for command line clipboard functionality)
 
 ## Development Requirements
 The above, plus:
