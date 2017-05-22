@@ -118,7 +118,13 @@ class Controller(object):
         clipboard.store()
 
     def on_button_open_clicked(self, *args):
-        self._app.open_last_screenshot()
+        success = self._app.open_last_screenshot()
+        if (not success):
+            md = Gtk.MessageDialog(self._window,
+                Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_WARNING,
+                Gtk.BUTTONS_OK, "Please install xdg-open to open files.")
+            md.run()
+            md.destroy()
 
     def on_button_about_clicked(self, *args):
         # make the main window unsensitive while viewing the "about"
