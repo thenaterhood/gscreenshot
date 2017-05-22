@@ -13,6 +13,8 @@
 #--------------------------------------------
 import os
 import sys
+import subprocess
+import tempfile
 
 from datetime import datetime
 from pkg_resources import resource_string
@@ -152,6 +154,26 @@ class Gscreenshot(object):
             image.save(filename, actual_file_ext.upper())
             return True
         else:
+            return False
+
+    def open_last_screenshot(self):
+        """
+        Calls xdg to open the screenshot in its default application
+
+        Returns:
+            bool success
+        """
+        screenshot_fname = os.path.join(
+                tempfile.gettempdir(),
+                self.get_time_filename()
+                )
+
+        self.save_last_image(screenshot_fname)
+
+        try:
+            subprocess.Popen(['xdg-open', screenshot_fname])
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError):
             return False
 
     def get_last_save_directory(self):

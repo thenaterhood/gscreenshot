@@ -117,6 +117,9 @@ class Controller(object):
         clipboard.set_image(pixbuf)
         clipboard.store()
 
+    def on_button_open_clicked(self, *args):
+        self._app.open_last_screenshot()
+
     def on_button_about_clicked(self, *args):
         # make the main window unsensitive while viewing the "about"
         # information
@@ -253,6 +256,7 @@ def main():
     accel = Gtk.AccelGroup()
     accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_saveas_clicked)
     accel.connect(Gdk.keyval_from_name('C'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_copy_clicked)
+    accel.connect(Gdk.keyval_from_name('O'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_open_clicked)
     window.add_accel_group(accel)
     window.connect("key-press-event", handler.handle_keypress)
 
