@@ -84,6 +84,7 @@ _automatically installed by the setup script or your package manager_
 _Optional, but recommended_
 * Slop (used for improved region and window selection)
 * Xclip (for command line clipboard functionality)
+* xdg-open (for opening screenshots in your image viewer)
 
 ## Development Requirements
 The above, plus:
