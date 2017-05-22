@@ -53,6 +53,7 @@ Keyboard shortcuts
 
 * Control+S opens the save dialog
 * Control+C copies the screenshot to the clipboard
+* Control+O opens your screenshot in your default image application
 * Escape quits the application
 
 ## Contributing
@@ -84,6 +85,7 @@ _automatically installed by the setup script or your package manager_
 _Optional, but recommended_
 * Slop (used for improved region and window selection)
 * Xclip (for command line clipboard functionality)
+* xdg-open (for opening screenshots in your image viewer)
 
 ## Development Requirements
 The above, plus:

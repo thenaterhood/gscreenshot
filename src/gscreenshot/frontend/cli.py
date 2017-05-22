@@ -50,6 +50,13 @@ def run():
             help="Copy the image to the clipboard. Requires xclip to be installed. This can be paired with -f to save and copy together."
             )
     parser.add_argument(
+            '-o',
+            '--open',
+            required=False,
+            action='store_true',
+            help="Open the screenshot in your default viewer."
+            )
+    parser.add_argument(
             '-s',
             '--selection',
             required=False,
@@ -92,6 +99,9 @@ def run():
         gscreenshot.save_last_image(args.filename)
     elif (args.clip is False):
         gscreenshot.save_last_image()
+
+    if (args.open is not False):
+        gscreenshot.open_last_screenshot()
 
     if (args.clip is not False):
         tmp_file = os.path.join(
