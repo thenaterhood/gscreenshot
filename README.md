@@ -53,6 +53,7 @@ Keyboard shortcuts
 
 * Control+S opens the save dialog
 * Control+C copies the screenshot to the clipboard
+* Control+O opens your screenshot in your default image application
 * Escape quits the application
 
 ## Contributing
