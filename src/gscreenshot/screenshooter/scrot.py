@@ -28,6 +28,13 @@ class Scrot(Screenshooter):
         """
         self._call_scrot(['-d', str(delay)])
 
+    def can_run():
+        try:
+            subprocess.check_output(['scrot', '--version'])
+            return True
+        except:
+            return False
+
     def _grab_selection_fallback(self, delay=0):
         self._call_scrot(['-d', str(delay), '-s'])
 

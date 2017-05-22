@@ -20,7 +20,7 @@ from datetime import datetime
 from pkg_resources import resource_string
 from pkg_resources import require
 from PIL import Image
-from gscreenshot.screenshooter.scrot import Scrot
+from gscreenshot.screenshooter.factory import ScreenshooterFactory
 
 
 class Gscreenshot(object):
@@ -33,8 +33,11 @@ class Gscreenshot(object):
         constructor
         """
 
-        if screenshooter is None:
-            screenshooter = Scrot()
+        factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = factory.create()
+        if (self.screenshooter is None):
+            print("No supported screenshot utility is installed.")
+            sys.exit(1)
 
         self.screenshooter = screenshooter
         self.saved_last_image = False

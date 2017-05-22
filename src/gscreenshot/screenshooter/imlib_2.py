@@ -31,6 +31,13 @@ class Imlib2(Screenshooter):
         sleep(delay)
         self._call_imlib_grab()
 
+    def can_run():
+        try:
+            subprocess.check_output(['imlib2_grab', '-help'])
+            return True
+        except:
+            return False
+
     def _call_imlib_grab(self, params=None):
         """
         Performs a subprocess call to scrot with a given list of

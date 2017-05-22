@@ -78,6 +78,9 @@ class Screenshooter(object):
         """
         self.grab_selection(delay)
 
+    def can_run():
+        return False
+
     def _grab_selection_fallback(self, delay=0):
         """
         Fallback for grabbing the selection, in case the selection tool fails to
@@ -87,3 +90,4 @@ class Screenshooter(object):
             int delay: seconds
         """
         self.grab_fullscreen(delay)
+
