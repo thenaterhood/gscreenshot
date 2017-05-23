@@ -13,6 +13,8 @@
 #--------------------------------------------
 import os
 import sys
+import subprocess
+import tempfile
 
 from datetime import datetime
 from pkg_resources import resource_string
@@ -35,6 +37,8 @@ class Gscreenshot(object):
             screenshooter = Scrot()
 
         self.screenshooter = screenshooter
+        self.saved_last_image = False
+        self.last_save_file = None
         self.last_save_directory = os.path.expanduser("~")
 
     def screenshot_full_display(self, delay=0):
@@ -50,6 +54,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_fullscreen(delay)
+        self.saved_last_image = False
         return self.screenshooter.image
 
     def screenshot_selected(self, delay=0):
@@ -65,6 +70,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_selection(delay)
+        self.saved_last_image = False
         return self.screenshooter.image
 
     def screenshot_window(self, delay=0):
@@ -80,6 +86,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_window(delay)
+        self.saved_last_image = False
         return self.screenshooter.image
 
     def get_last_image(self):
@@ -150,8 +157,33 @@ class Gscreenshot(object):
         if actual_file_ext in supported_formats:
             self.last_save_directory = os.path.dirname(filename)
             image.save(filename, actual_file_ext.upper())
+            self.saved_last_image = True
+            self.last_save_file = filename
             return True
         else:
+            return False
+
+    def open_last_screenshot(self):
+        """
+        Calls xdg to open the screenshot in its default application
+
+        Returns:
+            bool success
+        """
+        screenshot_fname = os.path.join(
+                tempfile.gettempdir(),
+                self.get_time_filename()
+                )
+
+        if (not self.saved_last_image):
+            self.save_last_image(screenshot_fname)
+        else:
+            screenshot_fname = self.last_save_file
+
+        try:
+            subprocess.Popen(['xdg-open', screenshot_fname])
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError):
             return False
 
     def get_last_save_directory(self):
