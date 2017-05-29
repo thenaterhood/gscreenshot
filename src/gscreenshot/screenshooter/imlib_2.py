@@ -51,4 +51,4 @@ class Imlib2(Screenshooter):
             self._image = PIL.Image.open(self.tempfile)
             os.unlink(self.tempfile)
         except subprocess.CalledProcessError:
-            pass
+            self._image = None

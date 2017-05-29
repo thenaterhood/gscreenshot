@@ -1,5 +1,5 @@
 import subprocess
-from gscreenshot.selector import SelectionParseError, SelectionExecError
+from gscreenshot.selector import SelectionParseError, SelectionExecError, SelectionCancelled
 
 
 class Slop(object):
@@ -53,9 +53,15 @@ class Slop(object):
         try:
             # nodecorations=0 - this is the slop default, but there's a bug
             # so skipping the "=0" causes a segfault.
-            proc_output = subprocess.check_output(['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'])
-        except subprocess.CalledProcessError:
-            raise SelectionExecError("Slop failed to return a selection")
+            proc_output = subprocess.check_output(
+                ['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'],
+                stderr=subprocess.STDOUT
+                )
+        except subprocess.CalledProcessError as e:
+            if ("cancelled" in e.output.decode("UTF-8")):
+                raise SelectionCancelled("Selection was cancelled")
+            else:
+                raise SelectionExecError("Slop failed to return a selection")
 
         slop_output = proc_output.decode("UTF-8").strip().split(",")
 
