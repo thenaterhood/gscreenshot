@@ -1,6 +1,6 @@
 import os
 import tempfile
-from gscreenshot.selector import SelectionExecError, SelectionParseError
+from gscreenshot.selector import SelectionExecError, SelectionParseError, SelectionCancelled
 
 
 class Screenshooter(object):
@@ -53,6 +53,9 @@ class Screenshooter(object):
         """
         try:
             crop_box = self.selector.region_select()
+        except (SelectionCancelled) as e:
+            print("Selection was cancelled")
+            return
         except (OSError, SelectionExecError) as e:
             print("Failed to call region selector -- Using fallback region selection")
             self._grab_selection_fallback(delay)

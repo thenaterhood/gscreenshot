@@ -186,6 +186,9 @@ class Controller(object):
 
     def _show_preview(self, image):
         # create an image buffer (pixbuf) and insert the grabbed image
+        if (image is None):
+            image = self._app.get_app_icon()
+
         previewPixbuf = self._image_to_pixbuf(image)
 
         allocation = self._preview.get_allocation()

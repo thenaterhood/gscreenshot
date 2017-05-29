@@ -198,6 +198,9 @@ class Gscreenshot(object):
 
         return authors
 
+    def get_app_icon(self):
+        return Image.open('/usr/share/pixmaps/gscreenshot.png')
+
     def get_program_description(self):
 
         return "A simple screenshot tool"
