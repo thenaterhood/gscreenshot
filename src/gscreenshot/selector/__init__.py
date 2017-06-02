@@ -6,3 +6,6 @@ class SelectionExecError(SelectionError):
 
 class SelectionParseError(SelectionError):
     pass
+
+class SelectionCancelled(SelectionError):
+    pass

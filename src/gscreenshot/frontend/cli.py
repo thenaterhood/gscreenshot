@@ -95,25 +95,28 @@ def run():
     else:
         gscreenshot.screenshot_full_display(args.delay)
 
-    if (args.filename is not False):
-        gscreenshot.save_last_image(args.filename)
-    elif (args.clip is False):
-        gscreenshot.save_last_image()
+    if (gscreenshot.get_last_image() is None):
+        pass
+    else:
+        if (args.filename is not False):
+            gscreenshot.save_last_image(args.filename)
+        elif (args.clip is False):
+            gscreenshot.save_last_image()
 
-    if (args.open is not False):
-        gscreenshot.open_last_screenshot()
+        if (args.open is not False):
+            gscreenshot.open_last_screenshot()
 
-    if (args.clip is not False):
-        tmp_file = os.path.join(
-                tempfile.gettempdir(),
-                'gscreenshot-cli-clip.png'
-                )
-        gscreenshot.save_last_image(tmp_file)
-        successful_clip = xclip_image_file(tmp_file)
+        if (args.clip is not False):
+            tmp_file = os.path.join(
+                    tempfile.gettempdir(),
+                    'gscreenshot-cli-clip.png'
+                    )
+            gscreenshot.save_last_image(tmp_file)
+            successful_clip = xclip_image_file(tmp_file)
 
-        if (not successful_clip):
-            print("Could not clip image! Xclip failed to run - is it installed?")
-            print("Your screenshot was saved to " + tmp_file)
+            if (not successful_clip):
+                print("Could not clip image! Xclip failed to run - is it installed?")
+                print("Your screenshot was saved to " + tmp_file)
 
 def main():
     with SignalHandler():

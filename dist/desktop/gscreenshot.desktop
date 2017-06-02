@@ -1,8 +1,8 @@
 [Desktop Entry]
-Version=2.7.0
+Version=2.7.1
 Type=Application
 Name=gscreenshot
-Comment=A pygtk wrapper for the 'scrot' utility
+Comment=A simple screenshot utility
 TryExec=/usr/bin/gscreenshot
 Exec=gscreenshot
 Icon=gscreenshot
