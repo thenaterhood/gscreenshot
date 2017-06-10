@@ -53,24 +53,33 @@ class Slop(object):
         try:
             # nodecorations=0 - this is the slop default, but there's a bug
             # so skipping the "=0" causes a segfault.
-            proc_output = subprocess.check_output(
+            p = subprocess.Popen(
                 ['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'],
-                stderr=subprocess.STDOUT
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
                 )
-        except subprocess.CalledProcessError as e:
-            if ("cancelled" in e.output.decode("UTF-8")):
+            stdout, stderr = p.communicate()
+            return_code = p.returncode
+        except OSError as e:
+            raise SelectionExecError("Slop was not found")
+
+        if (return_code != 0):
+            slop_error = stderr.decode("UTF-8")
+
+            if ("cancelled" in slop_error):
                 raise SelectionCancelled("Selection was cancelled")
             else:
-                raise SelectionExecError("Slop failed to return a selection")
+                raise SelectionExecError(slop_error)
 
-        slop_output = proc_output.decode("UTF-8").strip().split(",")
+        slop_output = stdout.decode("UTF-8").strip().split(",")
 
         slop_parsed = {}
         # We iterate through the output so we're not reliant
         # on the order or number of lines in slop's output
         for l in slop_output:
-            spl = l.split("=")
-            slop_parsed[spl[0]] = spl[1]
+            if ('=' in l):
+                spl = l.split("=")
+                slop_parsed[spl[0]] = spl[1]
 
         # (left, upper, right, lower)
         try:
