@@ -42,12 +42,28 @@ Version: 3.0.1
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
+  <object class="GtkImage" id="icon_everything">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-fullscreen</property>
+  </object>
+  <object class="GtkImage" id="icon_selection">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-select-all</property>
+  </object>
+  <object class="GtkImage" id="icon_window">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-leave-fullscreen</property>
+  </object>
   <object class="GtkWindow" id="window_main">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="title">gscreenshot</property>
     <property name="resizable">False</property>
     <property name="window_position">center</property>
+    <property name="icon">/usr/share/pixmaps/gscreenshot.png</property>
     <signal name="destroy" handler="on_window_main_destroy" swapped="no"/>
     <child>
       <object class="GtkBox">
@@ -101,6 +117,7 @@ Version: 3.0.1
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="border_width">5</property>
+                <property name="image">icon_everything</property>
                 <property name="use_underline">True</property>
                 <signal name="clicked" handler="on_button_all_clicked" swapped="no"/>
               </object>
@@ -117,6 +134,7 @@ Version: 3.0.1
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="border_width">5</property>
+                <property name="image">icon_selection</property>
                 <property name="use_underline">True</property>
                 <signal name="clicked" handler="on_button_selectarea_clicked" swapped="no"/>
               </object>
@@ -133,6 +151,7 @@ Version: 3.0.1
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="border_width">5</property>
+                <property name="image">icon_window</property>
                 <property name="use_underline">True</property>
                 <signal name="clicked" handler="on_button_window_clicked" swapped="no"/>
               </object>
