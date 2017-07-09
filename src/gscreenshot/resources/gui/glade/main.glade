@@ -55,7 +55,8 @@ Version: 3.0.1
   <object class="GtkImage" id="icon_window">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="stock">gtk-leave-fullscreen</property>
+    <property name="icon_name">window-new</property>
+    <property name="use_fallback">True</property>
   </object>
   <object class="GtkWindow" id="window_main">
     <property name="visible">True</property>
