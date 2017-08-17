@@ -106,6 +106,24 @@ class Controller(object):
             else:
                 cancelled = True
 
+    def on_button_openwith_clicked(self, *args):
+        self._window.set_sensitive(False)
+
+        self.handle_openwith_action()
+
+        self._window.set_sensitive(True)
+
+    def handle_openwith_action(self):
+        fname = self._app.save_and_return_path()
+        appchooser = OpenWithDialog()
+        appchooser.run()
+        appinfo = appchooser.appinfo
+        appchooser.destroy()
+
+        if (appinfo is not None):
+            print(fname)
+            appinfo.launch_uris(["file://"+fname], None)
+
     def on_button_copy_clicked(self, *args):
         """
         Copy the current screenshot to the clipboard
@@ -169,6 +187,9 @@ class Controller(object):
     def on_window_main_destroy(self, widget=None):
         self.quit(widget)
 
+    def on_window_resize(self, *kwargs):
+        self._show_preview(self._app.get_last_image())
+
     def quit(self, widget):
         self._app.quit()
 
@@ -192,16 +213,45 @@ class Controller(object):
         previewPixbuf = self._image_to_pixbuf(image)
 
         allocation = self._preview.get_allocation()
+        window_size = self._window.get_size()
 
-        thumbnail = self._app.get_thumbnail(allocation.width, allocation.height, image)
+        allocation_size = (allocation.height, allocation.width)
+        window_size = (window_size.height*.48, window_size.width*.98)
+
+        window_dimension = window_size[0] * window_size[1]
+        allocated_dimension = allocation_size[0] * allocation_size[1]
+        height = allocation_size[0]
+        width = allocation_size[1]
+        if (window_dimension < allocated_dimension):
+            height = window_size[0]
+            width = window_size[1]
+
+        thumbnail = self._app.get_thumbnail(width, height, image)
         previewPixbuf = self._image_to_pixbuf(thumbnail)
 
         # set the image_preview widget to the preview image size (previewWidth,
         # previewHeight)
-        self._preview.set_size_request(allocation.width, allocation.height)
+        self._preview.set_size_request(width, height)
 
         # view the previewPixbuf in the image_preview widget
         self._preview.set_from_pixbuf(previewPixbuf)
+
+
+class OpenWithDialog(Gtk.AppChooserDialog):
+
+    def __init__(self, parent=None):
+
+        Gtk.AppChooserDialog.__init__(self, content_type="image/png", parent=parent)
+        self.set_title("Choose an Application")
+        self.connect("response", self._on_response)
+        self.appinfo = None
+
+    def _on_response(self, dialog, response):
+        if (response == Gtk.ResponseType.OK):
+            self.appinfo = self.get_app_info()
+        else:
+            self.appinfo = None
+
 
 class FileSaveDialog(object):
 
@@ -270,6 +320,8 @@ def main():
     window.connect("key-press-event", handler.handle_keypress)
 
     builder.connect_signals(handler)
+
+    window.connect("check-resize", handler.on_window_resize)
 
     with SignalHandler():
         window.show_all()

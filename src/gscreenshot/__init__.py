@@ -130,6 +130,26 @@ class Gscreenshot(object):
         d = datetime.now()
         return datetime.strftime(d, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
+    def save_and_return_path(self):
+        """
+        Saves the last screenshot to /tmp if it hasn't been saved
+        and returns the path to it.
+
+        Returns:
+            str
+        """
+        screenshot_fname = os.path.join(
+                tempfile.gettempdir(),
+                self.get_time_filename()
+                )
+
+        if (not self.saved_last_image):
+            self.save_last_image(screenshot_fname)
+        else:
+            screenshot_fname = self.last_save_file
+
+        return screenshot_fname
+
     def save_last_image(self, filename = None):
         """
         Saves the last screenshot taken with a given filename.
@@ -170,15 +190,7 @@ class Gscreenshot(object):
         Returns:
             bool success
         """
-        screenshot_fname = os.path.join(
-                tempfile.gettempdir(),
-                self.get_time_filename()
-                )
-
-        if (not self.saved_last_image):
-            self.save_last_image(screenshot_fname)
-        else:
-            screenshot_fname = self.last_save_file
+        screenshot_fname = self.save_and_return_path()
 
         try:
             subprocess.Popen(['xdg-open', screenshot_fname])
