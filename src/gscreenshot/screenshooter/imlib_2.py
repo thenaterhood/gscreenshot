@@ -2,6 +2,7 @@ import os
 import subprocess
 import tempfile
 import PIL.Image
+from distutils.spawn import find_executable
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
@@ -31,12 +32,9 @@ class Imlib2(Screenshooter):
         sleep(delay)
         self._call_imlib_grab()
 
+    @staticmethod
     def can_run():
-        try:
-            subprocess.check_output(['imlib2_grab', '-help'])
-            return True
-        except:
-            return False
+        return find_executable('imlib2_grab') is not None
 
     def _call_imlib_grab(self, params=None):
         """

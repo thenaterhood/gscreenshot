@@ -39,7 +39,6 @@ class Gscreenshot(object):
             print("No supported screenshot utility is installed.")
             sys.exit(1)
 
-        self.screenshooter = screenshooter
         self.saved_last_image = False
         self.last_save_file = None
         self.last_save_directory = os.path.expanduser("~")
