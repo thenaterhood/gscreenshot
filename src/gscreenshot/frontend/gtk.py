@@ -156,6 +156,7 @@ class Controller(object):
         about.set_authors(authors)
 
         description = self._app.get_program_description()
+        description += "\nCurrently using " + self._app.get_screenshooter_name()
         about.set_comments(description)
 
         website = self._app.get_program_website()

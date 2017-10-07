@@ -1,5 +1,6 @@
 from gscreenshot.screenshooter.scrot import Scrot
 from gscreenshot.screenshooter.imlib_2 import Imlib2
+from gscreenshot.screenshooter.imagemagick import ImageMagick
 
 class ScreenshooterFactory(object):
 
@@ -7,6 +8,7 @@ class ScreenshooterFactory(object):
         self.screenshooter = screenshooter
         self.screenshooters = [
                 Scrot,
+                ImageMagick,
                 Imlib2
                 ]
 

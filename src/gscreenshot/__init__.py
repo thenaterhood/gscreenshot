@@ -43,6 +43,9 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.last_save_directory = os.path.expanduser("~")
 
+    def get_screenshooter_name(self):
+        return self.screenshooter.__class__.__name__
+
     def screenshot_full_display(self, delay=0):
         """
         Takes a screenshot of the full display with a
@@ -217,7 +220,7 @@ class Gscreenshot(object):
 
     def get_program_description(self):
 
-        return "A simple screenshot tool"
+        return "A simple screenshot tool supporting multiple backends."
 
     def get_program_website(self):
 
