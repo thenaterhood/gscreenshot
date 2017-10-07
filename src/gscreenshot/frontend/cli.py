@@ -73,6 +73,7 @@ def run():
 
     args = parser.parse_args()
 
+
     if (args.version is not False):
         authors = gscreenshot.get_program_authors()
         website = gscreenshot.get_program_website()
@@ -81,6 +82,7 @@ def run():
         name = gscreenshot.get_program_name()
         version = gscreenshot.get_program_version()
 
+        print("Using " + gscreenshot.get_screenshooter_name() + " screenshot backend")
         print("{0} {1}; {2}".format(name, version, description))
         print(website)
         print("")
