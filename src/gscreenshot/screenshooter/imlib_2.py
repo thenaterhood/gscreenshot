@@ -2,11 +2,11 @@ import os
 import subprocess
 import tempfile
 import PIL.Image
-from distutils.spawn import find_executable
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.selector.slop import Slop
+from gscreenshot.util import find_executable
 
 
 class Imlib2(Screenshooter):

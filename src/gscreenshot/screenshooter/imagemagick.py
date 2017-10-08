@@ -2,10 +2,10 @@ import os
 import subprocess
 import tempfile
 import PIL.Image
-from distutils.spawn import find_executable
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
+from gscreenshot.util import find_executable
 
 
 class ImageMagick(Screenshooter):
