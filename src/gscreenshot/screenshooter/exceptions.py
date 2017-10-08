@@ -1,0 +1,2 @@
+class NoSupportedScreenshooterError(BaseException):
+    pass
