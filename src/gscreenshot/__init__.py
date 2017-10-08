@@ -20,7 +20,7 @@ from datetime import datetime
 from pkg_resources import resource_string
 from pkg_resources import require
 from PIL import Image
-from gscreenshot.screenshooter.scrot import Scrot
+from gscreenshot.screenshooter.factory import ScreenshooterFactory
 
 
 class Gscreenshot(object):
@@ -33,13 +33,15 @@ class Gscreenshot(object):
         constructor
         """
 
-        if screenshooter is None:
-            screenshooter = Scrot()
+        factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = factory.create()
 
-        self.screenshooter = screenshooter
         self.saved_last_image = False
         self.last_save_file = None
         self.last_save_directory = os.path.expanduser("~")
+
+    def get_screenshooter_name(self):
+        return self.screenshooter.__class__.__name__
 
     def screenshot_full_display(self, delay=0):
         """
@@ -215,7 +217,7 @@ class Gscreenshot(object):
 
     def get_program_description(self):
 
-        return "A simple screenshot tool"
+        return "A simple screenshot tool supporting multiple backends."
 
     def get_program_website(self):
 

@@ -2,6 +2,7 @@ import os
 import subprocess
 import tempfile
 import PIL.Image
+from gscreenshot.util import find_executable
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.selector.slop import Slop
 
@@ -27,6 +28,10 @@ class Scrot(Screenshooter):
             int delay, in seconds
         """
         self._call_scrot(['-d', str(delay)])
+
+    @staticmethod
+    def can_run():
+        return find_executable('scrot') is not None
 
     def _grab_selection_fallback(self, delay=0):
         self._call_scrot(['-d', str(delay), '-s'])

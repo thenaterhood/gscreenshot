@@ -76,8 +76,13 @@ care of on this end.
 ## Requirements
 _automatically installed by the setup script or your package manager_
 
-* Python 2.7 or Python 3
+_Your preference for taking screenshots. You need at least one of these._
 * Scrot
+* ImageMagick
+* Imlib2_grab (the library Scrot uses)
+
+_These requirements_
+* Python 2.7 or Python 3
 * python-pillow
 * python-gobject
 * Setuptools

@@ -1,4 +1,5 @@
 import io
+import sys
 from gi import pygtkcompat
 
 pygtkcompat.enable()
@@ -8,6 +9,7 @@ from gi.repository import Gdk
 from gi.repository import Gtk
 from gscreenshot import Gscreenshot
 from gscreenshot.frontend import SignalHandler
+from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 from pkg_resources import resource_string
 from time import sleep
@@ -156,6 +158,7 @@ class Controller(object):
         about.set_authors(authors)
 
         description = self._app.get_program_description()
+        description += "\nCurrently using " + self._app.get_screenshooter_name()
         about.set_comments(description)
 
         website = self._app.get_program_website()
@@ -299,6 +302,18 @@ class FileSaveDialog(object):
 
 
 def main():
+
+    try:
+        application = Gscreenshot()
+    except NoSupportedScreenshooterError:
+        md = Gtk.MessageDialog(None,
+            Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_WARNING,
+            Gtk.BUTTONS_OK, "gscreenshot couldn't run. No supported screenshot utility could be found.")
+        md.run()
+        md.destroy()
+        sys.exit(1)
+
+
     builder = Gtk.Builder()
     builder.add_from_string(resource_string(
         'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
@@ -306,7 +321,6 @@ def main():
     window = builder.get_object('window_main')
     window.set_position(Gtk.WIN_POS_CENTER)
 
-    application = Gscreenshot()
     handler = Controller(
             application,
             builder,

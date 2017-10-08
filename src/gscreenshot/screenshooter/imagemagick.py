@@ -5,11 +5,10 @@ import PIL.Image
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.selector.slop import Slop
 from gscreenshot.util import find_executable
 
 
-class Imlib2(Screenshooter):
+class ImageMagick(Screenshooter):
 
     """
     Python class wrapper for the scrot screenshooter utility
@@ -20,7 +19,6 @@ class Imlib2(Screenshooter):
         constructor
         """
         Screenshooter.__init__(self)
-        self.selector = Slop()
 
     def grab_fullscreen(self, delay=0):
         """
@@ -30,13 +28,17 @@ class Imlib2(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        self._call_imlib_grab()
+        self._call_import(['-window', 'root'])
+
+    def grab_selection(self, delay=0):
+        sleep(delay)
+        self._call_import()
 
     @staticmethod
     def can_run():
-        return find_executable('imlib2_grab') is not None
+        return find_executable('import') is not None
 
-    def _call_imlib_grab(self, params=None):
+    def _call_import(self, params=None):
         """
         Performs a subprocess call to scrot with a given list of
         parameters.
@@ -50,7 +52,7 @@ class Imlib2(Screenshooter):
         if params is None:
             params = []
 
-        params = ['imlib2_grab', self.tempfile] + params
+        params = ['import'] + params + [self.tempfile]
         try:
             subprocess.check_output(params)
             self._image = PIL.Image.open(self.tempfile)
