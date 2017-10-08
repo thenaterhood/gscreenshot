@@ -35,9 +35,6 @@ class Gscreenshot(object):
 
         factory = ScreenshooterFactory(screenshooter)
         self.screenshooter = factory.create()
-        if (self.screenshooter is None):
-            print("No supported screenshot utility is installed.")
-            sys.exit(1)
 
         self.saved_last_image = False
         self.last_save_file = None

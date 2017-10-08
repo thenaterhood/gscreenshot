@@ -1,5 +1,6 @@
 from gscreenshot import Gscreenshot
 from gscreenshot.frontend import SignalHandler
+from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 import argparse
 import sys
@@ -25,7 +26,6 @@ def xclip_image_file(imagefname):
 
 def run():
 
-    gscreenshot = Gscreenshot()
     parser = argparse.ArgumentParser()
 
     parser.add_argument(
@@ -73,6 +73,12 @@ def run():
 
     args = parser.parse_args()
 
+    try:
+        gscreenshot = Gscreenshot()
+    except NoSupportedScreenshooterError:
+        print("No supported screenshot backend is available.")
+        print("Please install one to use gscreenshot.")
+        sys.exit(1)
 
     if (args.version is not False):
         authors = gscreenshot.get_program_authors()

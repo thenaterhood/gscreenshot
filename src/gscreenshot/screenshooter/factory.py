@@ -1,6 +1,7 @@
 from gscreenshot.screenshooter.scrot import Scrot
 from gscreenshot.screenshooter.imlib_2 import Imlib2
 from gscreenshot.screenshooter.imagemagick import ImageMagick
+from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 class ScreenshooterFactory(object):
 
@@ -19,4 +20,8 @@ class ScreenshooterFactory(object):
         for shooter in self.screenshooters:
             if shooter.can_run():
                 return shooter()
+
+        raise NoSupportedScreenshooterError(
+                "No supported screenshot backend available"
+                )
 
