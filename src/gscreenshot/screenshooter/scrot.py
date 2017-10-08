@@ -2,7 +2,7 @@ import os
 import subprocess
 import tempfile
 import PIL.Image
-from distutils.spawn import find_executable
+from gscreenshot.util import find_executable
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.selector.slop import Slop
 
