@@ -84,7 +84,7 @@ _Your preference for taking screenshots. You need at least one of these._
 _These requirements_
 * Python 2.7 or Python 3
 * python-pillow
-* python-gobject
+* python-gobject (may be called "python-gi" or "python3-gi")
 * Setuptools
 
 _Optional, but recommended_
