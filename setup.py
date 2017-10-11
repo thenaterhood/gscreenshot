@@ -6,9 +6,6 @@ import os
 
 install_requires = [
     'pillow',
-    # This currently throws an error. Install pygtk via your package manager.
-    #'pygtk',
-    'gi'
     ]
 
 test_requires = [
