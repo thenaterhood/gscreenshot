@@ -8,7 +8,7 @@ install_requires = [
     'pillow',
     # This currently throws an error. Install pygtk via your package manager.
     #'pygtk',
-    'pygobject'
+    'gi'
     ]
 
 test_requires = [
