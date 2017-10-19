@@ -17,8 +17,7 @@ import subprocess
 import tempfile
 
 from datetime import datetime
-from pkg_resources import resource_string
-from pkg_resources import require
+from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
 
@@ -213,7 +212,9 @@ class Gscreenshot(object):
         return authors
 
     def get_app_icon(self):
-        return Image.open('/usr/share/pixmaps/gscreenshot.png')
+        return Image.open(
+                resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
+                )
 
     def get_program_description(self):
 
