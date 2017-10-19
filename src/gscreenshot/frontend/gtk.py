@@ -1,4 +1,5 @@
 import io
+import os
 import sys
 from gi import pygtkcompat
 
@@ -11,7 +12,7 @@ from gscreenshot import Gscreenshot
 from gscreenshot.frontend import SignalHandler
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
-from pkg_resources import resource_string
+from pkg_resources import resource_string, resource_filename
 from time import sleep
 
 
@@ -175,7 +176,13 @@ class Controller(object):
         version = self._app.get_program_version()
         about.set_version(version)
 
-        about.set_logo_icon_name("gscreenshot")
+        about.set_logo(
+                Gtk.gdk.pixbuf_new_from_file(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
+                        )
+                    )
+                )
         about.connect("response", self.on_about_close)
 
         about.show()
@@ -302,7 +309,6 @@ class FileSaveDialog(object):
 
 
 def main():
-
     try:
         application = Gscreenshot()
     except NoSupportedScreenshooterError:
@@ -336,6 +342,7 @@ def main():
     builder.connect_signals(handler)
 
     window.connect("check-resize", handler.on_window_resize)
+    window.set_icon_from_file(resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png'))
 
     with SignalHandler():
         window.show_all()

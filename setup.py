@@ -45,10 +45,11 @@ setup(name='gscreenshot',
         'gscreenshot.selector',
         'gscreenshot.resources',
         'gscreenshot.resources.gui',
-        'gscreenshot.resources.gui.glade'
+        'gscreenshot.resources.gui.glade',
+        'gscreenshot.resources.pixmaps'
         ],
     data_files=data_files,
     package_data={
-        '': ['*.glade', 'LICENSE']
+        '': ['*.glade', 'LICENSE', '*.png']
         }
     )
