@@ -176,7 +176,13 @@ class Controller(object):
         version = self._app.get_program_version()
         about.set_version(version)
 
-        about.set_logo_icon_name("gscreenshot")
+        about.set_logo(
+                Gtk.gdk.pixbuf_new_from_file(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
+                        )
+                    )
+                )
         about.connect("response", self.on_about_close)
 
         about.show()
