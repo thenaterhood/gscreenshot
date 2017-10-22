@@ -35,6 +35,8 @@ class Controller(object):
 
     def _begin_take_screenshot(self, app_method):
         screenshot = app_method(self._delay)
+
+        # Re-enable UI on the UI thread.
         GObject.idle_add(self._end_take_screenshot, screenshot)
 
     def _end_take_screenshot(self, screenshot):
