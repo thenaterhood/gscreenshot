@@ -1,5 +1,7 @@
 import io
+import os
 import sys
+import threading
 from gi import pygtkcompat
 
 pygtkcompat.enable()
@@ -7,11 +9,13 @@ pygtkcompat.enable_gtk(version='3.0')
 
 from gi.repository import Gdk
 from gi.repository import Gtk
+from gi.repository import GObject
+
 from gscreenshot import Gscreenshot
 from gscreenshot.frontend import SignalHandler
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
-from pkg_resources import resource_string
+from pkg_resources import resource_string, resource_filename
 from time import sleep
 
 
@@ -29,7 +33,21 @@ class Controller(object):
         self._app.screenshot_full_display()
         self._show_preview(self._app.get_last_image())
 
+    def _begin_take_screenshot(self, app_method):
+        screenshot = app_method(self._delay)
+
+        # Re-enable UI on the UI thread.
+        GObject.idle_add(self._end_take_screenshot, screenshot)
+
+    def _end_take_screenshot(self, screenshot):
+        self._show_preview(screenshot)
+
+        self._window.set_sensitive(True)
+        self._window.set_opacity(1)
+        self._window.show_all()
+
     def take_screenshot(self, app_method):
+        self._window.set_sensitive(False)
         if self._hide:
             # We set the opacity to 0 because hiding the window is
             # subject to window closing effects, which can take long
@@ -41,11 +59,12 @@ class Controller(object):
             Gtk.main_iteration()
 
         sleep(0.2)
-        screenshot = app_method(self._delay)
-        self._show_preview(screenshot)
 
-        self._window.set_opacity(1)
-        self._window.show_all()
+        # Do work in background thread.
+        # Taken from here: https://wiki.gnome.org/Projects/PyGObject/Threading
+        _thread = threading.Thread(target=self._begin_take_screenshot(app_method))
+        _thread.daemon = True
+        _thread.start()
 
     def handle_keypress(self, widget=None, event=None, *args):
         """
@@ -175,7 +194,13 @@ class Controller(object):
         version = self._app.get_program_version()
         about.set_version(version)
 
-        about.set_logo_icon_name("gscreenshot")
+        about.set_logo(
+                Gtk.gdk.pixbuf_new_from_file(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
+                        )
+                    )
+                )
         about.connect("response", self.on_about_close)
 
         about.show()
@@ -302,7 +327,6 @@ class FileSaveDialog(object):
 
 
 def main():
-
     try:
         application = Gscreenshot()
     except NoSupportedScreenshooterError:
@@ -336,8 +360,10 @@ def main():
     builder.connect_signals(handler)
 
     window.connect("check-resize", handler.on_window_resize)
+    window.set_icon_from_file(resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png'))
 
     with SignalHandler():
+        GObject.threads_init(); # Start background threads.
         window.show_all()
         Gtk.main()
 

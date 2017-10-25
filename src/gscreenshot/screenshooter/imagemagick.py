@@ -5,6 +5,7 @@ import PIL.Image
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
+from gscreenshot.selector.slop import Slop
 from gscreenshot.util import find_executable
 
 
@@ -19,6 +20,7 @@ class ImageMagick(Screenshooter):
         constructor
         """
         Screenshooter.__init__(self)
+        self.selector = Slop()
 
     def grab_fullscreen(self, delay=0):
         """
@@ -30,7 +32,7 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_import(['-window', 'root'])
 
-    def grab_selection(self, delay=0):
+    def _grab_selection_fallback(self, delay=0):
         sleep(delay)
         self._call_import()
 
