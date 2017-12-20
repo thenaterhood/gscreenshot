@@ -60,7 +60,7 @@ class Slop(object):
                 )
             stdout, stderr = p.communicate()
             return_code = p.returncode
-        except OSError as e:
+        except OSError:
             raise SelectionExecError("Slop was not found")
 
         if (return_code != 0):

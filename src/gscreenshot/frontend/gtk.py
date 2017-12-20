@@ -1,5 +1,4 @@
 import io
-import os
 import sys
 import threading
 from gi import pygtkcompat
