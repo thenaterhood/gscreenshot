@@ -40,7 +40,7 @@ def run():
             '--filename',
             required=False,
             default=False,
-            help="Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy."
+            help="Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy. If you specify a filename without a file extension, it will be treated as a directory (creating the tree if needed) and screenshots will be saved there with the default filename scheme."
             )
     parser.add_argument(
             '-c',
@@ -104,12 +104,19 @@ def run():
         gscreenshot.screenshot_full_display(args.delay)
 
     if (gscreenshot.get_last_image() is None):
-        pass
+        print("No screenshot taken.")
+        sys.exit(1)
     else:
+        shot_saved = False
+        exit_code = 0
         if (args.filename is not False):
-            gscreenshot.save_last_image(args.filename)
+            shot_saved = gscreenshot.save_last_image(args.filename)
         elif (args.clip is False):
-            gscreenshot.save_last_image()
+            shot_saved = gscreenshot.save_last_image()
+
+        if (not shot_saved):
+            exit_code = 1
+            print("Failed to save screenshot!")
 
         if (args.open is not False):
             gscreenshot.open_last_screenshot()
@@ -125,6 +132,8 @@ def run():
             if (not successful_clip):
                 print("Could not clip image! Xclip failed to run - is it installed?")
                 print("Your screenshot was saved to " + tmp_file)
+                exit_code = 1
+        sys.exit(exit_code)
 
 def main():
     with SignalHandler():
