@@ -170,6 +170,26 @@ class Gscreenshot(object):
         image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 
+        if (actual_file_ext == ""):
+            # If we don't have any file extension, assume
+            # we were given a directory; create the tree
+            # if it doesn't exist, then store the screenshot
+            # there with a time-based filename.
+            try:
+                os.makedirs(filename)
+            except (IOError, OSError):
+                # Likely the directory already exists, so
+                # we'll throw the exception away.
+                # If we fail to save, we'll return a status
+                # saying so, so we'll be okay.
+                pass
+
+            filename = os.path.join(
+                    filename,
+                    self.get_time_filename()
+                    )
+            actual_file_ext = 'png'
+
         if actual_file_ext == 'jpg':
             actual_file_ext = 'jpeg'
 

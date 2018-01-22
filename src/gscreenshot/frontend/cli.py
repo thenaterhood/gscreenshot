@@ -40,7 +40,7 @@ def run():
             '--filename',
             required=False,
             default=False,
-            help="Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy."
+            help="Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy. If you specify a filename without a file extension, it will be treated as a directory (creating the tree if needed) and screenshots will be saved there with the default filename scheme."
             )
     parser.add_argument(
             '-c',
@@ -106,10 +106,14 @@ def run():
     if (gscreenshot.get_last_image() is None):
         pass
     else:
+        shot_saved = False
         if (args.filename is not False):
-            gscreenshot.save_last_image(args.filename)
+            shot_saved = gscreenshot.save_last_image(args.filename)
         elif (args.clip is False):
-            gscreenshot.save_last_image()
+            shot_saved = gscreenshot.save_last_image()
+
+        if (not shot_saved):
+            print("Failed to save screenshot!")
 
         if (args.open is not False):
             gscreenshot.open_last_screenshot()
