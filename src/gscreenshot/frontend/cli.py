@@ -104,15 +104,18 @@ def run():
         gscreenshot.screenshot_full_display(args.delay)
 
     if (gscreenshot.get_last_image() is None):
-        pass
+        print("No screenshot taken.")
+        sys.exit(1)
     else:
         shot_saved = False
+        exit_code = 0
         if (args.filename is not False):
             shot_saved = gscreenshot.save_last_image(args.filename)
         elif (args.clip is False):
             shot_saved = gscreenshot.save_last_image()
 
         if (not shot_saved):
+            exit_code = 1
             print("Failed to save screenshot!")
 
         if (args.open is not False):
@@ -129,6 +132,8 @@ def run():
             if (not successful_clip):
                 print("Could not clip image! Xclip failed to run - is it installed?")
                 print("Your screenshot was saved to " + tmp_file)
+                exit_code = 1
+        sys.exit(exit_code)
 
 def main():
     with SignalHandler():

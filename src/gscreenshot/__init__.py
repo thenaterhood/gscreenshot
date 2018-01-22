@@ -197,10 +197,14 @@ class Gscreenshot(object):
 
         if actual_file_ext in supported_formats:
             self.last_save_directory = os.path.dirname(filename)
-            image.save(filename, actual_file_ext.upper())
-            self.saved_last_image = True
-            self.last_save_file = filename
-            return True
+            try:
+                image.save(filename, actual_file_ext.upper())
+                self.saved_last_image = True
+                self.last_save_file = filename
+                return True
+            except IOError:
+                self.saved_last_image = False
+                return False
         else:
             return False
 
