@@ -196,7 +196,7 @@ class Gscreenshot(object):
         try:
             subprocess.Popen(['xdg-open', screenshot_fname])
             return True
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except (subprocess.CalledProcessError, IOError):
             return False
 
     def get_last_save_directory(self):

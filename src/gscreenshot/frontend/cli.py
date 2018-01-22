@@ -21,7 +21,7 @@ def xclip_image_file(imagefname):
     try:
         subprocess.Popen(params, close_fds=True, stdin=None, stdout=None, stderr=None)
         return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except (subprocess.CalledProcessError, IOError):
         return False
 
 def run():
