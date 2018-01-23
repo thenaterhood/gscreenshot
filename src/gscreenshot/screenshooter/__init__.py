@@ -38,7 +38,7 @@ class Screenshooter(object):
         Parameters:
             int delay, in seconds
         """
-        raise Exception("Not implemented")
+        raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
     def grab_selection(self, delay=0):
         """
@@ -53,14 +53,14 @@ class Screenshooter(object):
         """
         try:
             crop_box = self.selector.region_select()
-        except (SelectionCancelled) as e:
+        except SelectionCancelled:
             print("Selection was cancelled")
             return
-        except (OSError, SelectionExecError) as e:
+        except (OSError, SelectionExecError):
             print("Failed to call region selector -- Using fallback region selection")
             self._grab_selection_fallback(delay)
             return
-        except (SelectionParseError) as e:
+        except (SelectionParseError):
             print("Invalid selection data -- falling back to full screen")
             self.grab_fullscreen(delay)
             return
@@ -78,6 +78,7 @@ class Screenshooter(object):
         """
         self.grab_selection(delay)
 
+    @staticmethod
     def can_run():
         return False
 

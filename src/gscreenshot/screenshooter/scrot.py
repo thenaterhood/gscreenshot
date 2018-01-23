@@ -1,6 +1,5 @@
 import os
 import subprocess
-import tempfile
 import PIL.Image
 from gscreenshot.util import find_executable
 from gscreenshot.screenshooter import Screenshooter

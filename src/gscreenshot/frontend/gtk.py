@@ -1,5 +1,4 @@
 import io
-import os
 import sys
 import threading
 from gi import pygtkcompat
@@ -66,7 +65,7 @@ class Controller(object):
         _thread.daemon = True
         _thread.start()
 
-    def handle_keypress(self, widget=None, event=None, *args):
+    def handle_keypress(self, widget=None, event=None, *_):
         """
         This method handles individual keypresses. These are
         handled separately from accelerators (which include
@@ -85,7 +84,7 @@ class Controller(object):
     def delay_value_changed(self, widget):
         self._delay = widget.get_value()
 
-    def on_button_all_clicked(self, *args):
+    def on_button_all_clicked(self, *_):
 
         self.take_screenshot(
             self._app.screenshot_full_display
@@ -97,13 +96,13 @@ class Controller(object):
     def on_button_selectarea_clicked(self, *args):
         self._button_select_area_or_window_clicked(args)
 
-    def _button_select_area_or_window_clicked(self, *args):
+    def _button_select_area_or_window_clicked(self, *_):
 
         self.take_screenshot(
             self._app.screenshot_selected
             )
 
-    def on_button_saveas_clicked(self, *args):
+    def on_button_saveas_clicked(self, *_):
         # make the main window unsensitive while saving your image
         self._window.set_sensitive(False)
 
@@ -127,7 +126,7 @@ class Controller(object):
             else:
                 cancelled = True
 
-    def on_button_openwith_clicked(self, *args):
+    def on_button_openwith_clicked(self, *_):
         self._window.set_sensitive(False)
 
         self.handle_openwith_action()
@@ -145,18 +144,17 @@ class Controller(object):
             print(fname)
             appinfo.launch_uris(["file://"+fname], None)
 
-    def on_button_copy_clicked(self, *args):
+    def on_button_copy_clicked(self, *_):
         """
         Copy the current screenshot to the clipboard
         """
-        print(args)
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         img = self._app.get_last_image()
         pixbuf = self._image_to_pixbuf(img)
         clipboard.set_image(pixbuf)
         clipboard.store()
 
-    def on_button_open_clicked(self, *args):
+    def on_button_open_clicked(self, *_):
         success = self._app.open_last_screenshot()
         if (not success):
             md = Gtk.MessageDialog(self._window,
@@ -165,7 +163,7 @@ class Controller(object):
             md.run()
             md.destroy()
 
-    def on_button_about_clicked(self, *args):
+    def on_button_about_clicked(self, *_):
         # make the main window unsensitive while viewing the "about"
         # information
         self._window.set_sensitive(False)
@@ -205,7 +203,7 @@ class Controller(object):
 
         about.show()
 
-    def on_about_close(self, action, *args):
+    def on_about_close(self, action, *_):
         action.destroy()
         self._window.set_sensitive(True)
 
@@ -215,10 +213,10 @@ class Controller(object):
     def on_window_main_destroy(self, widget=None):
         self.quit(widget)
 
-    def on_window_resize(self, *kwargs):
+    def on_window_resize(self, *_):
         self._show_preview(self._app.get_last_image())
 
-    def quit(self, widget):
+    def quit(self, *_):
         self._app.quit()
 
     def _image_to_pixbuf(self, image):
