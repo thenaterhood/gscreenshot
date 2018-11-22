@@ -20,16 +20,15 @@ from time import sleep
 
 class Controller(object):
 
-    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview')
+    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize')
 
     def __init__(self, application, builder):
         self._app = application
+        self._can_resize = False
         self._window = builder.get_object('window_main')
         self._preview = builder.get_object('image1')
         self._delay = 0
         self._hide = True
-
-        self._app.screenshot_full_display()
         self._show_preview(self._app.get_last_image())
 
     def _begin_take_screenshot(self, app_method):
@@ -214,7 +213,8 @@ class Controller(object):
         self.quit(widget)
 
     def on_window_resize(self, *_):
-        self._show_preview(self._app.get_last_image())
+        if self._can_resize:
+            self._show_preview(self._app.get_last_image())
 
     def quit(self, *_):
         self._app.quit()
@@ -236,7 +236,11 @@ class Controller(object):
         if (image is None):
             image = self._app.get_app_icon()
 
-        previewPixbuf = self._image_to_pixbuf(image)
+        try:
+            previewPixbuf = self._image_to_pixbuf(image)
+        except:
+            print("Failed to generate preview. Using default.")
+            previewPixbuf = self._image_to_pixbuf(self._app.get_app_icon())
 
         allocation = self._preview.get_allocation()
         window_size = self._window.get_size()
@@ -335,6 +339,11 @@ def main():
         md.destroy()
         sys.exit(1)
 
+    # Improves startup performance by kicking off a screenshot
+    # as early as we can in the background.
+    screenshot_thread = threading.Thread(target=application.screenshot_full_display)
+    screenshot_thread.daemon = True
+    screenshot_thread.start()
 
     builder = Gtk.Builder()
     builder.add_from_string(resource_string(
@@ -342,6 +351,9 @@ def main():
 
     window = builder.get_object('window_main')
     window.set_position(Gtk.WIN_POS_CENTER)
+
+    while application.get_last_image() is None:
+        sleep(.01)
 
     handler = Controller(
             application,
