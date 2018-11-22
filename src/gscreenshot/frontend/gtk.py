@@ -141,7 +141,8 @@ class Controller(object):
 
         if (appinfo is not None):
             print(fname)
-            appinfo.launch_uris(["file://"+fname], None)
+            if appinfo.launch_uris(["file://"+fname], None):
+                self.quit(None)
 
     def on_button_copy_clicked(self, *_):
         """
@@ -161,6 +162,8 @@ class Controller(object):
                 Gtk.BUTTONS_OK, "Please install xdg-open to open files.")
             md.run()
             md.destroy()
+        else:
+            self.quit(None)
 
     def on_button_about_clicked(self, *_):
         # make the main window unsensitive while viewing the "about"
