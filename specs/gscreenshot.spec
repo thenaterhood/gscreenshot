@@ -1,7 +1,7 @@
 %define name gscreenshot
 %define version 2.10.1
 %define unmangled_version 2.10.1
-%define release 1
+%define release 2
 
 Summary: A simple screenshot tool
 Name: %{name}
@@ -24,10 +24,10 @@ A graphical and CLI screenshot utility.
 %setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
 
 %build
-/usr/bin/python3 setup.py build
+%{__python3} setup.py build
 
 %install
-/usr/bin/python3 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+%{__python3} setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 
 %clean
 rm -rf $RPM_BUILD_ROOT
