@@ -30,10 +30,10 @@ setup(name='gscreenshot',
     tests_require=test_requires,
     entry_points={
         'gui_scripts': [
-            'gscreenshot = gscreenshot.frontend.gtk:main'
+            'gscreenshot = gscreenshot.frontend:delegate'
         ],
         'console_scripts': [
-            'gscreenshot-cli = gscreenshot.frontend.cli:main'
+            'gscreenshot-cli = gscreenshot.frontend.cli:run'
         ]
     },
     test_suite='nose.collector',

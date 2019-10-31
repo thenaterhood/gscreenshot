@@ -1,4 +1,7 @@
 import signal
+import sys
+import gscreenshot.frontend.cli
+import gscreenshot.frontend.gtk
 
 
 class SignalHandler(object):
@@ -18,3 +21,18 @@ class SignalHandler(object):
         # signal handlers, but that isn't functionality
         # that's needed right now, so we'll do nothing.
         pass
+
+class FrontendDelegator(object):
+    """
+    Delegates a gscreenshot call to the correct frontend
+    """
+    @staticmethod
+    def delegate():
+        with SignalHandler():
+            if (len(sys.argv) > 1):
+                gscreenshot.frontend.cli.run()
+            else:
+                gscreenshot.frontend.gtk.main()
+
+def delegate():
+    FrontendDelegator.delegate()

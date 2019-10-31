@@ -11,7 +11,6 @@ from gi.repository import Gtk
 from gi.repository import GObject
 
 from gscreenshot import Gscreenshot
-from gscreenshot.frontend import SignalHandler
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 from pkg_resources import resource_string, resource_filename
@@ -377,10 +376,9 @@ def main():
     window.connect("check-resize", handler.on_window_resize)
     window.set_icon_from_file(resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png'))
 
-    with SignalHandler():
-        GObject.threads_init(); # Start background threads.
-        window.show_all()
-        Gtk.main()
+    GObject.threads_init(); # Start background threads.
+    window.show_all()
+    Gtk.main()
 
 if __name__ == "__main__":
     main()
