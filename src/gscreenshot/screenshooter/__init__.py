@@ -1,5 +1,8 @@
 import os
+import subprocess
+import PIL.Image
 import tempfile
+
 from gscreenshot.selector import SelectionExecError, SelectionParseError, SelectionCancelled
 
 
@@ -92,3 +95,19 @@ class Screenshooter(object):
         """
         self.grab_fullscreen(delay)
 
+    def _call_screenshooter(self, screenshooter, params = None):
+
+        # This is safer than defaulting to []
+        if params is None:
+            params = []
+
+        params = [screenshooter] + params
+        try:
+            subprocess.check_output(params)
+            self._image = PIL.Image.open(self.tempfile)
+            os.unlink(self.tempfile)
+        except subprocess.CalledProcessError:
+            self._image = None
+            return False
+
+        return True
