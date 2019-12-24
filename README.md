@@ -13,7 +13,7 @@ This application was originally written by matej.horvath. The original project
 can be found at https://code.google.com/p/gscreenshot/ while Google Code is
 still up and running.
 
-gscreenshot is licensed under the GPL.
+gscreenshot is licensed under the GPLv2.
 
 ## Installation
 
