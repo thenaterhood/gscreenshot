@@ -33,7 +33,7 @@ setup(name='gscreenshot',
             'gscreenshot = gscreenshot.frontend:delegate'
         ],
         'console_scripts': [
-            'gscreenshot-cli = gscreenshot.frontend.cli:run'
+            'gscreenshot-cli = gscreenshot.frontend:delegate'
         ]
     },
     test_suite='nose.collector',

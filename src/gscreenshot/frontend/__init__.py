@@ -29,7 +29,7 @@ class FrontendDelegator(object):
     @staticmethod
     def delegate():
         with SignalHandler():
-            if (len(sys.argv) > 1):
+            if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0]:
                 gscreenshot.frontend.cli.run()
             else:
                 gscreenshot.frontend.gtk.main()
