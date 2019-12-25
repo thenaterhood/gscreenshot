@@ -1,5 +1,4 @@
 from gscreenshot import Gscreenshot
-from gscreenshot.frontend import SignalHandler
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 import argparse
@@ -135,6 +134,3 @@ def run():
                 exit_code = 1
         sys.exit(exit_code)
 
-def main():
-    with SignalHandler():
-        run()
