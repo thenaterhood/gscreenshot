@@ -19,13 +19,14 @@ from time import sleep
 
 class Controller(object):
 
-    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize')
+    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize', '_control_grid')
 
     def __init__(self, application, builder):
         self._app = application
-        self._can_resize = False
+        self._can_resize = True
         self._window = builder.get_object('window_main')
         self._preview = builder.get_object('image1')
+        self._control_grid = builder.get_object('control_grid')
         self._delay = 0
         self._hide = True
         self._show_preview(self._app.get_last_image())
@@ -244,19 +245,13 @@ class Controller(object):
             print("Failed to generate preview. Using default.")
             previewPixbuf = self._image_to_pixbuf(self._app.get_app_icon())
 
-        allocation = self._preview.get_allocation()
         window_size = self._window.get_size()
+        control_size = self._control_grid.get_allocation()
 
-        allocation_size = (allocation.height, allocation.width)
-        window_size = (window_size.height*.48, window_size.width*.98)
+        preview_size = ((window_size.height-control_size.height)*.98, window_size.width*.98)
 
-        window_dimension = window_size[0] * window_size[1]
-        allocated_dimension = allocation_size[0] * allocation_size[1]
-        height = allocation_size[0]
-        width = allocation_size[1]
-        if (window_dimension < allocated_dimension):
-            height = window_size[0]
-            width = window_size[1]
+        height = preview_size[0]
+        width = preview_size[1]
 
         thumbnail = self._app.get_thumbnail(width, height, image)
         previewPixbuf = self._image_to_pixbuf(thumbnail)
