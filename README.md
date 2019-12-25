@@ -2,6 +2,7 @@
 
 [![Code Climate](https://codeclimate.com/github/thenaterhood/gscreenshot/badges/gpa.svg)](https://codeclimate.com/github/thenaterhood/gscreenshot)
 [![Code Health](https://landscape.io/github/thenaterhood/gscreenshot/master/landscape.svg?style=flat)](https://landscape.io/github/thenaterhood/gscreenshot/master)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fthenaterhood%2Fgscreenshot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fthenaterhood%2Fgscreenshot?ref=badge_shield)
 
 
 gscreenshot is a gtk frontend for scrot, an application for taking screenshots,
