@@ -29,6 +29,7 @@ class Controller(object):
         self._control_grid = builder.get_object('control_grid')
         self._delay = 0
         self._hide = True
+        self._was_maximized = False
         self._show_preview(self._app.get_last_image())
 
     def _begin_take_screenshot(self, app_method):
