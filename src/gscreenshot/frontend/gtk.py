@@ -19,7 +19,8 @@ from time import sleep
 
 class Controller(object):
 
-    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize', '_control_grid', '_was_maximized')
+    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
+            '_control_grid', '_was_maximized', '_last_window_dimensions')
 
     def __init__(self, application, builder):
         self._app = application
@@ -31,6 +32,7 @@ class Controller(object):
         self._hide = True
         self._was_maximized = False
         self._show_preview(self._app.get_last_image())
+        self._last_window_dimensions = None
 
     def _begin_take_screenshot(self, app_method):
         screenshot = app_method(self._delay)
@@ -233,7 +235,15 @@ class Controller(object):
 
     def on_window_resize(self, *_):
         if self._can_resize:
-            self._show_preview(self._app.get_last_image())
+            current_window_size = self._window.get_size()
+            if (self._last_window_dimensions is None):
+                self._last_window_dimensions = current_window_size
+
+            if (self._last_window_dimensions.width != current_window_size.width
+                    or self._last_window_dimensions.height != current_window_size.height):
+
+                self._show_preview(self._app.get_last_image())
+                self._last_window_dimensions = current_window_size
 
     def quit(self, *_):
         self._app.quit()
