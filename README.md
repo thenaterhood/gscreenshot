@@ -90,6 +90,7 @@ _These requirements_
 
 _Optional, but recommended_
 * Slop (used for improved region and window selection)
+  * There are some issues with the builtin selection functionality in scrot and some others
 * Xclip (for command line clipboard functionality)
 * xdg-open (for opening screenshots in your image viewer)
 

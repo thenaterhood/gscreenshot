@@ -32,3 +32,8 @@ class ImageMagick(Screenshooter):
     def can_run():
         return find_executable('import') is not None
 
+    def _grab_selection_fallback(self, delay=0):
+        sleep(delay)
+        if not self._call_screenshooter('import', [self.tempfile]):
+            super(ImageMagick, self)._grab_selection_fallback(delay=0)
+
