@@ -223,6 +223,36 @@ class Gscreenshot(object):
         except (subprocess.CalledProcessError, IOError):
             return False
 
+    def copy_last_screenshot_to_clipboard(self):
+        """
+        Copies the last screenshot to the clipboard with
+        xclip, if available. Most frontends should try to
+        use native methods (e.g. Gdk.Clipboard) if possible.
+
+        Returns:
+            bool success
+        """
+        tmp_file = os.path.join(
+                tempfile.gettempdir(),
+                'gscreenshot-cli-clip.png'
+                )
+
+        self.save_last_image(tmp_file)
+        params = [
+                'xclip',
+                '-i',
+                tmp_file,
+                '-selection',
+                'clipboard',
+                '-t',
+                'image/png'
+                ]
+        try:
+            subprocess.Popen(params, close_fds=True, stdin=None, stdout=None, stderr=None)
+            return True
+        except (subprocess.CalledProcessError, OSError):
+            return False
+
     def get_last_save_directory(self):
         return self.last_save_directory
 
