@@ -88,13 +88,15 @@ def run():
         sys.exit(1)
     else:
         shot_saved = False
+        should_save_shot = (args.filename is not False or args.clip is False)
         exit_code = 0
+
         if (args.filename is not False):
             shot_saved = gscreenshot.save_last_image(args.filename)
         elif (args.clip is False):
             shot_saved = gscreenshot.save_last_image()
 
-        if (not shot_saved):
+        if (should_save_shot and not shot_saved):
             exit_code = 1
             print("Failed to save screenshot!")
 
