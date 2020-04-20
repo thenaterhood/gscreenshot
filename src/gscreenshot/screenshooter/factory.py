@@ -8,6 +8,7 @@ class ScreenshooterFactory(object):
     def __init__(self, screenshooter=None):
         self.screenshooter = screenshooter
         self.screenshooters = [
+                ImageMagick,
                 Scrot,
                 ImageMagick,
                 Imlib2
