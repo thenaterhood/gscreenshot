@@ -13,15 +13,15 @@ test_requires = [
     'mock'
     ]
 
-data_files =[
-        ('share/applications', ['dist/desktop/gscreenshot.desktop']),
-        ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
-        ('share/menu', ['dist/menu/gscreenshot'])
-        ]
+data_files = [
+    ('share/applications', ['dist/desktop/gscreenshot.desktop']),
+    ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
+    ('share/menu', ['dist/menu/gscreenshot'])
+    ]
 
 
 setup(name='gscreenshot',
-    version='2.12.0',
+    version='2.12.1',
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
