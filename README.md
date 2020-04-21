@@ -1,7 +1,6 @@
 # gscreenshot
 
 [![Code Climate](https://codeclimate.com/github/thenaterhood/gscreenshot/badges/gpa.svg)](https://codeclimate.com/github/thenaterhood/gscreenshot)
-[![Code Health](https://landscape.io/github/thenaterhood/gscreenshot/master/landscape.svg?style=flat)](https://landscape.io/github/thenaterhood/gscreenshot/master)
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fthenaterhood%2Fgscreenshot.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fthenaterhood%2Fgscreenshot?ref=badge_shield)
 
 
@@ -90,6 +89,7 @@ _These requirements_
 
 _Optional, but recommended_
 * Slop (used for improved region and window selection)
+  * There are some issues with the builtin selection functionality in scrot and some others
 * Xclip (for command line clipboard functionality)
 * xdg-open (for opening screenshots in your image viewer)
 

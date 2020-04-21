@@ -167,10 +167,19 @@ class Controller(object):
         Copy the current screenshot to the clipboard
         """
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        img = self._app.get_last_image()
-        pixbuf = self._image_to_pixbuf(img)
-        clipboard.set_image(pixbuf)
-        clipboard.store()
+        display = Gdk.Display.get_default()
+
+        if display.supports_clipboard_persistence():
+            img = self._app.get_last_image()
+            pixbuf = self._image_to_pixbuf(img)
+            clipboard.set_image(pixbuf)
+            clipboard.store()
+        else:
+            if not self._app.copy_last_screenshot_to_clipboard():
+                warning_dialog = WarningDialog(
+                        "Copy failed. Your clipboard doesn't support persistence and xclip is unavailable.",
+                        self._window)
+                warning_dialog.run()
 
     def on_button_open_clicked(self, *_):
         success = self._app.open_last_screenshot()
@@ -351,15 +360,38 @@ class FileSaveDialog(object):
         return return_value
 
 
+class WarningDialog():
+
+    def __init__(self, message, parent=None):
+        self.parent = parent
+        self.message_dialog = Gtk.MessageDialog(
+                parent,
+                None,
+                Gtk.MESSAGE_WARNING,
+                Gtk.BUTTONS_OK,
+                message
+                )
+
+    def run(self):
+        if self.parent is not None:
+            self.parent.set_sensitive(False)
+
+        self.message_dialog.run()
+        self.message_dialog.destroy()
+
+        if self.parent is not None:
+            self.parent.set_sensitive(True)
+
+
 def main():
     try:
         application = Gscreenshot()
     except NoSupportedScreenshooterError:
-        md = Gtk.MessageDialog(None,
-            Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_WARNING,
-            Gtk.BUTTONS_OK, "gscreenshot couldn't run. No supported screenshot utility could be found.")
+        md = WarningDialog(
+                "gscreenshot couldn't run. No supported screenshot utility could be found.",
+                None
+                )
         md.run()
-        md.destroy()
         sys.exit(1)
 
     # Improves startup performance by kicking off a screenshot

@@ -3,25 +3,6 @@ from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 import argparse
 import sys
-import os
-import tempfile
-import subprocess
-
-def xclip_image_file(imagefname):
-    params = [
-            'xclip',
-            '-i',
-            imagefname,
-            '-selection',
-            'clipboard',
-            '-t',
-            'image/png'
-            ]
-    try:
-        subprocess.Popen(params, close_fds=True, stdin=None, stdout=None, stderr=None)
-        return True
-    except (subprocess.CalledProcessError, OSError):
-        return False
 
 def run():
 
@@ -107,13 +88,15 @@ def run():
         sys.exit(1)
     else:
         shot_saved = False
+        should_save_shot = (args.filename is not False or args.clip is False)
         exit_code = 0
+
         if (args.filename is not False):
             shot_saved = gscreenshot.save_last_image(args.filename)
         elif (args.clip is False):
             shot_saved = gscreenshot.save_last_image()
 
-        if (not shot_saved):
+        if (should_save_shot and not shot_saved):
             exit_code = 1
             print("Failed to save screenshot!")
 
@@ -121,12 +104,7 @@ def run():
             gscreenshot.open_last_screenshot()
 
         if (args.clip is not False):
-            tmp_file = os.path.join(
-                    tempfile.gettempdir(),
-                    'gscreenshot-cli-clip.png'
-                    )
-            gscreenshot.save_last_image(tmp_file)
-            successful_clip = xclip_image_file(tmp_file)
+            successful_clip = gscreenshot.copy_last_screenshot_to_clipboard()
 
             if (not successful_clip):
                 print("Could not clip image! Xclip failed to run - is it installed?")
