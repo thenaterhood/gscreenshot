@@ -295,10 +295,10 @@ class Controller(object):
         window_size = self._window.get_size()
         control_size = self._control_grid.get_allocation()
 
-        preview_size = ((window_size.height-control_size.height)*.98, window_size.width*.98)
-
-        height = preview_size[0]
-        width = preview_size[1]
+        height = window_size.height-control_size.height-50
+        width = window_size.width-20
+        if height < 0:
+            height = 1
 
         thumbnail = self._app.get_thumbnail(width, height, image)
         previewPixbuf = self._image_to_pixbuf(thumbnail)
