@@ -262,9 +262,9 @@ class Controller(object):
 
             if (self._last_window_dimensions.width != current_window_size.width
                     or self._last_window_dimensions.height != current_window_size.height):
-
-                self._show_preview(self._app.get_last_image())
                 self._last_window_dimensions = current_window_size
+            else:
+                self._show_preview(self._app.get_last_image())
 
     def quit(self, *_):
         self._app.quit()
@@ -295,10 +295,8 @@ class Controller(object):
         window_size = self._window.get_size()
         control_size = self._control_grid.get_allocation()
 
-        height = window_size.height-control_size.height-50
-        width = window_size.width-20
-        if height < 0:
-            height = 1
+        height = (window_size.height-control_size.height)*.95
+        width = window_size.width*.95
 
         thumbnail = self._app.get_thumbnail(width, height, image)
         previewPixbuf = self._image_to_pixbuf(thumbnail)
