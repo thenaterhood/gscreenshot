@@ -20,14 +20,15 @@ from time import sleep
 class Controller(object):
 
     __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
-            '_control_grid', '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen')
+            '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen', '_main_container', '_control_box')
 
     def __init__(self, application, builder):
         self._app = application
         self._can_resize = True
         self._window = builder.get_object('window_main')
         self._preview = builder.get_object('image1')
-        self._control_grid = builder.get_object('control_grid')
+        self._main_container = builder.get_object('main_container')
+        self._control_box = builder.get_object('control_box')
         self._delay = 0
         self._hide = True
         self._was_maximized = False
@@ -292,10 +293,10 @@ class Controller(object):
             print("Failed to generate preview. Using default.")
             previewPixbuf = self._image_to_pixbuf(self._app.get_app_icon())
 
-        window_size = self._window.get_size()
-        control_size = self._control_grid.get_allocation()
+        window_size = self._main_container.get_allocation()
+        control_size = self._control_box.get_allocation()
 
-        height = (window_size.height-control_size.height)*.95
+        height = (window_size.height - control_size.height)*.95
         width = window_size.width*.95
 
         thumbnail = self._app.get_thumbnail(width, height, image)

@@ -79,7 +79,7 @@ Version: 3.0.1
       <placeholder/>
     </child>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="main_container">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
@@ -100,11 +100,11 @@ Version: 3.0.1
           </packing>
         </child>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="control_box">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
-              <object class="GtkGrid" id="control_grid">
+              <object class="GtkGrid">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="margin_left">5</property>
@@ -112,7 +112,7 @@ Version: 3.0.1
                 <property name="margin_top">5</property>
                 <property name="margin_bottom">5</property>
                 <property name="hexpand">True</property>
-                <property name="column_homogeneous">True</property>
+                <property name="column_homogeneous">False</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
