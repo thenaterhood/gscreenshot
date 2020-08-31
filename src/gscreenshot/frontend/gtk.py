@@ -20,7 +20,7 @@ from time import sleep
 class Controller(object):
 
     __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
-            '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen', '_main_container', '_control_box')
+            '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen', '_main_container', '_pixbuf', '_original_width', '_original_height')
 
     def __init__(self, application, builder):
         self._app = application
@@ -28,11 +28,11 @@ class Controller(object):
         self._window = builder.get_object('window_main')
         self._preview = builder.get_object('image1')
         self._main_container = builder.get_object('main_container')
-        self._control_box = builder.get_object('control_box')
         self._delay = 0
         self._hide = True
         self._was_maximized = False
-        self._show_preview(self._app.get_last_image())
+        self._set_image(self._app.get_last_image())
+        self._show_preview()
         self._last_window_dimensions = None
 
     def _begin_take_screenshot(self, app_method):
@@ -42,7 +42,8 @@ class Controller(object):
         GObject.idle_add(self._end_take_screenshot, screenshot)
 
     def _end_take_screenshot(self, screenshot):
-        self._show_preview(screenshot)
+        self._set_image(screenshot)
+        self._show_preview()
 
         self._window.set_sensitive(True)
         self._window.set_opacity(1)
@@ -258,14 +259,7 @@ class Controller(object):
     def on_window_resize(self, *_):
         if self._can_resize:
             current_window_size = self._window.get_size()
-            if (self._last_window_dimensions is None):
-                self._last_window_dimensions = current_window_size
-
-            if (self._last_window_dimensions.width != current_window_size.width
-                    or self._last_window_dimensions.height != current_window_size.height):
-                self._last_window_dimensions = current_window_size
-            else:
-                self._show_preview(self._app.get_last_image())
+            self._show_preview()
 
     def quit(self, *_):
         self._app.quit()
@@ -282,25 +276,31 @@ class Controller(object):
         loader.close()
         return pixbuf
 
-    def _show_preview(self, image):
+    def _set_image(self, image):
         # create an image buffer (pixbuf) and insert the grabbed image
         if (image is None):
             image = self._app.get_app_icon()
+        self._pixbuf = self._image_to_pixbuf(image)
+        self._original_width = image.width
+        self._original_height = image.height
 
-        try:
-            previewPixbuf = self._image_to_pixbuf(image)
-        except:
-            print("Failed to generate preview. Using default.")
-            previewPixbuf = self._image_to_pixbuf(self._app.get_app_icon())
+    def _show_preview(self):
+        image_widget_size = self._preview.get_allocation()
 
-        window_size = self._main_container.get_allocation()
-        control_size = self._control_box.get_allocation()
+        if image_widget_size.width > image_widget_size.height:
+            width = image_widget_size.width * .95
+            height = (width/self._original_width)*self._original_height
+            if height > image_widget_size.height * .90:
+                height = image_widget_size.height * .90
+                width = (height/self._original_height)*self._original_width
+        else:
+            height = image_widget_size.height * .90
+            width = (height/self._original_height)*self._original_width
+            if width > image_widget_size.width * .95:
+                width = image_widget_size.width * .95
+                height = (width/self._original_width)*self._original_height
 
-        height = (window_size.height - control_size.height)*.95
-        width = window_size.width*.95
-
-        thumbnail = self._app.get_thumbnail(width, height, image)
-        previewPixbuf = self._image_to_pixbuf(thumbnail)
+        previewPixbuf = self._pixbuf.scale_simple(width, height, Gtk.gdk.INTERP_BILINEAR)
 
         # set the image_preview widget to the preview image size (previewWidth,
         # previewHeight)
