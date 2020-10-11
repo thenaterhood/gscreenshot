@@ -20,7 +20,7 @@ from time import sleep
 class Controller(object):
 
     __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
-            '_control_grid', '_was_maximized', '_last_window_dimensions')
+            '_control_grid', '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen')
 
     def __init__(self, application, builder):
         self._app = application
@@ -53,6 +53,8 @@ class Controller(object):
 
     def window_state_event_handler(self, widget, event, *args):
         self._was_maximized = bool(event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
+        self._window_is_fullscreen = bool(
+                            Gtk.gdk.WINDOW_STATE_FULLSCREEN & event.new_window_state)
 
     def take_screenshot(self, app_method):
         self._window.set_sensitive(False)
@@ -89,7 +91,8 @@ class Controller(object):
         modifiers).
         """
         shortcuts = {
-                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')): self.on_button_quit_clicked
+                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')): self.on_button_quit_clicked,
+                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')): self.on_fullscreen_toggle
                 }
 
         if event.keyval in shortcuts:
@@ -231,6 +234,15 @@ class Controller(object):
         about.connect("response", self.on_about_close)
 
         about.show()
+
+    def on_fullscreen_toggle(self):
+        print("Toggling full screen")
+        if self._window_is_fullscreen:
+            self._window.unfullscreen()
+        else:
+            self._window.fullscreen()
+
+        self._window_is_fullscreen = not self._window_is_fullscreen
 
     def on_about_close(self, action, *_):
         action.destroy()
