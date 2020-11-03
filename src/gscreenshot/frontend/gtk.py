@@ -34,8 +34,11 @@ class Controller(object):
         self._set_image(self._app.get_last_image())
         self._show_preview()
         self._last_window_dimensions = None
+        original_window_size = self._window.get_size()
+        self._window.set_geometry_hints(None, min_width=original_window_size.width, min_height=original_window_size.height)
 
     def _begin_take_screenshot(self, app_method):
+        self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
         screenshot = app_method(self._delay)
 
         # Re-enable UI on the UI thread.
@@ -47,6 +50,9 @@ class Controller(object):
 
         self._window.set_sensitive(True)
         self._window.set_opacity(1)
+
+        original_window_size = self._window.get_size()
+        self._window.set_geometry_hints(None, min_width=original_window_size.width, min_height=original_window_size.height)
 
         if self._was_maximized:
             self._window.maximize()
@@ -258,7 +264,6 @@ class Controller(object):
 
     def on_window_resize(self, *_):
         if self._can_resize:
-            current_window_size = self._window.get_size()
             self._show_preview()
 
     def quit(self, *_):
