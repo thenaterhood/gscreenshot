@@ -37,7 +37,24 @@ class Gscreenshot(object):
 
         self.saved_last_image = False
         self.last_save_file = None
-        self.last_save_directory = os.path.expanduser("~")
+        if os.path.isfile(self.get_save_file()):
+            f = open(self.get_save_file(), "r")
+            self.last_save_directory = f.readline()
+            f.close()
+        else:
+            self.last_save_directory = os.path.expanduser("~")
+            self.save_last_directory(self.last_save_directory)
+
+    def get_save_file(self):
+        if 'XDG_CACHE_HOME' in os.environ:
+            return os.environ['XDG_CACHE_HOME'] + "/gscreenshot"
+        else:
+            return os.path.expanduser("~/.gscreenshot")
+
+    def save_last_directory(self, directory):
+        f = open(self.get_save_file(), "w")
+        f.write(directory)
+        f.close()
 
     def get_screenshooter_name(self):
         return self.screenshooter.__class__.__name__
@@ -197,6 +214,7 @@ class Gscreenshot(object):
 
         if actual_file_ext in supported_formats:
             self.last_save_directory = os.path.dirname(filename)
+            self.save_last_directory(self.last_save_directory)
             try:
                 image.save(filename, actual_file_ext.upper())
                 self.saved_last_image = True
