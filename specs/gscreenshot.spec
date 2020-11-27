@@ -1,6 +1,6 @@
 %define name gscreenshot
-%define version 2.12.1
-%define unmangled_version 2.12.1
+%define version 2.12.2
+%define unmangled_version 2.12.2
 %define release 1
 
 Summary: A simple screenshot tool
@@ -13,6 +13,7 @@ Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
+BuildRequires: python3 python3-setuptools
 Requires: scrot python3 python3-pillow python3-gobject python3-setuptools
 Vendor: Nate Levesque <public@thenaterhood.com>
 Url: https://github.com/thenaterhood/gscreenshot
@@ -24,10 +25,10 @@ A graphical and CLI screenshot utility.
 %setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
 
 %build
-/usr/bin/python3 setup.py build
+python3 setup.py build
 
 %install
-/usr/bin/python3 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+python3 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
 
 %clean
 rm -rf $RPM_BUILD_ROOT
