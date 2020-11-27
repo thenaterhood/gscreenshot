@@ -17,25 +17,37 @@ gscreenshot is licensed under the GPLv2.
 ## Installation
 
 ArchLinux and derivatives:
-[Available in the Archlinux User Repository](https://aur.archlinux.org/packages/gscreenshot/)
+[Available in the AUR](https://aur.archlinux.org/packages/gscreenshot/)
+
+Fedora/Mageia/OpenSUSE:
+[Available in COPR](https://copr.fedorainfracloud.org/coprs/thenaterhood/gscreenshot/)
 
 SparkyLinux:
 Available in your distro's repositories. Run `sudo apt-get install gscreenshot`
 
-Other distros:
+Manual installation:
 
 1. Download the latest version from [here](https://github.com/thenaterhood/gscreenshot/releases/latest)
 2. Unzip or untar the file (depending which you downloaded)
 3. From the command line, navigate to the unzipped files and run
-`sudo pip install -e .` NOTE: you *can* install gscreenshot by running
-`sudo python setup.py install` but that method will not automatically handle
-dependencies for you.
+   - `sudo python setup.py install --single-version-externally-managed` (may fail on some Python versions)
+   - OR `sudo python setup.py install --old-and-unmanageable`
+   - OR you can also install with `sudo pip install -e .` but this won't install pixmaps or menu entries
+
+Building a package:
+
+Generally, running one of the setup.py calls above with the --root parameter
+should work fine for building a packageable version.
+
+gscreenshot automatically retrieves its version number from specs/gscreenshot.spec
+and setup.py should generate appropriate menu entries and binaries.
 
 ## Usage
-gscreenshot takes screenshots! Run it manually or bind it to a keystroke. Both a graphical (gscreenshot) and CLI (gscreenshot-cli) interface are available.
+gscreenshot takes screenshots! Run it manually or bind it to a keystroke.
+Both a graphical (gscreenshot) and CLI (gscreenshot-cli) interface are available.
 
 ### Command Line
-Run `gscreenshot-cli --help` for instructions. The shell interface is
+Run `gscreenshot --help` for instructions. The shell interface is
 non-interactive so it is suitable for use in scripts and pre-built
 calls.
 
