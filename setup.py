@@ -5,8 +5,6 @@ import errno
 import sys
 import os
 
-pkg_version='2.12.3'
-
 install_requires = [
     'pillow',
     ]
@@ -22,7 +20,23 @@ data_files = [
     ('share/menu', ['dist/menu/gscreenshot'])
     ]
 
-def build_data_files():
+def get_version_from_specfile():
+    '''
+    Gets the version from the RPM specfile in specs/
+
+    This is a hackaround because I always forget to update it
+    '''
+    version = None
+    with open('specs/gscreenshot.spec', 'r') as specfile:
+        for line in specfile:
+            if '%define version' in line:
+                version = line.split(' ')[2].strip()
+                break
+
+    return version
+
+
+def build_data_files(version):
     '''
     This is somewhat of a workaround so that the data files that
     contain a version number end up with the correct version number
@@ -37,7 +51,7 @@ def build_data_files():
         try:
             with open(d[1][0], 'r') as infile:
                 infile_data = infile.read()
-                updated_data = infile_data.replace('%%VERSION%%', pkg_version)
+                updated_data = infile_data.replace('%%VERSION%%', version)
                 try:
                     os.makedirs(os.path.dirname(generated_path))
                 except (OSError, FileExistsError) as e:
@@ -54,6 +68,7 @@ def build_data_files():
 
     return files
 
+pkg_version = get_version_from_specfile()
 
 setup(name='gscreenshot',
     version=pkg_version,
@@ -83,7 +98,7 @@ setup(name='gscreenshot',
         'gscreenshot.resources.gui.glade',
         'gscreenshot.resources.pixmaps'
         ],
-    data_files=build_data_files(),
+    data_files=build_data_files(pkg_version),
     package_data={
         '': ['*.glade', 'LICENSE', '*.png']
         }
