@@ -11,6 +11,7 @@
 # - Updated to use modern libraries and formats
 # - Further changes will be noted in release notes
 #--------------------------------------------
+import json
 import os
 import sys
 import subprocess
@@ -37,23 +38,27 @@ class Gscreenshot(object):
 
         self.saved_last_image = False
         self.last_save_file = None
-        if os.path.isfile(self.get_save_file()):
-            f = open(self.get_save_file(), "r")
-            self.last_save_directory = f.readline()
+        self.cache = {"last_save_dir": os.path.expanduser("~")}
+        if os.path.isfile(self.get_cache_file()):
+            f = open(self.get_cache_file(), "r")
+            try:
+                self.cache = json.load(f)
+            except Exception:
+                self.cache = {"last_save_dir": os.path.expanduser("~")}
+                self.save_cache()
             f.close()
         else:
-            self.last_save_directory = os.path.expanduser("~")
-            self.save_last_directory(self.last_save_directory)
+            self.save_cache()
 
-    def get_save_file(self):
+    def get_cache_file(self):
         if 'XDG_CACHE_HOME' in os.environ:
             return os.environ['XDG_CACHE_HOME'] + "/gscreenshot"
         else:
             return os.path.expanduser("~/.gscreenshot")
 
-    def save_last_directory(self, directory):
-        f = open(self.get_save_file(), "w")
-        f.write(directory)
+    def save_cache(self):
+        f = open(self.get_cache_file(), "w")
+        json.dump(self.cache, f);
         f.close()
 
     def get_screenshooter_name(self):
@@ -213,8 +218,8 @@ class Gscreenshot(object):
         supported_formats = self.get_supported_formats()
 
         if actual_file_ext in supported_formats:
-            self.last_save_directory = os.path.dirname(filename)
-            self.save_last_directory(self.last_save_directory)
+            self.cache["last_save_dir"] = os.path.dirname(filename)
+            self.save_cache()
             try:
                 image.save(filename, actual_file_ext.upper())
                 self.saved_last_image = True
@@ -272,7 +277,7 @@ class Gscreenshot(object):
             return False
 
     def get_last_save_directory(self):
-        return self.last_save_directory
+        return self.cache["last_save_dir"]
 
     def get_program_authors(self):
         authors = [
