@@ -5,6 +5,12 @@ import errno
 import sys
 import os
 
+try:
+    FileExistsError()
+except:
+    class FileExistsError(BaseException):
+        pass
+
 install_requires = [
     'pillow',
     ]
