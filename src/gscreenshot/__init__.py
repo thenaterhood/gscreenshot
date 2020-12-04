@@ -1,16 +1,15 @@
 #!/usr/bin/env python
+'''
+ gscreenshot.py
+ Matej Horvath <matej.horvath@gmail.com>
+ 3. september 2006
 
-#--------------------------------------------
-# gscreenshot.py
-# Matej Horvath <matej.horvath@gmail.com>
-# 3. september 2006
-#
-# Adopted August 9, 2015
-# Nate Levesque <public@thenaterhood.com>
-# - Retrieved from Google Code
-# - Updated to use modern libraries and formats
-# - Further changes will be noted in release notes
-#--------------------------------------------
+ Adopted August 9, 2015
+ Nate Levesque <public@thenaterhood.com>
+ - Retrieved from Google Code
+ - Updated to use modern libraries and formats
+ - Further changes will be noted in release notes
+'''
 import json
 import os
 import sys
@@ -40,28 +39,33 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
-            f = open(self.get_cache_file(), "r")
+            cachefile = open(self.get_cache_file(), "r")
             try:
-                self.cache = json.load(f)
-            except Exception:
+                self.cache = json.load(cachefile)
+            except json.JSONDecodeError:
                 self.cache = {"last_save_dir": os.path.expanduser("~")}
                 self.save_cache()
-            f.close()
+            cachefile.close()
         else:
             self.save_cache()
 
     def get_cache_file(self):
+        """
+        Find the gscreenshot cache file and return its path
+        """
         if 'XDG_CACHE_HOME' in os.environ:
             return os.environ['XDG_CACHE_HOME'] + "/gscreenshot"
         else:
             return os.path.expanduser("~/.gscreenshot")
 
     def save_cache(self):
-        f = open(self.get_cache_file(), "w")
-        json.dump(self.cache, f);
-        f.close()
+        """Writes the cache to disk"""
+        cachefile = open(self.get_cache_file(), "w")
+        json.dump(self.cache, cachefile)
+        cachefile.close()
 
     def get_screenshooter_name(self):
+        """Gets the name of the current screenshooter"""
         return self.screenshooter.__class__.__name__
 
     def screenshot_full_display(self, delay=0):
@@ -135,6 +139,17 @@ class Gscreenshot(object):
         return supported_formats
 
     def get_thumbnail(self, width, height, image=None):
+        """
+        Gets a thumbnail of either the current image, or a passed one
+
+        Params:
+            width: int
+            height: int
+            image: Image|None
+
+        Returns:
+            Image
+        """
         if image is None:
             thumbnail = self.screenshooter.image.copy()
         else:
@@ -150,8 +165,8 @@ class Gscreenshot(object):
         Returns:
             str
         """
-        d = datetime.now()
-        return datetime.strftime(d, "gscreenshot_%Y-%m-%d-%H%M%S.png")
+        now = datetime.now()
+        return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
     def save_and_return_path(self):
         """
@@ -166,7 +181,7 @@ class Gscreenshot(object):
                 self.get_time_filename()
                 )
 
-        if (not self.saved_last_image):
+        if not self.saved_last_image:
             self.save_last_image(screenshot_fname)
         else:
             screenshot_fname = self.last_save_file
@@ -186,13 +201,13 @@ class Gscreenshot(object):
             bool success
         """
 
-        if (filename is None):
+        if filename is None:
             filename = self.get_time_filename()
 
         image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 
-        if (actual_file_ext == ""):
+        if actual_file_ext == "":
             # If we don't have any file extension, assume
             # we were given a directory; create the tree
             # if it doesn't exist, then store the screenshot
@@ -277,9 +292,16 @@ class Gscreenshot(object):
             return False
 
     def get_last_save_directory(self):
+        """Returns the path of the last save directory"""
         return self.cache["last_save_dir"]
 
     def get_program_authors(self):
+        """
+        Returns the list of authors
+
+        Returns:
+            string[]
+        """
         authors = [
                 "Nate Levesque <public@thenaterhood.com>",
                 "Original Author (2006)",
@@ -289,32 +311,33 @@ class Gscreenshot(object):
         return authors
 
     def get_app_icon(self):
+        """Returns the application icon"""
         return Image.open(
                 resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
                 )
 
     def get_program_description(self):
-
+        """Returns the program description"""
         return "A simple screenshot tool supporting multiple backends."
 
     def get_program_website(self):
-
+        """Returns the URL of the program website"""
         return "https://github.com/thenaterhood/gscreenshot"
 
     def get_program_name(self):
-
+        """Returns the program name"""
         return "gscreenshot"
 
     def get_program_license_text(self):
-
+        """Returns the license text"""
         return resource_string('gscreenshot.resources', 'LICENSE').decode('UTF-8')
 
     def get_program_license(self):
-
+        """Returns the license name"""
         return "GPLv2"
 
     def get_program_version(self):
-
+        """Returns the program version"""
         return require("gscreenshot")[0].version
 
     def quit(self):
