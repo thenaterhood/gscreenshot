@@ -1,11 +1,15 @@
+'''
+Classes and exceptions related to screen region selection
+'''
+
 class SelectionError(BaseException):
-    pass
+    '''Generic selection error'''
 
 class SelectionExecError(SelectionError):
-    pass
+    '''Error executing selector'''
 
 class SelectionParseError(SelectionError):
-    pass
+    '''Error parsing selection output'''
 
 class SelectionCancelled(SelectionError):
-    pass
+    '''Selection cancelled error'''

@@ -35,7 +35,6 @@ class Controller(object):
         self._show_preview()
         self._last_window_dimensions = None
         original_window_size = self._window.get_size()
-        self._window.set_geometry_hints(None, min_width=original_window_size.width, min_height=original_window_size.height)
 
     def _begin_take_screenshot(self, app_method):
         self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
@@ -61,6 +60,7 @@ class Controller(object):
 
     def window_state_event_handler(self, widget, event, *args):
         self._was_maximized = bool(event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
+        print(self._was_maximized)
         self._window_is_fullscreen = bool(
                             Gtk.gdk.WINDOW_STATE_FULLSCREEN & event.new_window_state)
 
