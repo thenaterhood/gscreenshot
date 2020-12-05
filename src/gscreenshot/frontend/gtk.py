@@ -1,21 +1,21 @@
 '''
 Classes for the GTK gscreenshot frontend
 '''
+#pylint: disable=unused-argument,wrong-import-position
 import io
 import sys
 import threading
-from pkg_resources import resource_string, resource_filename
 from time import sleep
+from pkg_resources import resource_string, resource_filename
 from gi import pygtkcompat
+from gscreenshot import Gscreenshot
+from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
-
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
-
-from gscreenshot import Gscreenshot
-from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 
 class Controller(object):
@@ -34,6 +34,7 @@ class Controller(object):
         self._delay = 0
         self._hide = True
         self._was_maximized = False
+        self._window_is_fullscreen = False
         self._set_image(self._app.get_last_image())
         self._show_preview()
         self._last_window_dimensions = None
@@ -100,7 +101,7 @@ class Controller(object):
         _thread.daemon = True
         _thread.start()
 
-    def handle_keypress(self, widget=None, event=None, *_):
+    def handle_keypress(self, widget=None, event=None, *args):
         """
         This method handles individual keypresses. These are
         handled separately from accelerators (which include
@@ -330,14 +331,14 @@ class Controller(object):
                 width = image_widget_size.width * .95
                 height = (width/self._original_width)*self._original_height
 
-        previewPixbuf = self._pixbuf.scale_simple(width, height, Gtk.gdk.INTERP_BILINEAR)
+        preview_pixbuf = self._pixbuf.scale_simple(width, height, Gtk.gdk.INTERP_BILINEAR)
 
         # set the image_preview widget to the preview image size (previewWidth,
         # previewHeight)
         self._preview.set_size_request(width, height)
 
         # view the previewPixbuf in the image_preview widget
-        self._preview.set_from_pixbuf(previewPixbuf)
+        self._preview.set_from_pixbuf(preview_pixbuf)
 
 
 class OpenWithDialog(Gtk.AppChooserDialog):
@@ -433,11 +434,11 @@ def main():
     try:
         application = Gscreenshot()
     except NoSupportedScreenshooterError:
-        md = WarningDialog(
+        warning = WarningDialog(
             "gscreenshot couldn't run. No supported screenshot utility found.",
             None
             )
-        md.run()
+        warning.run()
         sys.exit(1)
 
     # Improves startup performance by kicking off a screenshot

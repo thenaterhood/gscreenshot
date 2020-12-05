@@ -32,4 +32,3 @@ def delegate():
             gscreenshot.frontend.cli.run()
         else:
             gscreenshot.frontend.gtk.main()
-
