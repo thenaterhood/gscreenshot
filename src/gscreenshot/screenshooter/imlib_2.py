@@ -1,3 +1,6 @@
+'''
+Integration for the imlib2 screenshot utility
+'''
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
@@ -6,7 +9,6 @@ from gscreenshot.util import find_executable
 
 
 class Imlib2(Screenshooter):
-
     """
     Python class wrapper for the scrot screenshooter utility
     """
@@ -30,5 +32,5 @@ class Imlib2(Screenshooter):
 
     @staticmethod
     def can_run():
+        '''Whether this utility is available'''
         return find_executable('imlib2_grab') is not None
-

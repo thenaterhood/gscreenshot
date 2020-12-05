@@ -1,3 +1,6 @@
+'''
+Wrapper for the slop screen selector utility
+'''
 import subprocess
 from gscreenshot.selector import SelectionParseError, SelectionExecError, SelectionCancelled
 
@@ -15,7 +18,6 @@ class Slop(object):
         """
         constructor
         """
-        pass
 
     def region_select(self):
         """
@@ -35,16 +37,6 @@ class Slop(object):
         """
         return self._get_boundary_interactive()
 
-    def grab_window(self, delay=0):
-        """
-        Takes an interactive screenshot of a selected window with a
-        given delay
-
-        Parameters:
-            int delay: seconds
-        """
-        self.grab_selection(delay)
-
     def _get_boundary_interactive(self):
         """
         Calls slop and returns the boundary produced by
@@ -53,32 +45,32 @@ class Slop(object):
         try:
             # nodecorations=0 - this is the slop default, but there's a bug
             # so skipping the "=0" causes a segfault.
-            p = subprocess.Popen(
+            process = subprocess.Popen(
                 ['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
                 )
-            stdout, stderr = p.communicate()
-            return_code = p.returncode
-        except OSError:
-            raise SelectionExecError("Slop was not found")
+            stdout, stderr = process.communicate()
+            return_code = process.returncode
+        except OSError as exception:
+            raise SelectionExecError("Slop was not found") from exception
 
-        if (return_code != 0):
+        if return_code != 0:
             slop_error = stderr.decode("UTF-8")
 
-            if ("cancelled" in slop_error):
+            if "cancelled" in slop_error:
                 raise SelectionCancelled("Selection was cancelled")
-            else:
-                raise SelectionExecError(slop_error)
+
+            raise SelectionExecError(slop_error)
 
         slop_output = stdout.decode("UTF-8").strip().split(",")
 
         slop_parsed = {}
         # We iterate through the output so we're not reliant
         # on the order or number of lines in slop's output
-        for l in slop_output:
-            if ('=' in l):
-                spl = l.split("=")
+        for line in slop_output:
+            if '=' in line:
+                spl = line.split("=")
                 slop_parsed[spl[0]] = spl[1]
 
         # (left, upper, right, lower)
@@ -89,7 +81,7 @@ class Slop(object):
                 int(slop_parsed['X']) + int(slop_parsed['W']),
                 int(slop_parsed['Y']) + int(slop_parsed['H'])
             )
-        except KeyError:
-            raise SelectionParseError("Unexpected slop output")
+        except KeyError as exception:
+            raise SelectionParseError("Unexpected slop output") from exception
 
         return crop_box
