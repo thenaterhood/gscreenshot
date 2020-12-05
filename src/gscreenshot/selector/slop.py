@@ -83,6 +83,7 @@ class Slop(object):
                 int(slop_parsed['Y']) + int(slop_parsed['H'])
             )
         except KeyError as exception:
-            raise SelectionParseError("Unexpected slop output") from exception
+            #pylint: disable=raise-missing-from
+            raise SelectionParseError("Unexpected slop output") #from exception
 
         return crop_box
