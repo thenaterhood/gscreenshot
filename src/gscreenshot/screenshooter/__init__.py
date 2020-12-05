@@ -14,7 +14,7 @@ class Screenshooter(object):
     Python interface for a screenshooter
     """
 
-    __slots__ = ('_image', 'tempfile')
+    __slots__ = ('_image', 'tempfile', 'selector')
 
     def __init__(self):
         """
@@ -67,7 +67,7 @@ class Screenshooter(object):
             print("Failed to call region selector -- Using fallback region selection")
             self._grab_selection_fallback(delay)
             return
-        except (SelectionParseError):
+        except SelectionParseError:
             print("Invalid selection data -- falling back to full screen")
             self.grab_fullscreen(delay)
             return

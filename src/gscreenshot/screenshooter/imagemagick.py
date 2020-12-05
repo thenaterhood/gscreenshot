@@ -41,4 +41,3 @@ class ImageMagick(Screenshooter):
             #pylint: disable=super-with-arguments
             #disabling this until we don't support Python 2 anymore
             super(ImageMagick, self)._grab_selection_fallback(delay=0)
-
