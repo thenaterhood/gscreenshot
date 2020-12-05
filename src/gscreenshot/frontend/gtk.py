@@ -1,8 +1,12 @@
+'''
+Classes for the GTK gscreenshot frontend
+'''
 import io
 import sys
 import threading
+from pkg_resources import resource_string, resource_filename
+from time import sleep
 from gi import pygtkcompat
-
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
@@ -13,14 +17,13 @@ from gi.repository import GObject
 from gscreenshot import Gscreenshot
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
-from pkg_resources import resource_string, resource_filename
-from time import sleep
-
 
 class Controller(object):
+    '''Controller class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
-            '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen', '_main_container', '_pixbuf', '_original_width', '_original_height')
+            '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen',
+            '_main_container', '_pixbuf', '_original_width', '_original_height')
 
     def __init__(self, application, builder):
         self._app = application
@@ -34,7 +37,6 @@ class Controller(object):
         self._set_image(self._app.get_last_image())
         self._show_preview()
         self._last_window_dimensions = None
-        original_window_size = self._window.get_size()
 
     def _begin_take_screenshot(self, app_method):
         self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
@@ -51,20 +53,26 @@ class Controller(object):
         self._window.set_opacity(1)
 
         original_window_size = self._window.get_size()
-        self._window.set_geometry_hints(None, min_width=original_window_size.width, min_height=original_window_size.height)
+        self._window.set_geometry_hints(
+            None,
+            min_width=original_window_size.width,
+            min_height=original_window_size.height
+        )
 
         if self._was_maximized:
             self._window.maximize()
 
         self._window.show_all()
 
-    def window_state_event_handler(self, widget, event, *args):
+    def window_state_event_handler(self, widget, event, *_):
+        '''Handle window state events'''
+        widget = None
         self._was_maximized = bool(event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
-        print(self._was_maximized)
         self._window_is_fullscreen = bool(
                             Gtk.gdk.WINDOW_STATE_FULLSCREEN & event.new_window_state)
 
     def take_screenshot(self, app_method):
+        '''Take a screenshot using the passed app method'''
         self._window.set_sensitive(False)
         if self._hide:
             # We set the opacity to 0 because hiding the window is
@@ -99,29 +107,35 @@ class Controller(object):
         modifiers).
         """
         shortcuts = {
-                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')): self.on_button_quit_clicked,
-                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')): self.on_fullscreen_toggle
+                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')):
+                    self.on_button_quit_clicked,
+                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')):
+                    self.on_fullscreen_toggle
                 }
 
         if event.keyval in shortcuts:
             shortcuts[event.keyval]()
 
     def hide_window_toggled(self, widget):
+        '''Toggle the window to hidden'''
         self._hide = widget.get_active()
 
     def delay_value_changed(self, widget):
+        '''Handle a change with the screenshot delay input'''
         self._delay = widget.get_value()
 
     def on_button_all_clicked(self, *_):
-
+        '''Take a screenshot of the full screen'''
         self.take_screenshot(
             self._app.screenshot_full_display
             )
 
     def on_button_window_clicked(self, *args):
+        '''Take a screenshot of a window'''
         self._button_select_area_or_window_clicked(args)
 
     def on_button_selectarea_clicked(self, *args):
+        '''Take a screenshot of an area'''
         self._button_select_area_or_window_clicked(args)
 
     def _button_select_area_or_window_clicked(self, *_):
@@ -131,6 +145,7 @@ class Controller(object):
             )
 
     def on_button_saveas_clicked(self, *_):
+        '''Handle the saveas button'''
         # make the main window unsensitive while saving your image
         self._window.set_sensitive(False)
 
@@ -139,6 +154,7 @@ class Controller(object):
         self._window.set_sensitive(True)
 
     def handle_save_action(self):
+        '''Handle the save button'''
         saved = False
         cancelled = False
         save_dialog = FileSaveDialog(
@@ -155,6 +171,7 @@ class Controller(object):
                 cancelled = True
 
     def on_button_openwith_clicked(self, *_):
+        '''Handle the "open with" button'''
         self._window.set_sensitive(False)
 
         self.handle_openwith_action()
@@ -162,13 +179,14 @@ class Controller(object):
         self._window.set_sensitive(True)
 
     def handle_openwith_action(self):
+        '''Handle the "open with" button'''
         fname = self._app.save_and_return_path()
         appchooser = OpenWithDialog()
         appchooser.run()
         appinfo = appchooser.appinfo
         appchooser.destroy()
 
-        if (appinfo is not None):
+        if appinfo is not None:
             print(fname)
             if appinfo.launch_uris(["file://"+fname], None):
                 self.quit(None)
@@ -188,22 +206,24 @@ class Controller(object):
         else:
             if not self._app.copy_last_screenshot_to_clipboard():
                 warning_dialog = WarningDialog(
-                        "Copy failed. Your clipboard doesn't support persistence and xclip is unavailable.",
-                        self._window)
+                    "Your clipboard doesn't support persistence and xclip isn't available.",
+                    self._window)
                 warning_dialog.run()
 
     def on_button_open_clicked(self, *_):
+        '''Handle the open button'''
         success = self._app.open_last_screenshot()
-        if (not success):
-            md = Gtk.MessageDialog(self._window,
+        if not success:
+            dialog = Gtk.MessageDialog(self._window,
                 Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_WARNING,
                 Gtk.BUTTONS_OK, "Please install xdg-open to open files.")
-            md.run()
-            md.destroy()
+            dialog.run()
+            dialog.destroy()
         else:
             self.quit(None)
 
     def on_button_about_clicked(self, *_):
+        '''Handle the about button'''
         # make the main window unsensitive while viewing the "about"
         # information
         self._window.set_sensitive(False)
@@ -244,7 +264,7 @@ class Controller(object):
         about.show()
 
     def on_fullscreen_toggle(self):
-        print("Toggling full screen")
+        '''Handle the window getting toggled to fullscreen'''
         if self._window_is_fullscreen:
             self._window.unfullscreen()
         else:
@@ -253,28 +273,33 @@ class Controller(object):
         self._window_is_fullscreen = not self._window_is_fullscreen
 
     def on_about_close(self, action, *_):
+        '''Handle closing the 'about' dialog'''
         action.destroy()
         self._window.set_sensitive(True)
 
     def on_button_quit_clicked(self, widget=None):
+        '''Handle the quit button'''
         self.quit(widget)
 
     def on_window_main_destroy(self, widget=None):
+        '''Handle the titlebar close button'''
         self.quit(widget)
 
     def on_window_resize(self, *_):
+        '''Handle window resizes'''
         if self._can_resize:
             self._show_preview()
 
     def quit(self, *_):
+        '''Exit the app'''
         self._app.quit()
 
     def _image_to_pixbuf(self, image):
-        fd = io.BytesIO()
+        descriptor = io.BytesIO()
         image = image.convert("RGB")
-        image.save(fd, "ppm")
-        contents = fd.getvalue()
-        fd.close()
+        image.save(descriptor, "ppm")
+        contents = descriptor.getvalue()
+        descriptor.close()
         loader = Gtk.gdk.PixbufLoader("pnm")
         loader.write(contents)
         pixbuf = loader.get_pixbuf()
@@ -283,7 +308,7 @@ class Controller(object):
 
     def _set_image(self, image):
         # create an image buffer (pixbuf) and insert the grabbed image
-        if (image is None):
+        if image is None:
             image = self._app.get_app_icon()
         self._pixbuf = self._image_to_pixbuf(image)
         self._original_width = image.width
@@ -316,6 +341,7 @@ class Controller(object):
 
 
 class OpenWithDialog(Gtk.AppChooserDialog):
+    '''The "Open With" dialog'''
 
     def __init__(self, parent=None):
 
@@ -325,26 +351,27 @@ class OpenWithDialog(Gtk.AppChooserDialog):
         self.appinfo = None
 
     def _on_response(self, dialog, response):
-        if (response == Gtk.ResponseType.OK):
+        if response == Gtk.ResponseType.OK:
             self.appinfo = self.get_app_info()
         else:
             self.appinfo = None
 
 
 class FileSaveDialog(object):
-
+    '''The 'save as' dialog'''
     def __init__(self, default_filename=None, default_folder=None, parent=None):
         self.default_filename = default_filename
         self.default_folder = default_folder
         self.parent = parent
 
     def run(self):
-
+        ''' Run the dialog'''
         filename = self.request_file()
 
         return filename
 
     def request_file(self):
+        '''Run the file selection dialog'''
         chooser = Gtk.FileChooserDialog(
                 transient_for=self.parent,
                 title=None,
@@ -367,7 +394,7 @@ class FileSaveDialog(object):
 
         response = chooser.run()
 
-        if (response == Gtk.RESPONSE_OK):
+        if response == Gtk.RESPONSE_OK:
             return_value = chooser.get_filename()
         else:
             return_value = None
@@ -377,6 +404,7 @@ class FileSaveDialog(object):
 
 
 class WarningDialog():
+    '''A warning dialog'''
 
     def __init__(self, message, parent=None):
         self.parent = parent
@@ -389,6 +417,7 @@ class WarningDialog():
                 )
 
     def run(self):
+        '''Run the warning dialog'''
         if self.parent is not None:
             self.parent.set_sensitive(False)
 
@@ -400,19 +429,22 @@ class WarningDialog():
 
 
 def main():
+    '''The main function for the GTK frontend'''
     try:
         application = Gscreenshot()
     except NoSupportedScreenshooterError:
         md = WarningDialog(
-                "gscreenshot couldn't run. No supported screenshot utility could be found.",
-                None
-                )
+            "gscreenshot couldn't run. No supported screenshot utility found.",
+            None
+            )
         md.run()
         sys.exit(1)
 
     # Improves startup performance by kicking off a screenshot
     # as early as we can in the background.
-    screenshot_thread = threading.Thread(target=application.screenshot_full_display)
+    screenshot_thread = threading.Thread(
+        target=application.screenshot_full_display
+    )
     screenshot_thread.daemon = True
     screenshot_thread.start()
 
@@ -434,9 +466,12 @@ def main():
             )
 
     accel = Gtk.AccelGroup()
-    accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_saveas_clicked)
-    accel.connect(Gdk.keyval_from_name('C'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_copy_clicked)
-    accel.connect(Gdk.keyval_from_name('O'), Gdk.ModifierType.CONTROL_MASK, 0, handler.on_button_open_clicked)
+    accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK,
+            0, handler.on_button_saveas_clicked)
+    accel.connect(Gdk.keyval_from_name('C'), Gdk.ModifierType.CONTROL_MASK,
+            0, handler.on_button_copy_clicked)
+    accel.connect(Gdk.keyval_from_name('O'), Gdk.ModifierType.CONTROL_MASK,
+            0, handler.on_button_open_clicked)
     window.add_accel_group(accel)
     window.connect("key-press-event", handler.handle_keypress)
 
@@ -444,9 +479,11 @@ def main():
 
     window.connect("check-resize", handler.on_window_resize)
     window.connect("window-state-event", handler.window_state_event_handler)
-    window.set_icon_from_file(resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png'))
+    window.set_icon_from_file(
+        resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
+    )
 
-    GObject.threads_init(); # Start background threads.
+    GObject.threads_init() # Start background threads.
     window.show_all()
     Gtk.main()
 
