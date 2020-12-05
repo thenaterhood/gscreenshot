@@ -1,3 +1,6 @@
+'''
+Shared utilities for gscreenshot's various frontends
+'''
 import signal
 import sys
 import gscreenshot.frontend.cli
@@ -28,6 +31,7 @@ class FrontendDelegator(object):
     """
     @staticmethod
     def delegate():
+        '''Choose the appropriate frontend and run it'''
         with SignalHandler():
             if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0]:
                 gscreenshot.frontend.cli.run()
