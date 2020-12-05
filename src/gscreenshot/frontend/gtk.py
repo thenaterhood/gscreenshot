@@ -1,7 +1,10 @@
+#pylint: disable=unused-argument
+#pylint: disable=wrong-import-order
+#pylint: disable=wrong-import-position
+#pylint: disable=ungrouped-imports
 '''
 Classes for the GTK gscreenshot frontend
 '''
-#pylint: disable=unused-argument,wrong-import-position
 import io
 import sys
 import threading
@@ -101,7 +104,7 @@ class Controller(object):
         _thread.daemon = True
         _thread.start()
 
-    def handle_keypress(self, widget=None, event=None, *args):
+    def handle_keypress(self, widget, event, *args):
         """
         This method handles individual keypresses. These are
         handled separately from accelerators (which include
