@@ -52,7 +52,7 @@ class Slop(object):
                 )
             stdout, stderr = process.communicate()
             return_code = process.returncode
-        except OSError as exception:
+        except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slop was not found") #from exception
 
@@ -82,7 +82,7 @@ class Slop(object):
                 int(slop_parsed['X']) + int(slop_parsed['W']),
                 int(slop_parsed['Y']) + int(slop_parsed['H'])
             )
-        except KeyError as exception:
+        except KeyError:
             #pylint: disable=raise-missing-from
             raise SelectionParseError("Unexpected slop output") #from exception
 
