@@ -53,7 +53,8 @@ class Slop(object):
             stdout, stderr = process.communicate()
             return_code = process.returncode
         except OSError as exception:
-            raise SelectionExecError("Slop was not found") from exception
+            #pylint: disable=raise-missing-from
+            raise SelectionExecError("Slop was not found") #from exception
 
         if return_code != 0:
             slop_error = stderr.decode("UTF-8")
