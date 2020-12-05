@@ -1,2 +1,4 @@
+'''Exception types for screenshot utilities'''
+
 class NoSupportedScreenshooterError(BaseException):
-    pass
+    '''No supported screenshot utility available'''

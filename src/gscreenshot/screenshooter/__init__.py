@@ -1,7 +1,10 @@
+'''
+Interface class for integrating a screenshot utility
+'''
 import os
 import subprocess
-import PIL.Image
 import tempfile
+import PIL.Image
 
 from gscreenshot.selector import SelectionExecError, SelectionParseError, SelectionCancelled
 
@@ -23,6 +26,7 @@ class Screenshooter(object):
                 tempfile.gettempdir(),
                 str(os.getpid()) + ".png"
                 )
+        self.selector = None
 
     @property
     def image(self):
@@ -83,6 +87,9 @@ class Screenshooter(object):
 
     @staticmethod
     def can_run():
+        """
+        Whether this utility can run
+        """
         return False
 
     def _grab_selection_fallback(self, delay=0):
