@@ -7,25 +7,41 @@ from gscreenshot.screenshooter.imagemagick import ImageMagick
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 class ScreenshooterFactory(object):
-    '''Selects and instantiates a usable screenshot class'''
 
     def __init__(self, screenshooter=None):
         self.screenshooter = screenshooter
-        self.screenshooters = [
-                Scrot,
-                ImageMagick,
-                Imlib2
-                ]
+        self.screenshooters = {
+                'scrot': Scrot,
+                'imagemagick': ImageMagick,
+                'imlib2': Imlib2
+                }
 
     def create(self):
-        '''Returns a screenshooter instance'''
-        if self.screenshooter is not None:
+        if (self.screenshooter is not None):
             return self.screenshooter
 
-        for shooter in self.screenshooters:
+        for shooter in self.screenshooters.values():
             if shooter.can_run():
                 return shooter()
 
         raise NoSupportedScreenshooterError(
                 "No supported screenshot backend available"
                 )
+
+    def get_screenshooters(self):
+        return self.screenshooters.values()
+
+    def get_screenshooter_names(self):
+        return self.screenshooters.keys()
+
+    def select_screenshooter(self, screenshooter=None):
+        if screenshooter is None:
+            # This will force a redetect next time we're called
+            self.screenshooter = None
+            return True
+
+        if screenshooter in self.get_screenshooter_names():
+            self.screenshooter = self.screenshooters[screenshooter]()
+            return True
+
+        return False

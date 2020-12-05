@@ -32,8 +32,8 @@ class Gscreenshot(object):
         constructor
         """
 
-        factory = ScreenshooterFactory(screenshooter)
-        self.screenshooter = factory.create()
+        self.screenshooter_factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = self.screenshooter_factory.create()
 
         self.saved_last_image = False
         self.last_save_file = None
@@ -48,6 +48,10 @@ class Gscreenshot(object):
             cachefile.close()
         else:
             self.save_cache()
+
+    def set_screenshooter(self, screenshooter_name):
+        if self.screenshooter_factory.select_screenshooter(screenshooter_name):
+            self.screenshooter = self.screenshooter_factory.create()
 
     def get_cache_file(self):
         """
