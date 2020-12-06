@@ -295,7 +295,7 @@ class Controller(object):
         '''Handle window resizes'''
         if self._can_resize:
             current_window_size = self._window.get_size()
-            if (self._last_window_dimensions is None):
+            if self._last_window_dimensions is None:
                 self._last_window_dimensions = current_window_size
 
             if (self._last_window_dimensions.width != current_window_size.width
