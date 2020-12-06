@@ -26,21 +26,23 @@ class Controller(object):
 
     __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
             '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen',
-            '_main_container', '_pixbuf', '_original_width', '_original_height')
+            '_main_container', '_pixbuf', '_original_width', '_original_height',
+            '_control_grid')
 
     def __init__(self, application, builder):
         self._app = application
         self._can_resize = True
         self._window = builder.get_object('window_main')
         self._preview = builder.get_object('image1')
+        self._control_grid = builder.get_object('control_box')
         self._main_container = builder.get_object('main_container')
         self._delay = 0
         self._hide = True
         self._was_maximized = False
         self._window_is_fullscreen = False
+        self._last_window_dimensions = self._window.get_size()
         self._set_image(self._app.get_last_image())
         self._show_preview()
-        self._last_window_dimensions = None
 
     def _begin_take_screenshot(self, app_method):
         self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
@@ -292,6 +294,14 @@ class Controller(object):
     def on_window_resize(self, *_):
         '''Handle window resizes'''
         if self._can_resize:
+            current_window_size = self._window.get_size()
+            if (self._last_window_dimensions is None):
+                self._last_window_dimensions = current_window_size
+
+            if (self._last_window_dimensions.width != current_window_size.width
+                    or self._last_window_dimensions.height != current_window_size.height):
+
+                self._last_window_dimensions = current_window_size
             self._show_preview()
 
     def quit(self, *_):
@@ -333,15 +343,21 @@ class Controller(object):
             if width > image_widget_size.width * .95:
                 width = image_widget_size.width * .95
                 height = (width/self._original_width)*self._original_height
+        window_size = self._window.get_size()
+        control_size = self._control_grid.get_allocation()
 
-        preview_pixbuf = self._pixbuf.scale_simple(width, height, Gtk.gdk.INTERP_BILINEAR)
+        preview_size = ((window_size.height-control_size.height)*.98, window_size.width*.98)
+
+        height = preview_size[0]
+        width = preview_size[1]
+        preview_img = self._app.get_thumbnail(width, height)
 
         # set the image_preview widget to the preview image size (previewWidth,
         # previewHeight)
         self._preview.set_size_request(width, height)
 
         # view the previewPixbuf in the image_preview widget
-        self._preview.set_from_pixbuf(preview_pixbuf)
+        self._preview.set_from_pixbuf(self._image_to_pixbuf(preview_img))
 
 
 class OpenWithDialog(Gtk.AppChooserDialog):
