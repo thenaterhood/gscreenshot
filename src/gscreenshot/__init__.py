@@ -71,8 +71,11 @@ class Gscreenshot(object):
         Send a notification if the screenshot was taken from a
         non-X11 or wayland session.
         '''
-        if 'XDG_SESSION_TYPE' not in os.environ:
+        if 'XDG_SESSION_ID' not in os.environ:
             return
+
+        if 'XDG_SESSION_TYPE' not in os.environ:
+            self.show_screenshot_notification()
 
         session_type = os.environ['XDG_SESSION_TYPE']
         if session_type.lower() not in ('x11', 'mir', 'wayland'):
