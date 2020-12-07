@@ -6,5 +6,7 @@ __pycache__
 .settings
 install.txt
 .eggs
+*.egg
+*.egg-info
 build/
 generated/

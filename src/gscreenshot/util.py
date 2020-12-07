@@ -1,3 +1,10 @@
+'''
+Misc utility functions for gscreenshot
+
+Functions:
+    find_executable(string, string|None) -> string
+'''
+#pylint: disable=no-else-return, invalid-name
 import os
 import sys
 
