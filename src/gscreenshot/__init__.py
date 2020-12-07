@@ -50,6 +50,11 @@ class Gscreenshot(object):
             self.save_cache()
 
     def show_screenshot_notification(self):
+        '''
+        Show a notification that a screenshot was taken.
+        This method is a "fire-and-forget" and won't
+        return a status as to whether it succeeded.
+        '''
         try:
             subprocess.Popen([
                 'notify-send',
@@ -62,11 +67,16 @@ class Gscreenshot(object):
             return
 
     def run_display_mismatch_warning(self):
+        '''
+        Send a notification if the screenshot was taken from a
+        non-X11 or wayland session.
+        '''
         if 'XDG_SESSION_TYPE' not in os.environ:
             return
 
         session_type = os.environ['XDG_SESSION_TYPE']
-        if session_type != 'x11':
+        if (session_type != 'x11' and
+            session_type != 'mir' and session_type != 'wayland'):
             self.show_screenshot_notification()
 
     def get_cache_file(self):
