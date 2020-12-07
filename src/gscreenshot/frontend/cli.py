@@ -55,6 +55,13 @@ def run():
             action='store_true',
             help="Show information about gscreenshot"
             )
+    parser.add_argument(
+            '-n',
+            '--notify',
+            required=False,
+            action='store_true',
+            help="Show a notification when the screenshot is taken. Gscreenshot will automatically show a notification if a screenshot is taken from a different session, so some situations may not need this option."
+    )
 
     args = parser.parse_args()
 
@@ -94,6 +101,8 @@ def run():
         print("No screenshot taken.")
         sys.exit(1)
     else:
+        if args.notify:
+            gscreenshot.show_screenshot_notification()
         shot_saved = False
         should_save_shot = (args.filename is not False or args.clip is False)
         exit_code = 0
