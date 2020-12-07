@@ -1,5 +1,5 @@
 #pylint: disable=too-many-statements
-#pyling: disable=too-many-branches
+#pylint: disable=too-many-branches
 '''
 Gscreenshot's CLI
 '''

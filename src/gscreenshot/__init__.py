@@ -75,8 +75,7 @@ class Gscreenshot(object):
             return
 
         session_type = os.environ['XDG_SESSION_TYPE']
-        if (session_type != 'x11' and
-            session_type != 'mir' and session_type != 'wayland'):
+        if session_type.lower() not in ('x11', 'mir', 'wayland'):
             self.show_screenshot_notification()
 
     def get_cache_file(self):
