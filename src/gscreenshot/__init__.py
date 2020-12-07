@@ -60,9 +60,12 @@ class Gscreenshot(object):
 
     def save_cache(self):
         """Writes the cache to disk"""
-        cachefile = open(self.get_cache_file(), "w")
-        json.dump(self.cache, cachefile)
-        cachefile.close()
+        try:
+            cachefile = open(self.get_cache_file(), "w")
+            json.dump(self.cache, cachefile)
+            cachefile.close()
+        except FileNotFoundError:
+            print("unable to save cache file")
 
     def get_screenshooter_name(self):
         """Gets the name of the current screenshooter"""
