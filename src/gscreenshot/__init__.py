@@ -49,6 +49,38 @@ class Gscreenshot(object):
         else:
             self.save_cache()
 
+    def show_screenshot_notification(self):
+        '''
+        Show a notification that a screenshot was taken.
+        This method is a "fire-and-forget" and won't
+        return a status as to whether it succeeded.
+        '''
+        try:
+            subprocess.Popen([
+                'notify-send',
+                'gscreenshot',
+                'a screenshot was taken from a script or terminal',
+                '--icon',
+                'gscreenshot'
+            ])
+        except OSError:
+            return
+
+    def run_display_mismatch_warning(self):
+        '''
+        Send a notification if the screenshot was taken from a
+        non-X11 or wayland session.
+        '''
+        if 'XDG_SESSION_ID' not in os.environ:
+            return
+
+        if 'XDG_SESSION_TYPE' not in os.environ:
+            self.show_screenshot_notification()
+
+        session_type = os.environ['XDG_SESSION_TYPE']
+        if session_type.lower() not in ('x11', 'mir', 'wayland'):
+            self.show_screenshot_notification()
+
     def get_cache_file(self):
         """
         Find the gscreenshot cache file and return its path
@@ -84,6 +116,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_fullscreen(delay)
+        self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
@@ -100,6 +133,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_selection(delay)
+        self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
@@ -116,6 +150,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_window(delay)
+        self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
