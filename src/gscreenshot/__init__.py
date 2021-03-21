@@ -64,6 +64,7 @@ class Gscreenshot(object):
                 'gscreenshot'
             ])
         except OSError:
+            print("failed to show screenshot notification - is notify-send working?")
             return
 
     def run_display_mismatch_warning(self):
