@@ -28,7 +28,7 @@ class Gscreenshot(object):
     """
 
     # generated using piexif
-    EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00'
+    EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
 
     def __init__(self, screenshooter=None):
         """
@@ -282,8 +282,14 @@ class Gscreenshot(object):
                 # dynamically generate it, just find and replace.
                 # This avoids needing an external library for such a simple
                 # thing.
-                exif_data = self.EXIF_TEMPLATE.replace('[[VERSION]]'.encode(), self.get_program_version(True).encode())
-                exif_data = exif_data.replace('[[CREATE_DATE]]'.encode(), datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode())
+                exif_data = self.EXIF_TEMPLATE.replace(
+                    '[[VERSION]]'.encode(),
+                    self.get_program_version(True).encode()
+                )
+                exif_data = exif_data.replace(
+                    '[[CREATE_DATE]]'.encode(),
+                    datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
+                )
 
                 image.save(filename, actual_file_ext.upper(), exif=exif_data)
 
