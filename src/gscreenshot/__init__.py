@@ -27,6 +27,9 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
+    # generated using piexif
+    EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
+
     def __init__(self, screenshooter=None):
         """
         constructor
@@ -48,6 +51,39 @@ class Gscreenshot(object):
             cachefile.close()
         else:
             self.save_cache()
+
+    def show_screenshot_notification(self):
+        '''
+        Show a notification that a screenshot was taken.
+        This method is a "fire-and-forget" and won't
+        return a status as to whether it succeeded.
+        '''
+        try:
+            subprocess.Popen([
+                'notify-send',
+                'gscreenshot',
+                'a screenshot was taken from a script or terminal',
+                '--icon',
+                'gscreenshot'
+            ])
+        except OSError:
+            print("failed to show screenshot notification - is notify-send working?")
+            return
+
+    def run_display_mismatch_warning(self):
+        '''
+        Send a notification if the screenshot was taken from a
+        non-X11 or wayland session.
+        '''
+        if 'XDG_SESSION_ID' not in os.environ:
+            return
+
+        if 'XDG_SESSION_TYPE' not in os.environ:
+            self.show_screenshot_notification()
+
+        session_type = os.environ['XDG_SESSION_TYPE']
+        if session_type.lower() not in ('x11', 'mir', 'wayland'):
+            self.show_screenshot_notification()
 
     def get_cache_file(self):
         """
@@ -84,6 +120,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_fullscreen(delay)
+        self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
@@ -100,6 +137,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_selection(delay)
+        self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
@@ -116,6 +154,7 @@ class Gscreenshot(object):
         """
 
         self.screenshooter.grab_window(delay)
+        self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
@@ -239,7 +278,21 @@ class Gscreenshot(object):
             self.cache["last_save_dir"] = os.path.dirname(filename)
             self.save_cache()
             try:
-                image.save(filename, actual_file_ext.upper())
+                # add exif data. This is sketchy but we don't need to
+                # dynamically generate it, just find and replace.
+                # This avoids needing an external library for such a simple
+                # thing.
+                exif_data = self.EXIF_TEMPLATE.replace(
+                    '[[VERSION]]'.encode(),
+                    self.get_program_version(True).encode()
+                )
+                exif_data = exif_data.replace(
+                    '[[CREATE_DATE]]'.encode(),
+                    datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
+                )
+
+                image.save(filename, actual_file_ext.upper(), exif=exif_data)
+
                 self.saved_last_image = True
                 self.last_save_file = filename
                 return True
@@ -339,9 +392,14 @@ class Gscreenshot(object):
         """Returns the license name"""
         return "GPLv2"
 
-    def get_program_version(self):
+    def get_program_version(self, padded = False):
         """Returns the program version"""
-        return require("gscreenshot")[0].version
+        if not padded:
+            return require("gscreenshot")[0].version
+        else:
+            version = require("gscreenshot")[0].version.split(".")
+            padded_version = [v.rjust(2, "0") for v in version]
+            return ".".join(padded_version)
 
     def quit(self):
         """
