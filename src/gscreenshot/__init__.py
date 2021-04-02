@@ -192,13 +192,18 @@ class Gscreenshot(object):
         Returns:
             Image
         """
-        if image is None:
+        thumbnail = None
+
+        if image is None and self.screenshooter.image is not None:
             thumbnail = self.screenshooter.image.copy()
-        else:
+        elif image is not None:
             thumbnail = image.copy()
 
-        thumbnail.thumbnail((width, height), Image.ANTIALIAS)
-        return thumbnail
+        if thumbnail is not None:
+            thumbnail.thumbnail((width, height), Image.ANTIALIAS)
+            return thumbnail
+
+        return self.get_app_icon()
 
     def get_time_filename(self):
         """
