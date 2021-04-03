@@ -25,7 +25,7 @@ class Presenter(object):
     '''Presenter class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view')
+            '_pixbuf', '_view', '_keymappings')
 
     def __init__(self, application, view):
         self._app = application
@@ -35,6 +35,7 @@ class Presenter(object):
         self._hide = True
         self._set_image(self._app.get_last_image())
         self._show_preview()
+        self._keymappings = {}
 
     def _begin_take_screenshot(self, app_method):
         screenshot = app_method(self._delay)
@@ -47,6 +48,10 @@ class Presenter(object):
         self._show_preview()
 
         self._view.unhide()
+
+    def set_keymappings(self, keymappings):
+        '''Set the keymappings'''
+        self._keymappings = keymappings
 
     def window_state_event_handler(self, widget, event, *_):
         '''Handle window state events'''
@@ -69,15 +74,8 @@ class Presenter(object):
         handled separately from accelerators (which include
         modifiers).
         """
-        shortcuts = {
-                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')):
-                    self.on_button_quit_clicked,
-                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')):
-                    self.on_fullscreen_toggle
-                }
-
-        if event.keyval in shortcuts:
-            shortcuts[event.keyval]()
+        if event.keyval in self._keymappings:
+            self._keymappings[event.keyval]()
 
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
@@ -141,15 +139,10 @@ class Presenter(object):
         """
         Copy the current screenshot to the clipboard
         """
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        display = Gdk.Display.get_default()
+        img = self._app.get_last_image()
+        pixbuf = self._image_to_pixbuf(img)
 
-        if display.supports_clipboard_persistence():
-            img = self._app.get_last_image()
-            pixbuf = self._image_to_pixbuf(img)
-            clipboard.set_image(pixbuf)
-            clipboard.store()
-        else:
+        if not self._view.copy_to_clipboard(pixbuf):
             if not self._app.copy_last_screenshot_to_clipboard():
                 warning_dialog = WarningDialog(
                     "Your clipboard doesn't support persistence and xclip isn't available.",
@@ -160,9 +153,9 @@ class Presenter(object):
         '''Handle the open button'''
         success = self._app.open_last_screenshot()
         if success:
-            dialog = Gtk.MessageDialog(self._view.get_window(),
-                Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_WARNING,
-                Gtk.BUTTONS_OK, "Please install xdg-open to open files.")
+            dialog = WarningDialog(
+                "Please install xdg-open to open files.",
+                self._view.get_window())
             self._view.run_dialog(dialog)
         else:
             self.quit(None)
@@ -391,6 +384,21 @@ class View(object):
         # view the previewPixbuf in the image_preview widget
         self._preview.set_from_pixbuf(pixbuf)
 
+    def copy_to_clipboard(self, pixbuf):
+        """
+        Copy the provided image to the screen's clipboard,
+        if it supports persistence
+        """
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        display = Gdk.Display.get_default()
+
+        if display.supports_clipboard_persistence():
+            clipboard.set_image(pixbuf)
+            clipboard.store()
+            return True
+
+        return False
+
     def run_dialog(self, dialog):
         '''Run a dialog window and return the outcome'''
         self._window.set_sensitive(False)
@@ -526,9 +534,10 @@ def main():
         waited += .01
 
     view = View(builder.get_object('window_main'), builder)
+
     presenter = Presenter(
             application,
-            view,
+            view
             )
 
     accel = Gtk.AccelGroup()
@@ -539,7 +548,16 @@ def main():
     accel.connect(Gdk.keyval_from_name('O'), Gdk.ModifierType.CONTROL_MASK,
             0, presenter.on_button_open_clicked)
     window.add_accel_group(accel)
+
     window.connect("key-press-event", presenter.handle_keypress)
+
+    keymappings = {
+        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')):
+            presenter.on_button_quit_clicked,
+        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')):
+            presenter.on_fullscreen_toggle
+    }
+    presenter.set_keymappings(keymappings)
 
     builder.connect_signals(presenter)
 
