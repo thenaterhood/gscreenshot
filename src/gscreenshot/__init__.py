@@ -35,8 +35,8 @@ class Gscreenshot(object):
         constructor
         """
 
-        factory = ScreenshooterFactory(screenshooter)
-        self.screenshooter = factory.create()
+        self.screenshooter_factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = self.screenshooter_factory.create()
 
         self.saved_last_image = False
         self.last_save_file = None
