@@ -27,7 +27,7 @@ class Controller(object):
     __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
             '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen',
             '_main_container', '_pixbuf', '_original_width', '_original_height',
-            '_control_grid')
+            '_control_grid', '_header_bar')
 
     def __init__(self, application, builder):
         self._app = application
@@ -36,6 +36,7 @@ class Controller(object):
         self._preview = builder.get_object('image1')
         self._control_grid = builder.get_object('control_box')
         self._main_container = builder.get_object('main_container')
+        self._header_bar = builder.get_object('header_bar')
         self._delay = 0
         self._hide = True
         self._was_maximized = False
@@ -175,6 +176,15 @@ class Controller(object):
                 saved = self._app.save_last_image(fname)
             else:
                 cancelled = True
+
+    def on_imlib2_selected(self, *_):
+        self._app.set_screenshooter('imlib2')
+
+    def on_scrot_selected(self, *_):
+        self._app.set_screenshooter('scrot')
+
+    def on_imagemagick_selected(self, *_):
+        self._app.set_screenshooter('imagemagick')
 
     def on_button_openwith_clicked(self, *_):
         '''Handle the "open with" button'''
@@ -345,16 +355,14 @@ class Controller(object):
                 height = (width/self._original_width)*self._original_height
         window_size = self._window.get_size()
         control_size = self._control_grid.get_allocation()
+        header_height = self._header_bar.get_allocation().height if self._header_bar is not None else 0
+        width_x = .8 if self._header_bar is not None else .98
 
-        preview_size = ((window_size.height-control_size.height)*.98, window_size.width*.98)
+        preview_size = ((window_size.height-control_size.height-(.6*header_height))*.98, window_size.width*width_x)
 
         height = preview_size[0]
         width = preview_size[1]
         preview_img = self._app.get_thumbnail(width, height)
-
-        # set the image_preview widget to the preview image size (previewWidth,
-        # previewHeight)
-        self._preview.set_size_request(width, height)
 
         # view the previewPixbuf in the image_preview widget
         self._preview.set_from_pixbuf(self._image_to_pixbuf(preview_img))
@@ -502,6 +510,30 @@ def main():
     window.set_icon_from_file(
         resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
     )
+
+    # Set the initial size of the window
+    active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+    while active_window is None:
+        # There appears to be a race condition with getting the active window,
+        # so we'll keep trying until we have it
+        active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+
+    initial_screen = window.get_screen().get_monitor_at_window(active_window)
+    geometry = window.get_screen().get_monitor_geometry(initial_screen)
+
+    if handler._header_bar is not None:
+        height_x = .6
+    else:
+        height_x = .48
+
+    gscreenshot_height = geometry.height * height_x
+    gscreenshot_width = gscreenshot_height * .9
+
+    if geometry.height > geometry.width:
+        gscreenshot_width = geometry.width * height_x
+        gscreenshot_height = gscreenshot_width * .9
+
+    window.set_size_request(gscreenshot_width, gscreenshot_height)
 
     GObject.threads_init() # Start background threads.
     window.show_all()

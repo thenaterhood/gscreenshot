@@ -35,8 +35,8 @@ class Gscreenshot(object):
         constructor
         """
 
-        factory = ScreenshooterFactory(screenshooter)
-        self.screenshooter = factory.create()
+        self.screenshooter_factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = self.screenshooter_factory.create()
 
         self.saved_last_image = False
         self.last_save_file = None
@@ -84,6 +84,10 @@ class Gscreenshot(object):
         session_type = os.environ['XDG_SESSION_TYPE']
         if session_type.lower() not in ('x11', 'mir', 'wayland'):
             self.show_screenshot_notification()
+
+    def set_screenshooter(self, screenshooter_name):
+        if self.screenshooter_factory.select_screenshooter(screenshooter_name):
+            self.screenshooter = self.screenshooter_factory.create()
 
     def get_cache_file(self):
         """
