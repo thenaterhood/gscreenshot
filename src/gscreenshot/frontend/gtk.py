@@ -363,7 +363,6 @@ class View(object):
 
     def get_preview_dimensions(self):
         '''Get the current dimensions of the preview widget'''
-        image_widget_size = self._preview.get_allocation()
         window_size = self._window.get_size()
         control_size = self._control_grid.get_allocation()
 
