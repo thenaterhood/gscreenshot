@@ -177,15 +177,6 @@ class Controller(object):
             else:
                 cancelled = True
 
-    def on_imlib2_selected(self, *_):
-        self._app.set_screenshooter('imlib2')
-
-    def on_scrot_selected(self, *_):
-        self._app.set_screenshooter('scrot')
-
-    def on_imagemagick_selected(self, *_):
-        self._app.set_screenshooter('imagemagick')
-
     def on_button_openwith_clicked(self, *_):
         '''Handle the "open with" button'''
         self._window.set_sensitive(False)

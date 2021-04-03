@@ -85,10 +85,6 @@ class Gscreenshot(object):
         if session_type.lower() not in ('x11', 'mir', 'wayland'):
             self.show_screenshot_notification()
 
-    def set_screenshooter(self, screenshooter_name):
-        if self.screenshooter_factory.select_screenshooter(screenshooter_name):
-            self.screenshooter = self.screenshooter_factory.create()
-
     def get_cache_file(self):
         """
         Find the gscreenshot cache file and return its path
