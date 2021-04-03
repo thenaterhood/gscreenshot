@@ -46,6 +46,7 @@ class Controller(object):
         self._show_preview()
 
     def has_header(self):
+        '''Whether a GTK client decoration header bar is present'''
         return self._header_bar is not None
 
     def _begin_take_screenshot(self, app_method):
