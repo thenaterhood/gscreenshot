@@ -7,6 +7,7 @@ from gscreenshot.screenshooter.imagemagick import ImageMagick
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 class ScreenshooterFactory(object):
+    '''Selects and instantiates a usable screenshot class'''
 
     def __init__(self, screenshooter=None):
         self.screenshooter = screenshooter
@@ -17,6 +18,7 @@ class ScreenshooterFactory(object):
                 ]
 
     def create(self):
+        '''Returns a screenshooter instance'''
         if self.screenshooter is not None:
             return self.screenshooter
 
