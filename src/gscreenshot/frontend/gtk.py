@@ -45,6 +45,9 @@ class Controller(object):
         self._set_image(self._app.get_last_image())
         self._show_preview()
 
+    def has_header(self):
+        return self._header_bar is not None
+
     def _begin_take_screenshot(self, app_method):
         self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
         screenshot = app_method(self._delay)
@@ -346,10 +349,17 @@ class Controller(object):
                 height = (width/self._original_width)*self._original_height
         window_size = self._window.get_size()
         control_size = self._control_grid.get_allocation()
-        header_height = self._header_bar.get_allocation().height if self._header_bar is not None else 0
+
+        header_height = 0
+        if self._header_bar is not None:
+            header_height = self._header_bar.get_allocation().height
+
         width_x = .8 if self._header_bar is not None else .98
 
-        preview_size = ((window_size.height-control_size.height-(.6*header_height))*.98, window_size.width*width_x)
+        preview_size = (
+            (window_size.height-control_size.height-(.6*header_height))*.98,
+            window_size.width*width_x
+        )
 
         height = preview_size[0]
         width = preview_size[1]
@@ -512,7 +522,7 @@ def main():
     initial_screen = window.get_screen().get_monitor_at_window(active_window)
     geometry = window.get_screen().get_monitor_geometry(initial_screen)
 
-    if handler._header_bar is not None:
+    if handler.has_header():
         height_x = .6
     else:
         height_x = .48
