@@ -172,7 +172,9 @@ class Presenter(object):
         about.set_authors(authors)
 
         description = i18n(self._app.get_program_description())
-        description += "\n" + i18n("Using {0} screenshot backend").format(self._app.get_screenshooter_name())
+        description += "\n" + i18n("Using {0} screenshot backend").format(
+            self._app.get_screenshooter_name()
+        )
         about.set_comments(i18n(description))
 
         website = self._app.get_program_website()

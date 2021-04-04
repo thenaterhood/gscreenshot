@@ -16,15 +16,13 @@ _ = gettext.gettext
 
 
 def run():
-
+    '''Run the CLI frontend'''
     locale_path = resource_filename('gscreenshot.resources', 'locale')
     locale.setlocale(locale.LC_ALL, '')
-    locale.bindtextdomain('gscreenshot', locale_path)
     gettext.bindtextdomain('gscreenshot', locale_path)
     gettext.textdomain('gscreenshot')
 
 
-    '''Run the CLI frontend'''
     parser = argparse.ArgumentParser()
 
     #pylint: disable=line-too-long
