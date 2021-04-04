@@ -2,6 +2,8 @@
 
 from setuptools import setup
 import errno
+import glob
+import subprocess
 import sys
 import os
 
@@ -74,7 +76,29 @@ def build_data_files(version):
 
     return files
 
+def compile_locales():
+    print('=> Compiling locales...')
+
+    locale_po = glob.glob('src/gscreenshot/resources/locale/*/LC_MESSAGES/*.po')
+
+    for po in locale_po:
+        dirname = os.path.dirname(po)
+        basename = os.path.basename(po)
+        outname = os.path.splitext(basename)[0] + ".mo"
+        original_dir = os.path.abspath(os.path.curdir)
+        print('===> Compiling ' + po)
+        os.chdir(dirname)
+        try:
+            subprocess.check_output(['msgfmt', basename, '-o', outname])
+        except:
+            print("===> Failed to compile " + po)
+            os.chdir(original_dir)
+            sys.exit(1)
+        os.chdir(original_dir)
+
 pkg_version = get_version_from_specfile()
+
+compile_locales()
 
 setup(name='gscreenshot',
     version=pkg_version,
@@ -102,10 +126,13 @@ setup(name='gscreenshot',
         'gscreenshot.resources',
         'gscreenshot.resources.gui',
         'gscreenshot.resources.gui.glade',
+        'gscreenshot.resources.locale.en.LC_MESSAGES',
+        'gscreenshot.resources.locale.es.LC_MESSAGES',
         'gscreenshot.resources.pixmaps'
         ],
     data_files=build_data_files(pkg_version),
     package_data={
-        '': ['*.glade', 'LICENSE', '*.png']
-        }
+        '': ['*.glade', 'LICENSE', '*.png', '*.mo']
+        },
+    include_package_data=True
     )

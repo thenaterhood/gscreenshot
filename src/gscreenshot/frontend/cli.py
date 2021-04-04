@@ -4,13 +4,25 @@
 Gscreenshot's CLI
 '''
 import argparse
+import locale
 import sys
+import gettext
+from pkg_resources import resource_filename
 
 from gscreenshot import Gscreenshot
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
+_ = gettext.gettext
+
+
 def run():
     '''Run the CLI frontend'''
+    locale_path = resource_filename('gscreenshot.resources', 'locale')
+    locale.setlocale(locale.LC_ALL, '')
+    gettext.bindtextdomain('gscreenshot', locale_path)
+    gettext.textdomain('gscreenshot')
+
+
     parser = argparse.ArgumentParser()
 
     #pylint: disable=line-too-long
@@ -19,49 +31,49 @@ def run():
             '--delay',
             required=False,
             default=0,
-            help="How many seconds to wait before taking the screenshot. Defaults to 0."
+            help=_("How many seconds to wait before taking the screenshot. Defaults to 0.")
             )
     parser.add_argument(
             '-f',
             '--filename',
             required=False,
             default=False,
-            help="Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy. If you specify a filename without a file extension, it will be treated as a directory (creating the tree if needed) and screenshots will be saved there with the default filename scheme."
+            help=_("Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy. If you specify a filename without a file extension, it will be treated as a directory (creating the tree if needed) and screenshots will be saved there with the default filename scheme.")
             )
     parser.add_argument(
             '-c',
             '--clip',
             required=False,
             action='store_true',
-            help="Copy the image to the clipboard. Requires xclip to be installed. This can be paired with -f to save and copy together."
+            help=_("Copy the image to the clipboard. Requires xclip to be installed. This can be paired with -f to save and copy together.")
             )
     parser.add_argument(
             '-o',
             '--open',
             required=False,
             action='store_true',
-            help="Open the screenshot in your default viewer."
+            help=_("Open the screenshot in your default viewer.")
             )
     parser.add_argument(
             '-s',
             '--selection',
             required=False,
             action='store_true',
-            help="Choose a window or select a region to screenshot."
+            help=_("Choose a window or select a region to screenshot.")
             )
     parser.add_argument(
             '-V',
             '--version',
             required=False,
             action='store_true',
-            help="Show information about gscreenshot"
+            help=_("Show information about gscreenshot")
             )
     parser.add_argument(
             '-n',
             '--notify',
             required=False,
             action='store_true',
-            help="Show a notification when the screenshot is taken. Gscreenshot will automatically show a notification if a screenshot is taken from a different session, so some situations may not need this option."
+            help=_("Show a notification when the screenshot is taken. Gscreenshot will automatically show a notification if a screenshot is taken from a different session, so some situations may not need this option.")
     )
 
     args = parser.parse_args()
@@ -71,8 +83,8 @@ def run():
     try:
         gscreenshot = Gscreenshot()
     except NoSupportedScreenshooterError:
-        print("No supported screenshot backend is available.")
-        print("Please install one to use gscreenshot.")
+        print(_("No supported screenshot backend is available."))
+        print(_("Please install one to use gscreenshot."))
         sys.exit(1)
 
     if args.version is not False:
@@ -83,14 +95,14 @@ def run():
         name = gscreenshot.get_program_name()
         version = gscreenshot.get_program_version()
 
-        print("Using " + gscreenshot.get_screenshooter_name() + " screenshot backend")
-        print("{0} {1}; {2}".format(name, version, description))
+        print(_("Using {0} screenshot backend").format(gscreenshot.get_screenshooter_name()))
+        print("{0} {1}; {2}".format(name, version, _(description)))
         print(website)
         print("")
-        print("Author(s)")
+        print(_("Author(s)"))
         print("\n".join(authors))
         print("")
-        print("Licensed as {0}".format(license_name))
+        print(_("Licensed as {0}").format(license_name))
         sys.exit(0)
 
     if args.selection is not False:
@@ -99,7 +111,7 @@ def run():
         gscreenshot.screenshot_full_display(args.delay)
 
     if gscreenshot.get_last_image() is None:
-        print("No screenshot taken.")
+        print(_("No screenshot taken."))
         sys.exit(1)
     else:
         if args.notify:
@@ -115,7 +127,7 @@ def run():
 
         if should_save_shot and not shot_saved:
             exit_code = 1
-            print("Failed to save screenshot!")
+            print(_("Failed to save screenshot!"))
 
         if args.open is not False:
             gscreenshot.open_last_screenshot()
@@ -125,7 +137,7 @@ def run():
 
             if not successful_clip:
                 tmp_file = gscreenshot.save_and_return_path()
-                print("Could not clip image! Xclip failed to run.")
-                print("Your screenshot was saved to " + tmp_file)
+                print(_("Could not clip image! Xclip failed to run."))
+                print(_("Your screenshot was saved to {0}").format(tmp_file))
                 exit_code = 1
         sys.exit(exit_code)

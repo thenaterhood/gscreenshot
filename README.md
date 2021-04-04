@@ -71,6 +71,17 @@ Keyboard shortcuts
 Find a problem? Have something to add? Just think gscreenshot is super
 cool? gscreenshot accepts contributions!
 
+### Localization
+gscreenshot uses the standard gettext tools. Locale files can be found in
+src/gscreenshot/resources/locale.
+
+If you contribute a localization, do not add the compiled .mo files. They
+are generated on demand as part of the installation.
+
+Current supported languages are:
+* English
+* Español
+
 ### Contributing Code
 Please base pull requests off of and open pull requests against the
 'dev' branch. 'master' is reserved for stable code. You may be asked to

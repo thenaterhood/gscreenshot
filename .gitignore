@@ -10,3 +10,4 @@ install.txt
 *.egg-info
 build/
 generated/
+*.mo

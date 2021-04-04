@@ -1,0 +1,147 @@
+# gscreenshot.
+# Copyright (C) thenaterhood 2021
+# This file is distributed under the same license as the gscreenshot package.
+# Nate Levesque <public@thenaterhood.com>, 2021.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: gscreenshot VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-04-03 16:01-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Nate Levesque <nate@thenaterhood.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:41
+msgid "Open With"
+msgstr "Abrir Con"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:123
+msgid "Options"
+msgstr "Opciones"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:141
+msgid "Everything"
+msgstr "Todos"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:160
+msgid "Selection"
+msgstr "Selección"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:179
+msgid "Window"
+msgstr "Ventana"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:209
+msgid "Take screenshot of..."
+msgstr "Tomar captura de pantalla de..."
+
+#: src/gscreenshot/resources/gui/glade/main.glade:222
+msgid "Hide gscreenshot"
+msgstr "Esconde gscreenshot"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:347
+msgid "Delay"
+msgstr "Demora"
+
+#: src/gscreenshot/frontend/cli.py:35
+msgid "How many seconds to wait before taking the screenshot. Defaults to 0."
+msgstr "Cuántos segundos esperar antes de tomar la captura de pantalla. El valor predeterminado es 0."
+
+#: src/gscreenshot/frontend/cli.py:42
+msgid ""
+"Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This "
+"can be paired with -c to save and copy. If you specify a filename without a "
+"file extension, it will be treated as a directory (creating the tree if "
+"needed) and screenshots will be saved there with the default filename scheme."
+msgstr ""
+"Dónde almacenar el archivo de captura de pantalla. El valor predeterminado es "
+"gscreenshot_<time> .png. Esto se puede combinar con -c para guardar y copiar. "
+"Si especifica un nombre de archivo sin una extensión de archivo, se tratará "
+"como un directorio (se creará si es necesario) y las capturas de pantalla se "
+"guardarán allí con el esquema de nombre de archivo predeterminado. "
+
+#: src/gscreenshot/frontend/cli.py:49
+msgid ""
+"Copy the image to the clipboard. Requires xclip to be installed. This can be "
+"paired with -f to save and copy together."
+msgstr "Copie la imagen al portapapeles. Requiere que se instale xclip. Esto se puede combinar con -f para guardar y copiar juntos."
+
+#: src/gscreenshot/frontend/cli.py:56
+msgid "Open the screenshot in your default viewer."
+msgstr "Abra la captura de pantalla en su visor de imágenes predeterminado."
+
+#: src/gscreenshot/frontend/cli.py:63
+msgid "Choose a window or select a region to screenshot."
+msgstr "Elija una ventana o seleccione una región para hacer una captura de pantalla."
+
+#: src/gscreenshot/frontend/cli.py:70
+msgid "Show information about gscreenshot"
+msgstr "Mostrar información sobre gscreenshot"
+
+#: src/gscreenshot/frontend/cli.py:77
+msgid ""
+"Show a notification when the screenshot is taken. Gscreenshot will "
+"automatically show a notification if a screenshot is taken from a different "
+"session, so some situations may not need this option."
+msgstr ""
+"Muestra una notificación cuando se toma la captura de pantalla. Gscreenshot "
+"mostrará automáticamente una notificación si se toma una captura de pantalla "
+"de una sesión diferente, por lo que es posible que algunas situaciones no "
+"necesiten esta opción."
+
+#: src/gscreenshot/frontend/cli.py:87
+msgid "No supported screenshot backend is available."
+msgstr "No hay ninguna utilidad de captura de pantalla compatible disponible."
+
+#: src/gscreenshot/frontend/cli.py:88
+msgid "Please install one to use gscreenshot."
+msgstr "Instale uno para utilizar gscreenshot."
+
+#: src/gscreenshot/frontend/cli.py:99
+#, python-brace-format
+msgid "Using {0} screenshot backend"
+msgstr "Usando la herramienta de captura de pantalla de {0}"
+
+#: src/gscreenshot/frontend/gtk.py:152
+msgid "Your clipboard doesn't support persistence and xclip isn't available."
+msgstr "Su portapapeles no admite la persistencia y xclip no está instalado."
+
+#: src/gscreenshot/frontend/gtk.py:161
+msgid "Please install xdg-open to open files."
+msgstr "Instale xdg-open para abrir archivos."
+
+#: src/gscreenshot/frontend/gtk.py:184
+msgid "About"
+msgstr "Acerca de"
+
+#: src/gscreenshot/frontend/gtk.py:427
+msgid "Choose an Application"
+msgstr "Elige una aplicación"
+
+msgid "A simple screenshot tool supporting multiple backends."
+msgstr ""
+"Una herramienta de captura de pantalla simple que admite múltiples "
+"herramientas de captura de pantalla."
+
+msgid "Author(s)"
+msgstr "Autor(s)"
+
+#, python-brace-format
+msgid "Licensed as {0}"
+msgstr "Con licencia GPLv2"
+
+msgid "No screenshot taken."
+msgstr "No se tomó ninguna captura de pantalla"
+
+msgid "Failed to save screenshot!"
+msgstr "¡No se pudo guardar la captura de pantalla!"
+
+msgid "Could not clip image! Xclip failed to run."
+msgstr "No se pudo copiar la imagen. Xclip no se pudo ejecutar."
+
+msgid "Your screenshot was saved to {0}"
+msgstr "Tu captura de pantalla se guardó en {0}"
