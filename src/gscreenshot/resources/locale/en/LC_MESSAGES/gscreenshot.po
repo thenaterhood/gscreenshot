@@ -116,3 +116,10 @@ msgstr ""
 #: src/gscreenshot/frontend/gtk.py:427
 msgid "Choose an Application"
 msgstr ""
+
+msgid "Author(s)"
+msgstr ""
+
+#, python-brace-format
+msgid "Licensed as {0}"
+msgstr ""

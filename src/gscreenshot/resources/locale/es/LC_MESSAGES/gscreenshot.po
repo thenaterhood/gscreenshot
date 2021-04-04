@@ -104,7 +104,7 @@ msgstr "Instale uno para utilizar gscreenshot."
 #: src/gscreenshot/frontend/cli.py:99
 #, python-brace-format
 msgid "Using {0} screenshot backend"
-msgstr "Usando el backend de captura de pantalla de {0}"
+msgstr "Usando la herramienta de captura de pantalla de {0}"
 
 #: src/gscreenshot/frontend/gtk.py:152
 msgid "Your clipboard doesn't support persistence and xclip isn't available."
@@ -126,3 +126,10 @@ msgid "A simple screenshot tool supporting multiple backends."
 msgstr ""
 "Una herramienta de captura de pantalla simple que admite múltiples "
 "herramientas de captura de pantalla."
+
+msgid "Author(s)"
+msgstr "Autor(s)"
+
+#, python-brace-format
+msgid "Licensed as {0}"
+msgstr "Con licencia GPLv2"

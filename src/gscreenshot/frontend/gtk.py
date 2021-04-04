@@ -510,8 +510,6 @@ def main():
     '''The main function for the GTK frontend'''
 
     locale_path = resource_filename('gscreenshot.resources', 'locale')
-    lang = gettext.translation('gscreenshot', localedir=locale_path, languages=["es"])
-    i18n = lang.gettext
     locale.setlocale(locale.LC_ALL, '')
     locale.bindtextdomain('gscreenshot', locale_path)
     gettext.bindtextdomain('gscreenshot', locale_path)

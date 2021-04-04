@@ -115,3 +115,10 @@ msgstr ""
 
 msgid "A simple screenshot tool supporting multiple backends."
 msgstr ""
+
+msgid "Author(s)"
+msgstr ""
+
+#, python-brace-format
+msgid "Licensed as {0}"
+msgstr ""
