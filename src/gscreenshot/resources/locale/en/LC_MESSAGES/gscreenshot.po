@@ -1,0 +1,118 @@
+# gscreenshot.
+# Copyright (C) thenaterhood 2021
+# This file is distributed under the same license as the gscreenshot package.
+# Nate Levesque <public@thenaterhood.com>, 2021.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: gscreenshot VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-04-03 16:01-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Nate Levesque <nate@thenaterhood.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/gscreenshot/resources/gui/glade/main.glade:41
+msgid "Open With"
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:123
+msgid "Options"
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:141
+msgid "Everything"
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:160
+msgid "Selection"
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:179
+msgid "Window"
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:209
+msgid "Take screenshot of..."
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:222
+msgid "Hide gscreenshot"
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:347
+msgid "Delay"
+msgstr ""
+
+#: src/gscreenshot/resources/gui/glade/main.glade:362
+msgid "0"
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:35
+msgid "How many seconds to wait before taking the screenshot. Defaults to 0."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:42
+msgid ""
+"Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This "
+"can be paired with -c to save and copy. If you specify a filename without a "
+"file extension, it will be treated as a directory (creating the tree if "
+"needed) and screenshots will be saved there with the default filename scheme."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:49
+msgid ""
+"Copy the image to the clipboard. Requires xclip to be installed. This can be "
+"paired with -f to save and copy together."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:56
+msgid "Open the screenshot in your default viewer."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:63
+msgid "Choose a window or select a region to screenshot."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:70
+msgid "Show information about gscreenshot"
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:77
+msgid ""
+"Show a notification when the screenshot is taken. Gscreenshot will "
+"automatically show a notification if a screenshot is taken from a different "
+"session, so some situations may not need this option."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:87
+msgid "No supported screenshot backend is available."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:88
+msgid "Please install one to use gscreenshot."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py:99
+#, python-brace-format
+msgid "Using {0} screenshot backend"
+msgstr ""
+
+#: src/gscreenshot/frontend/gtk.py:152
+msgid "Your clipboard doesn't support persistence and xclip isn't available."
+msgstr ""
+
+#: src/gscreenshot/frontend/gtk.py:161
+msgid "Please install xdg-open to open files."
+msgstr ""
+
+#: src/gscreenshot/frontend/gtk.py:184
+msgid "About"
+msgstr ""
+
+#: src/gscreenshot/frontend/gtk.py:427
+msgid "Choose an Application"
+msgstr ""

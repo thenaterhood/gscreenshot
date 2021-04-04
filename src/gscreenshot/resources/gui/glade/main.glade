@@ -38,7 +38,7 @@ Version: 3.0.1
     </child>
     <child>
       <object class="GtkImageMenuItem">
-        <property name="label">Open With</property>
+        <property name="label" translatable="yes">Open With</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="use-stock">False</property>
@@ -359,7 +359,7 @@ Version: 3.0.1
                             <property name="can-focus">True</property>
                             <property name="halign">end</property>
                             <property name="width-chars">3</property>
-                            <property name="text" translatable="yes">0</property>
+                            <property name="text">0</property>
                             <property name="caps-lock-warning">False</property>
                             <property name="input-purpose">number</property>
                             <property name="adjustment">adjustment1</property>

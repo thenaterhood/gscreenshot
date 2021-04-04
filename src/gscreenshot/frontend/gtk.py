@@ -5,7 +5,9 @@
 '''
 Classes for the GTK gscreenshot frontend
 '''
+import gettext
 import io
+import locale
 import sys
 import threading
 from time import sleep
@@ -19,6 +21,8 @@ pygtkcompat.enable_gtk(version='3.0')
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
+
+i18n = gettext.gettext
 
 
 class Presenter(object):
@@ -145,7 +149,7 @@ class Presenter(object):
         if not self._view.copy_to_clipboard(pixbuf):
             if not self._app.copy_last_screenshot_to_clipboard():
                 warning_dialog = WarningDialog(
-                    "Your clipboard doesn't support persistence and xclip isn't available.",
+                    i18n("Your clipboard doesn't support persistence and xclip isn't available."),
                     self._view.get_window())
                 self._view.run_dialog(warning_dialog)
 
@@ -154,7 +158,7 @@ class Presenter(object):
         success = self._app.open_last_screenshot()
         if success:
             dialog = WarningDialog(
-                "Please install xdg-open to open files.",
+                i18n("Please install xdg-open to open files."),
                 self._view.get_window())
             self._view.run_dialog(dialog)
         else:
@@ -167,9 +171,9 @@ class Presenter(object):
         authors = self._app.get_program_authors()
         about.set_authors(authors)
 
-        description = self._app.get_program_description()
-        description += "\nCurrently using " + self._app.get_screenshooter_name()
-        about.set_comments(description)
+        description = i18n(self._app.get_program_description())
+        description += "\n" + i18n("Using {0} screenshot backend").format(self._app.get_screenshooter_name())
+        about.set_comments(i18n(description))
 
         website = self._app.get_program_website()
         about.set_website(website)
@@ -177,7 +181,7 @@ class Presenter(object):
 
         name = self._app.get_program_name()
         about.set_program_name(name)
-        about.set_title("About gscreenshot")
+        about.set_title(i18n("About"))
 
         license_text = self._app.get_program_license_text()
         about.set_license(license_text)
@@ -420,7 +424,7 @@ class OpenWithDialog(Gtk.AppChooserDialog):
     def __init__(self, parent=None):
 
         Gtk.AppChooserDialog.__init__(self, content_type="image/png", parent=parent)
-        self.set_title("Choose an Application")
+        self.set_title(i18n("Choose an Application"))
         self.connect("response", self._on_response)
         self.appinfo = None
 
@@ -504,11 +508,20 @@ class WarningDialog():
 
 def main():
     '''The main function for the GTK frontend'''
+
+    locale_path = resource_filename('gscreenshot.resources', 'locale')
+    lang = gettext.translation('gscreenshot', localedir=locale_path, languages=["es"])
+    i18n = lang.gettext
+    locale.setlocale(locale.LC_ALL, '')
+    locale.bindtextdomain('gscreenshot', locale_path)
+    gettext.bindtextdomain('gscreenshot', locale_path)
+    gettext.textdomain('gscreenshot')
+
     try:
         application = Gscreenshot()
     except NoSupportedScreenshooterError:
         warning = WarningDialog(
-            "gscreenshot couldn't run. No supported screenshot utility found.",
+            i18n("No supported screenshot backend is available."),
             None
             )
         warning.run()
@@ -523,6 +536,7 @@ def main():
     screenshot_thread.start()
 
     builder = Gtk.Builder()
+    builder.set_translation_domain('gscreenshot')
     builder.add_from_string(resource_string(
         'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
 
