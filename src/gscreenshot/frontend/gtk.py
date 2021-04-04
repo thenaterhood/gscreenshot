@@ -513,6 +513,10 @@ def main():
 
     locale_path = resource_filename('gscreenshot.resources', 'locale')
     locale.setlocale(locale.LC_ALL, '')
+
+    # I don't know what's going on with this. This call appears to exist,
+    # works fine, and seems required for glade localization to work.
+    #pylint: disable=no-member
     locale.bindtextdomain('gscreenshot', locale_path)
     gettext.bindtextdomain('gscreenshot', locale_path)
     gettext.textdomain('gscreenshot')
