@@ -133,3 +133,15 @@ msgstr "Autor(s)"
 #, python-brace-format
 msgid "Licensed as {0}"
 msgstr "Con licencia GPLv2"
+
+msgid "No screenshot taken."
+msgstr "No se tomó ninguna captura de pantalla"
+
+msgid "Failed to save screenshot!"
+msgstr "¡No se pudo guardar la captura de pantalla!"
+
+msgid "Could not clip image! Xclip failed to run."
+msgstr "No se pudo copiar la imagen. Xclip no se pudo ejecutar."
+
+msgid "Your screenshot was saved to {0}"
+msgstr "Tu captura de pantalla se guardó en {0}"

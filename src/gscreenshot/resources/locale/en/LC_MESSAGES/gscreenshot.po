@@ -123,3 +123,15 @@ msgstr ""
 #, python-brace-format
 msgid "Licensed as {0}"
 msgstr ""
+
+msgid "No screenshot taken."
+msgstr ""
+
+msgid "Failed to save screenshot!"
+msgstr ""
+
+msgid "Could not clip image! Xclip failed to run."
+msgstr ""
+
+msgid "Your screenshot was saved to {0}"
+msgstr ""
