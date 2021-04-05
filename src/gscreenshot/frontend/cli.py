@@ -6,7 +6,6 @@ Gscreenshot's CLI
 import argparse
 import sys
 import gettext
-from pkg_resources import resource_filename
 
 from gscreenshot import Gscreenshot
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
