@@ -145,3 +145,12 @@ msgstr "No se pudo copiar la imagen. Xclip no se pudo ejecutar."
 
 msgid "Your screenshot was saved to {0}"
 msgstr "Tu captura de pantalla se guardó en {0}"
+
+msgid "a screenshot was taken from a script or terminal"
+msgstr "La captura de pantalla se tomó de un script o terminal."
+
+msgid "failed to show screenshot notification - is notify-send working?"
+msgstr "no se pudo mostrar la notificación de captura de pantalla: ¿funciona el envío de notificación?"
+
+msgid "unable to save cache file"
+msgstr "no se puede guardar el archivo de caché"
