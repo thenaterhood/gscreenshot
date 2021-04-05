@@ -135,3 +135,12 @@ msgstr ""
 
 msgid "Your screenshot was saved to {0}"
 msgstr ""
+
+msgid "a screenshot was taken from a script or terminal"
+msgstr ""
+
+msgid "failed to show screenshot notification - is notify-send working?"
+msgstr ""
+
+msgid "unable to save cache file"
+msgstr ""

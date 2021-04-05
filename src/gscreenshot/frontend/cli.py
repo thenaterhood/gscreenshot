@@ -4,7 +4,6 @@
 Gscreenshot's CLI
 '''
 import argparse
-import locale
 import sys
 import gettext
 from pkg_resources import resource_filename
@@ -17,11 +16,6 @@ _ = gettext.gettext
 
 def run():
     '''Run the CLI frontend'''
-    locale_path = resource_filename('gscreenshot.resources', 'locale')
-    locale.setlocale(locale.LC_ALL, '')
-    gettext.bindtextdomain('gscreenshot', locale_path)
-    gettext.textdomain('gscreenshot')
-
 
     parser = argparse.ArgumentParser()
 
