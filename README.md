@@ -30,9 +30,12 @@ Manual installation:
 1. Download the latest version from [here](https://github.com/thenaterhood/gscreenshot/releases/latest)
 2. Unzip or untar the file (depending which you downloaded)
 3. From the command line, navigate to the unzipped files and run one of the following:
-   - `sudo python setup.py install` - install systemwide
-   - `python setup.py install --user` - install to the current user (binary at ~/.local/bin/gscreenshot)
-   - you can also install with `sudo pip install -e .` but this won't install pixmaps, locales, or menu entries
+   - `sudo python setup.py install --single-version-externally-managed` - install systemwide
+     - If this fails, exclude the `--single-version-externally-managed` flag -
+       but you'll need to manually install icons and menu entries
+   - `python setup.py install --user --single-version-externally-managed` - install to the current user
+     (binary at ~/.local/bin/gscreenshot). See the previous note about `--single-version-externally-managed`
+   - you can also install with `sudo pip install -e .` but this won't install pixmaps or menu entries
 
 Building a package:
 
