@@ -111,6 +111,7 @@ _These requirements_
 * python-pillow
 * python-gobject (may be called "python-gi" or "python3-gi")
 * Setuptools
+* gettext
 
 _Optional, but recommended_
 * Slop (used for improved region and window selection)

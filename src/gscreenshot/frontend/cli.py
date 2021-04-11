@@ -15,6 +15,12 @@ _ = gettext.gettext
 
 def run():
     '''Run the CLI frontend'''
+    try:
+        gscreenshot = Gscreenshot()
+    except NoSupportedScreenshooterError:
+        print(_("No supported screenshot backend is available."))
+        print(_("Please install one to use gscreenshot."))
+        sys.exit(1)
 
     parser = argparse.ArgumentParser()
 
@@ -73,12 +79,6 @@ def run():
 
     #pylint: enable=line-too-long
 
-    try:
-        gscreenshot = Gscreenshot()
-    except NoSupportedScreenshooterError:
-        print(_("No supported screenshot backend is available."))
-        print(_("Please install one to use gscreenshot."))
-        sys.exit(1)
 
     if args.version is not False:
         authors = gscreenshot.get_program_authors()
