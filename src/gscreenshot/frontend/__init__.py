@@ -4,7 +4,12 @@ Shared utilities for gscreenshot's various frontends
 import signal
 import sys
 import gscreenshot.frontend.cli
-import gscreenshot.frontend.gtk
+
+try:
+    import gscreenshot.frontend.gtk
+    gtk_capable = True
+except ValueError:
+    gtk_capable = False
 
 
 class SignalHandler(object):
@@ -28,7 +33,7 @@ class SignalHandler(object):
 def delegate():
     '''Choose the appropriate frontend and run it'''
     with SignalHandler():
-        if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0]:
+        if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not gtk_capable:
             gscreenshot.frontend.cli.run()
         else:
             gscreenshot.frontend.gtk.main()
