@@ -13,7 +13,7 @@ Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
-BuildRequires: python3 python3-setuptools
+BuildRequires: python3 python3-setuptools gettext
 Requires: scrot python3 python3-pillow python3-gobject python3-setuptools
 Vendor: Nate Levesque <public@thenaterhood.com>
 Url: https://github.com/thenaterhood/gscreenshot
