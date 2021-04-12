@@ -7,9 +7,9 @@ import gscreenshot.frontend.cli
 
 try:
     import gscreenshot.frontend.gtk
-    gtk_capable = True
+    GTK_CAPABLE = True
 except ValueError:
-    gtk_capable = False
+    GTK_CAPABLE = False
 
 
 class SignalHandler(object):
@@ -33,7 +33,7 @@ class SignalHandler(object):
 def delegate():
     '''Choose the appropriate frontend and run it'''
     with SignalHandler():
-        if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not gtk_capable:
+        if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not GTK_CAPABLE:
             gscreenshot.frontend.cli.run()
         else:
             gscreenshot.frontend.gtk.main()
