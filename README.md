@@ -16,6 +16,32 @@ gscreenshot is licensed under the GPLv2.
 
 ## Installation
 
+### Requirements
+_automatically installed by the setup script or your package manager_
+
+_Your preference for taking screenshots. You need at least one of these._
+* Scrot
+* ImageMagick
+* Imlib2_grab (the library Scrot uses)
+
+_These requirements_
+* Python 2.7 or Python 3
+* python-pillow
+* python-gobject (may be called "python-gi" or "python3-gi")
+* Setuptools
+* gettext
+
+_Optional, but recommended_
+* Slop (used for improved region and window selection)
+  * There are some issues with the builtin selection functionality in scrot and some others
+* Xclip (for command line clipboard functionality)
+* xdg-open (for opening screenshots in your image viewer)
+
+### Development Requirements
+The above, plus:
+* Glade
+
+### How to Install
 ArchLinux and derivatives:
 [Available in the AUR](https://aur.archlinux.org/packages/gscreenshot/)
 
@@ -97,29 +123,4 @@ sometimes it just takes a little while to get to them.
 ### Opening Issues
 Don't worry about categorizing your issue properly, it'll get taken
 care of on this end.
-
-## Requirements
-_automatically installed by the setup script or your package manager_
-
-_Your preference for taking screenshots. You need at least one of these._
-* Scrot
-* ImageMagick
-* Imlib2_grab (the library Scrot uses)
-
-_These requirements_
-* Python 2.7 or Python 3
-* python-pillow
-* python-gobject (may be called "python-gi" or "python3-gi")
-* Setuptools
-* gettext
-
-_Optional, but recommended_
-* Slop (used for improved region and window selection)
-  * There are some issues with the builtin selection functionality in scrot and some others
-* Xclip (for command line clipboard functionality)
-* xdg-open (for opening screenshots in your image viewer)
-
-## Development Requirements
-The above, plus:
-* Glade
 
