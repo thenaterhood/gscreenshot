@@ -5,6 +5,7 @@
 '''
 Classes for the GTK gscreenshot frontend
 '''
+import gettext
 import io
 import sys
 import threading
@@ -20,32 +21,26 @@ from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
 
+i18n = gettext.gettext
 
-class Controller(object):
-    '''Controller class for the GTK frontend'''
 
-    __slots__ = ('_delay', '_app', '_hide', '_window', '_preview', '_can_resize',
-            '_was_maximized', '_last_window_dimensions', '_window_is_fullscreen',
-            '_main_container', '_pixbuf', '_original_width', '_original_height',
-            '_control_grid')
+class Presenter(object):
+    '''Presenter class for the GTK frontend'''
 
-    def __init__(self, application, builder):
+    __slots__ = ('_delay', '_app', '_hide', '_can_resize',
+            '_pixbuf', '_view', '_keymappings')
+
+    def __init__(self, application, view):
         self._app = application
+        self._view = view
         self._can_resize = True
-        self._window = builder.get_object('window_main')
-        self._preview = builder.get_object('image1')
-        self._control_grid = builder.get_object('control_box')
-        self._main_container = builder.get_object('main_container')
         self._delay = 0
         self._hide = True
-        self._was_maximized = False
-        self._window_is_fullscreen = False
-        self._last_window_dimensions = self._window.get_size()
         self._set_image(self._app.get_last_image())
         self._show_preview()
+        self._keymappings = {}
 
     def _begin_take_screenshot(self, app_method):
-        self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
         screenshot = app_method(self._delay)
 
         # Re-enable UI on the UI thread.
@@ -55,50 +50,20 @@ class Controller(object):
         self._set_image(screenshot)
         self._show_preview()
 
-        self._window.set_sensitive(True)
-        self._window.set_opacity(1)
+        self._view.unhide()
 
-        original_window_size = self._window.get_size()
-        self._window.set_geometry_hints(
-            None,
-            min_width=original_window_size.width,
-            min_height=original_window_size.height
-        )
-
-        if self._was_maximized:
-            self._window.maximize()
-
-        self._window.show_all()
+    def set_keymappings(self, keymappings):
+        '''Set the keymappings'''
+        self._keymappings = keymappings
 
     def window_state_event_handler(self, widget, event, *_):
         '''Handle window state events'''
-        widget = None
-        self._was_maximized = bool(event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
-        self._window_is_fullscreen = bool(
-                            Gtk.gdk.WINDOW_STATE_FULLSCREEN & event.new_window_state)
+        self._view.handle_state_event(widget, event)
 
     def take_screenshot(self, app_method):
         '''Take a screenshot using the passed app method'''
-        self._window.set_sensitive(False)
         if self._hide:
-            # We set the opacity to 0 because hiding the window is
-            # subject to window closing effects, which can take long
-            # enough that the window will still appear in the screenshot
-            self._window.set_opacity(0)
-
-            # This extra step allows the window to be unmaximized after it
-            # reappears. Otherwise, the hide() call clears the previous
-            # state and the window is stuck maximized. We restore the
-            # maximization when we unhide the window.
-            if self._was_maximized:
-                self._window.unmaximize()
-
-            self._window.hide()
-
-        while Gtk.events_pending():
-            Gtk.main_iteration()
-
-        sleep(0.2)
+            self._view.hide()
 
         # Do work in background thread.
         # Taken from here: https://wiki.gnome.org/Projects/PyGObject/Threading
@@ -112,15 +77,8 @@ class Controller(object):
         handled separately from accelerators (which include
         modifiers).
         """
-        shortcuts = {
-                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')):
-                    self.on_button_quit_clicked,
-                Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')):
-                    self.on_fullscreen_toggle
-                }
-
-        if event.keyval in shortcuts:
-            shortcuts[event.keyval]()
+        if event.keyval in self._keymappings:
+            self._keymappings[event.keyval]()
 
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
@@ -152,25 +110,16 @@ class Controller(object):
 
     def on_button_saveas_clicked(self, *_):
         '''Handle the saveas button'''
-        # make the main window unsensitive while saving your image
-        self._window.set_sensitive(False)
-
-        self.handle_save_action()
-
-        self._window.set_sensitive(True)
-
-    def handle_save_action(self):
-        '''Handle the save button'''
         saved = False
         cancelled = False
         save_dialog = FileSaveDialog(
                 self._app.get_time_filename(),
                 self._app.get_last_save_directory(),
-                self._window
+                self._view.get_window()
                 )
 
         while not (saved or cancelled):
-            fname = save_dialog.run()
+            fname = self._view.run_dialog(save_dialog)
             if fname is not None:
                 saved = self._app.save_last_image(fname)
             else:
@@ -178,22 +127,14 @@ class Controller(object):
 
     def on_button_openwith_clicked(self, *_):
         '''Handle the "open with" button'''
-        self._window.set_sensitive(False)
-
-        self.handle_openwith_action()
-
-        self._window.set_sensitive(True)
-
-    def handle_openwith_action(self):
-        '''Handle the "open with" button'''
         fname = self._app.save_and_return_path()
         appchooser = OpenWithDialog()
-        appchooser.run()
+
+        self._view.run_dialog(appchooser)
+
         appinfo = appchooser.appinfo
-        appchooser.destroy()
 
         if appinfo is not None:
-            print(fname)
             if appinfo.launch_uris(["file://"+fname], None):
                 self.quit(None)
 
@@ -201,48 +142,39 @@ class Controller(object):
         """
         Copy the current screenshot to the clipboard
         """
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        display = Gdk.Display.get_default()
+        img = self._app.get_last_image()
+        pixbuf = self._image_to_pixbuf(img)
 
-        if display.supports_clipboard_persistence():
-            img = self._app.get_last_image()
-            pixbuf = self._image_to_pixbuf(img)
-            clipboard.set_image(pixbuf)
-            clipboard.store()
-        else:
+        if not self._view.copy_to_clipboard(pixbuf):
             if not self._app.copy_last_screenshot_to_clipboard():
                 warning_dialog = WarningDialog(
-                    "Your clipboard doesn't support persistence and xclip isn't available.",
-                    self._window)
-                warning_dialog.run()
+                    i18n("Your clipboard doesn't support persistence and xclip isn't available."),
+                    self._view.get_window())
+                self._view.run_dialog(warning_dialog)
 
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
         success = self._app.open_last_screenshot()
-        if not success:
-            dialog = Gtk.MessageDialog(self._window,
-                Gtk.DIALOG_DESTROY_WITH_PARENT, Gtk.MESSAGE_WARNING,
-                Gtk.BUTTONS_OK, "Please install xdg-open to open files.")
-            dialog.run()
-            dialog.destroy()
+        if success:
+            dialog = WarningDialog(
+                i18n("Please install xdg-open to open files."),
+                self._view.get_window())
+            self._view.run_dialog(dialog)
         else:
             self.quit(None)
 
     def on_button_about_clicked(self, *_):
         '''Handle the about button'''
-        # make the main window unsensitive while viewing the "about"
-        # information
-        self._window.set_sensitive(False)
-
-        # send the "about" dialog object a request to create it's window
-        about = Gtk.AboutDialog(transient_for=self._window)
+        about = Gtk.AboutDialog(transient_for=self._view.get_window())
 
         authors = self._app.get_program_authors()
         about.set_authors(authors)
 
-        description = self._app.get_program_description()
-        description += "\nCurrently using " + self._app.get_screenshooter_name()
-        about.set_comments(description)
+        description = i18n(self._app.get_program_description())
+        description += "\n" + i18n("Using {0} screenshot backend").format(
+            self._app.get_screenshooter_name()
+        )
+        about.set_comments(i18n(description))
 
         website = self._app.get_program_website()
         about.set_website(website)
@@ -250,7 +182,7 @@ class Controller(object):
 
         name = self._app.get_program_name()
         about.set_program_name(name)
-        about.set_title("About gscreenshot")
+        about.set_title(i18n("About"))
 
         license_text = self._app.get_program_license_text()
         about.set_license(license_text)
@@ -265,23 +197,12 @@ class Controller(object):
                         )
                     )
                 )
-        about.connect("response", self.on_about_close)
 
-        about.show()
+        self._view.run_dialog(about)
 
     def on_fullscreen_toggle(self):
         '''Handle the window getting toggled to fullscreen'''
-        if self._window_is_fullscreen:
-            self._window.unfullscreen()
-        else:
-            self._window.fullscreen()
-
-        self._window_is_fullscreen = not self._window_is_fullscreen
-
-    def on_about_close(self, action, *_):
-        '''Handle closing the 'about' dialog'''
-        action.destroy()
-        self._window.set_sensitive(True)
+        self._view.toggle_fullscreen()
 
     def on_button_quit_clicked(self, widget=None):
         '''Handle the quit button'''
@@ -294,14 +215,7 @@ class Controller(object):
     def on_window_resize(self, *_):
         '''Handle window resizes'''
         if self._can_resize:
-            current_window_size = self._window.get_size()
-            if self._last_window_dimensions is None:
-                self._last_window_dimensions = current_window_size
-
-            if (self._last_window_dimensions.width != current_window_size.width
-                    or self._last_window_dimensions.height != current_window_size.height):
-
-                self._last_window_dimensions = current_window_size
+            self._view.resize()
             self._show_preview()
 
     def quit(self, *_):
@@ -325,39 +239,184 @@ class Controller(object):
         if image is None:
             image = self._app.get_app_icon()
         self._pixbuf = self._image_to_pixbuf(image)
-        self._original_width = image.width
-        self._original_height = image.height
 
     def _show_preview(self):
-        image_widget_size = self._preview.get_allocation()
+        height, width = self._view.get_preview_dimensions()
 
-        if image_widget_size.width > image_widget_size.height:
-            width = image_widget_size.width * .95
-            height = (width/self._original_width)*self._original_height
-            if height > image_widget_size.height * .90:
-                height = image_widget_size.height * .90
-                width = (height/self._original_height)*self._original_width
+        preview_img = self._app.get_thumbnail(width, height)
+
+        self._view.update_preview(self._image_to_pixbuf(preview_img))
+
+
+class View(object):
+    '''View class for the GTK frontend'''
+
+    def __init__(self, window, builder):
+        self._window = window
+        self._window_is_fullscreen = False
+        self._was_maximized = False
+        self._last_window_dimensions = self._window.get_size()
+        self._header_bar = builder.get_object('header_bar')
+        self._preview = builder.get_object('image1')
+        self._control_grid = builder.get_object('control_box')
+
+    def run(self):
+        '''Run the view'''
+        self._window.set_position(Gtk.WIN_POS_CENTER)
+        # Set the initial size of the window
+        active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+        while active_window is None:
+            # There appears to be a race condition with getting the active window,
+            # so we'll keep trying until we have it
+            active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+
+        initial_screen = self._window.get_screen().get_monitor_at_window(active_window)
+        geometry = self._window.get_screen().get_monitor_geometry(initial_screen)
+
+        if self._header_bar is not None:
+            height_x = .6
         else:
-            height = image_widget_size.height * .90
-            width = (height/self._original_height)*self._original_width
-            if width > image_widget_size.width * .95:
-                width = image_widget_size.width * .95
-                height = (width/self._original_width)*self._original_height
+            height_x = .48
+
+        gscreenshot_height = geometry.height * height_x
+        gscreenshot_width = gscreenshot_height * .9
+
+        if geometry.height > geometry.width:
+            gscreenshot_width = geometry.width * height_x
+            gscreenshot_height = gscreenshot_width * .9
+
+        self._window.set_size_request(gscreenshot_width, gscreenshot_height)
+
+        self._window.show_all()
+
+    def get_window(self):
+        '''Returns the associated window'''
+        return self._window
+
+    def toggle_fullscreen(self):
+        '''Toggle the window to full screen'''
+        if self._window_is_fullscreen:
+            self._window.unfullscreen()
+        else:
+            self._window.fullscreen()
+
+        self._window_is_fullscreen = not self._window_is_fullscreen
+
+    def handle_state_event(self, widget, event):
+        '''Handles a window state event'''
+        widget = None
+        self._was_maximized = bool(event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
+        self._window_is_fullscreen = bool(
+                            Gtk.gdk.WINDOW_STATE_FULLSCREEN & event.new_window_state)
+
+    def hide(self):
+        '''Hide the view'''
+        self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
+        # We set the opacity to 0 because hiding the window is
+        # subject to window closing effects, which can take long
+        # enough that the window will still appear in the screenshot
+        self._window.set_opacity(0)
+
+        # This extra step allows the window to be unmaximized after it
+        # reappears. Otherwise, the hide() call clears the previous
+        # state and the window is stuck maximized. We restore the
+        # maximization when we unhide the window.
+        if self._was_maximized:
+            self._window.unmaximize()
+
+        self._window.hide()
+
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+
+        sleep(0.2)
+
+    def unhide(self):
+        '''Unhide the view'''
+        self._window.set_sensitive(True)
+        self._window.set_opacity(1)
+
+        original_window_size = self._window.get_size()
+        self._window.set_geometry_hints(
+            None,
+            min_width=original_window_size.width,
+            min_height=original_window_size.height
+        )
+
+        if self._was_maximized:
+            self._window.maximize()
+
+        self._window.show_all()
+
+    def resize(self):
+        '''Resize the display'''
+        current_window_size = self._window.get_size()
+        if self._last_window_dimensions is None:
+            self._last_window_dimensions = current_window_size
+
+        if (self._last_window_dimensions.width != current_window_size.width
+                or self._last_window_dimensions.height != current_window_size.height):
+
+            self._last_window_dimensions = current_window_size
+
+    def get_preview_dimensions(self):
+        '''Get the current dimensions of the preview widget'''
         window_size = self._window.get_size()
         control_size = self._control_grid.get_allocation()
 
-        preview_size = ((window_size.height-control_size.height)*.98, window_size.width*.98)
+        header_height = 0
+        if self._header_bar is not None:
+            header_height = self._header_bar.get_allocation().height
+
+        width_x = .8 if self._header_bar is not None else .98
+
+        preview_size = (
+            (window_size.height-control_size.height-(.6*header_height))*.98,
+            window_size.width*width_x
+        )
 
         height = preview_size[0]
         width = preview_size[1]
-        preview_img = self._app.get_thumbnail(width, height)
 
-        # set the image_preview widget to the preview image size (previewWidth,
-        # previewHeight)
-        self._preview.set_size_request(width, height)
+        return height, width
 
+    def update_preview(self, pixbuf):
+        '''
+        Update the preview widget with a new image.
+
+        This assumes the pixbuf has already been resized appropriately.
+        '''
         # view the previewPixbuf in the image_preview widget
-        self._preview.set_from_pixbuf(self._image_to_pixbuf(preview_img))
+        self._preview.set_from_pixbuf(pixbuf)
+
+    def copy_to_clipboard(self, pixbuf):
+        """
+        Copy the provided image to the screen's clipboard,
+        if it supports persistence
+        """
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        display = Gdk.Display.get_default()
+
+        if display.supports_clipboard_persistence():
+            clipboard.set_image(pixbuf)
+            clipboard.store()
+            return True
+
+        return False
+
+    def run_dialog(self, dialog):
+        '''Run a dialog window and return the outcome'''
+        self._window.set_sensitive(False)
+        result = dialog.run()
+        self._window.set_sensitive(True)
+
+        try:
+            dialog.destroy()
+        except AttributeError:
+            # This process is wonky, and due to incorrect polymorphism
+            pass
+
+        return result
 
 
 class OpenWithDialog(Gtk.AppChooserDialog):
@@ -366,7 +425,7 @@ class OpenWithDialog(Gtk.AppChooserDialog):
     def __init__(self, parent=None):
 
         Gtk.AppChooserDialog.__init__(self, content_type="image/png", parent=parent)
-        self.set_title("Choose an Application")
+        self.set_title(i18n("Choose an Application"))
         self.connect("response", self._on_response)
         self.appinfo = None
 
@@ -450,11 +509,12 @@ class WarningDialog():
 
 def main():
     '''The main function for the GTK frontend'''
+
     try:
         application = Gscreenshot()
     except NoSupportedScreenshooterError:
         warning = WarningDialog(
-            "gscreenshot couldn't run. No supported screenshot utility found.",
+            i18n("No supported screenshot backend is available."),
             None
             )
         warning.run()
@@ -469,42 +529,54 @@ def main():
     screenshot_thread.start()
 
     builder = Gtk.Builder()
+    builder.set_translation_domain('gscreenshot')
     builder.add_from_string(resource_string(
         'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
 
     window = builder.get_object('window_main')
-    window.set_position(Gtk.WIN_POS_CENTER)
 
     waited = 0
     while application.get_last_image() is None and waited < 4:
         sleep(.01)
         waited += .01
 
-    handler = Controller(
+    view = View(builder.get_object('window_main'), builder)
+
+    presenter = Presenter(
             application,
-            builder,
+            view
             )
 
     accel = Gtk.AccelGroup()
     accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK,
-            0, handler.on_button_saveas_clicked)
+            0, presenter.on_button_saveas_clicked)
     accel.connect(Gdk.keyval_from_name('C'), Gdk.ModifierType.CONTROL_MASK,
-            0, handler.on_button_copy_clicked)
+            0, presenter.on_button_copy_clicked)
     accel.connect(Gdk.keyval_from_name('O'), Gdk.ModifierType.CONTROL_MASK,
-            0, handler.on_button_open_clicked)
+            0, presenter.on_button_open_clicked)
     window.add_accel_group(accel)
-    window.connect("key-press-event", handler.handle_keypress)
 
-    builder.connect_signals(handler)
+    window.connect("key-press-event", presenter.handle_keypress)
 
-    window.connect("check-resize", handler.on_window_resize)
-    window.connect("window-state-event", handler.window_state_event_handler)
+    keymappings = {
+        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')):
+            presenter.on_button_quit_clicked,
+        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')):
+            presenter.on_fullscreen_toggle
+    }
+    presenter.set_keymappings(keymappings)
+
+    builder.connect_signals(presenter)
+
+    window.connect("check-resize", presenter.on_window_resize)
+    window.connect("window-state-event", presenter.window_state_event_handler)
     window.set_icon_from_file(
         resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
     )
 
+    view.run()
+
     GObject.threads_init() # Start background threads.
-    window.show_all()
     Gtk.main()
 
 if __name__ == "__main__":

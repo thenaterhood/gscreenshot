@@ -10,7 +10,9 @@
  - Updated to use modern libraries and formats
  - Further changes will be noted in release notes
 '''
+import gettext
 import json
+import locale
 import os
 import sys
 import subprocess
@@ -20,6 +22,8 @@ from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
+
+_ = gettext.gettext
 
 
 class Gscreenshot(object):
@@ -34,9 +38,17 @@ class Gscreenshot(object):
         """
         constructor
         """
+        locale_path = resource_filename('gscreenshot.resources', 'locale')
+        locale.setlocale(locale.LC_ALL, '')
+        # I don't know what's going on with this. This call appears to exist,
+        # works fine, and seems required for glade localization to work.
+        #pylint: disable=no-member
+        locale.bindtextdomain('gscreenshot', locale_path)
+        gettext.bindtextdomain('gscreenshot', locale_path)
+        gettext.textdomain('gscreenshot')
 
-        factory = ScreenshooterFactory(screenshooter)
-        self.screenshooter = factory.create()
+        self.screenshooter_factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = self.screenshooter_factory.create()
 
         self.saved_last_image = False
         self.last_save_file = None
@@ -62,12 +74,12 @@ class Gscreenshot(object):
             subprocess.Popen([
                 'notify-send',
                 'gscreenshot',
-                'a screenshot was taken from a script or terminal',
+                _('a screenshot was taken from a script or terminal'),
                 '--icon',
                 'gscreenshot'
             ])
         except OSError:
-            print("failed to show screenshot notification - is notify-send working?")
+            print(_("failed to show screenshot notification - is notify-send working?"))
             return
 
     def run_display_mismatch_warning(self):
@@ -101,7 +113,7 @@ class Gscreenshot(object):
             json.dump(self.cache, cachefile)
             cachefile.close()
         except FileNotFoundError:
-            print("unable to save cache file")
+            print(_("unable to save cache file"))
 
     def get_screenshooter_name(self):
         """Gets the name of the current screenshooter"""
@@ -192,13 +204,18 @@ class Gscreenshot(object):
         Returns:
             Image
         """
-        if image is None:
+        thumbnail = None
+
+        if image is None and self.screenshooter.image is not None:
             thumbnail = self.screenshooter.image.copy()
-        else:
+        elif image is not None:
             thumbnail = image.copy()
 
-        thumbnail.thumbnail((width, height), Image.ANTIALIAS)
-        return thumbnail
+        if thumbnail is not None:
+            thumbnail.thumbnail((width, height), Image.ANTIALIAS)
+            return thumbnail
+
+        return self.get_app_icon()
 
     def get_time_filename(self):
         """

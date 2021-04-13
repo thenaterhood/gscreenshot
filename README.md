@@ -16,6 +16,32 @@ gscreenshot is licensed under the GPLv2.
 
 ## Installation
 
+### Requirements
+_automatically installed by the setup script or your package manager_
+
+_Your preference for taking screenshots. You need at least one of these._
+* Scrot
+* ImageMagick
+* Imlib2_grab (the library Scrot uses)
+
+_These requirements_
+* Python 2.7 or Python 3
+* python-pillow
+* python-gobject (may be called "python-gi" or "python3-gi")
+* Setuptools
+* gettext
+
+_Optional, but recommended_
+* Slop (used for improved region and window selection)
+  * There are some issues with the builtin selection functionality in scrot and some others
+* Xclip (for command line clipboard functionality)
+* xdg-open (for opening screenshots in your image viewer)
+
+### Development Requirements
+The above, plus:
+* Glade
+
+### How to Install
 ArchLinux and derivatives:
 [Available in the AUR](https://aur.archlinux.org/packages/gscreenshot/)
 
@@ -29,10 +55,13 @@ Manual installation:
 
 1. Download the latest version from [here](https://github.com/thenaterhood/gscreenshot/releases/latest)
 2. Unzip or untar the file (depending which you downloaded)
-3. From the command line, navigate to the unzipped files and run
-   - `sudo python setup.py install --single-version-externally-managed` (may fail on some Python versions)
-   - OR `sudo python setup.py install --old-and-unmanageable`
-   - OR you can also install with `sudo pip install -e .` but this won't install pixmaps or menu entries
+3. From the command line, navigate to the unzipped files and run one of the following:
+   - `sudo python setup.py install --single-version-externally-managed` - install systemwide
+     - If this fails, exclude the `--single-version-externally-managed` flag -
+       but you'll need to manually install icons and menu entries
+   - `python setup.py install --user --single-version-externally-managed` - install to the current user
+     (binary at ~/.local/bin/gscreenshot). See the previous note about `--single-version-externally-managed`
+   - you can also install with `sudo pip install -e .` but this won't install pixmaps or menu entries
 
 Building a package:
 
@@ -71,6 +100,17 @@ Keyboard shortcuts
 Find a problem? Have something to add? Just think gscreenshot is super
 cool? gscreenshot accepts contributions!
 
+### Localization
+gscreenshot uses the standard gettext tools. Locale files can be found in
+src/gscreenshot/resources/locale.
+
+If you contribute a localization, do not add the compiled .mo files. They
+are generated on demand as part of the installation.
+
+Current supported languages are:
+* English
+* Español
+
 ### Contributing Code
 Please base pull requests off of and open pull requests against the
 'dev' branch. 'master' is reserved for stable code. You may be asked to
@@ -83,28 +123,4 @@ sometimes it just takes a little while to get to them.
 ### Opening Issues
 Don't worry about categorizing your issue properly, it'll get taken
 care of on this end.
-
-## Requirements
-_automatically installed by the setup script or your package manager_
-
-_Your preference for taking screenshots. You need at least one of these._
-* Scrot
-* ImageMagick
-* Imlib2_grab (the library Scrot uses)
-
-_These requirements_
-* Python 2.7 or Python 3
-* python-pillow
-* python-gobject (may be called "python-gi" or "python3-gi")
-* Setuptools
-
-_Optional, but recommended_
-* Slop (used for improved region and window selection)
-  * There are some issues with the builtin selection functionality in scrot and some others
-* Xclip (for command line clipboard functionality)
-* xdg-open (for opening screenshots in your image viewer)
-
-## Development Requirements
-The above, plus:
-* Glade
 
