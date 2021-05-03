@@ -16,7 +16,6 @@ class Scrot(Screenshooter):
         constructor
         """
         Screenshooter.__init__(self)
-        self.selector = Slop()
 
     def grab_fullscreen(self, delay=0):
         """

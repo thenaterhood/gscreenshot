@@ -2,10 +2,11 @@
 Wrapper for the slop screen selector utility
 '''
 import subprocess
-from gscreenshot.selector import SelectionParseError, SelectionExecError, SelectionCancelled
+from gscreenshot.selector import SelectionParseError, SelectionExecError, SelectionCancelled, RegionSelector
+from gscreenshot.util import find_executable
 
 
-class Slop(object):
+class Slop(RegionSelector):
 
     """
     Python class wrapper for the slop region selection tool
@@ -36,6 +37,11 @@ class Slop(object):
            (x top left, y top left, x bottom right, y bottom right)
         """
         return self._get_boundary_interactive()
+
+    @staticmethod
+    def can_run():
+        """Whether slop is available"""
+        return find_executable('slop') is not None
 
     def _get_boundary_interactive(self):
         """
@@ -69,24 +75,5 @@ class Slop(object):
 
         slop_output = stdout.decode("UTF-8").strip().split(",")
 
-        slop_parsed = {}
-        # We iterate through the output so we're not reliant
-        # on the order or number of lines in slop's output
-        for line in slop_output:
-            if '=' in line:
-                spl = line.split("=")
-                slop_parsed[spl[0]] = spl[1]
+        return self._parse_selection_output(slop_output)
 
-        # (left, upper, right, lower)
-        try:
-            crop_box = (
-                int(slop_parsed['X']),
-                int(slop_parsed['Y']),
-                int(slop_parsed['X']) + int(slop_parsed['W']),
-                int(slop_parsed['Y']) + int(slop_parsed['H'])
-            )
-        except KeyError:
-            #pylint: disable=raise-missing-from
-            raise SelectionParseError("Unexpected slop output") #from exception
-
-        return crop_box

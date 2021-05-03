@@ -6,7 +6,8 @@ import subprocess
 import tempfile
 import PIL.Image
 
-from gscreenshot.selector import SelectionExecError, SelectionParseError, SelectionCancelled
+from gscreenshot.selector import SelectionExecError, SelectionParseError, SelectionCancelled, NoSupportedSelectorError
+from gscreenshot.selector.factory import SelectorFactory
 
 
 class Screenshooter(object):
@@ -20,13 +21,16 @@ class Screenshooter(object):
         """
         constructor
         """
+        try:
+            self.selector = SelectorFactory().create()
+        except NoSupportedSelectorError:
+            self.selector = None
 
         self._image = None
         self.tempfile = os.path.join(
                 tempfile.gettempdir(),
                 str(os.getpid()) + ".png"
                 )
-        self.selector = None
 
     @property
     def image(self):
@@ -58,6 +62,10 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
+        if self.selector is None:
+            self._grab_selection_fallback(delay)
+            return
+
         try:
             crop_box = self.selector.region_select()
         except SelectionCancelled:

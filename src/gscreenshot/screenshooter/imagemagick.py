@@ -4,7 +4,6 @@ ImageMagick screenshot class
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.selector.slop import Slop
 from gscreenshot.util import find_executable
 
 
@@ -18,7 +17,6 @@ class ImageMagick(Screenshooter):
         constructor
         """
         Screenshooter.__init__(self)
-        self.selector = Slop()
 
     def grab_fullscreen(self, delay=0):
         """
