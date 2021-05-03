@@ -2,6 +2,7 @@
 Integration for the PIL screenshot functionality
 '''
 from time import sleep
+from gscreenshot.screenshooter import Screenshooter
 
 SUPPORTED_PLATFORM = False
 
@@ -10,8 +11,6 @@ try:
     SUPPORTED_PLATFORM = True
 except ImportError:
     SUPPORTED_PLATFORM = False
-
-from gscreenshot.screenshooter import Screenshooter
 
 
 class PILWrapper(Screenshooter):
