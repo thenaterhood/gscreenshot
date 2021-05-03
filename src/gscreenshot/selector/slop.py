@@ -2,7 +2,7 @@
 Wrapper for the slop screen selector utility
 '''
 import subprocess
-from gscreenshot.selector import SelectionParseError, SelectionExecError, SelectionCancelled, RegionSelector
+from gscreenshot.selector import SelectionExecError, SelectionCancelled, RegionSelector
 from gscreenshot.util import find_executable
 
 
@@ -19,6 +19,7 @@ class Slop(RegionSelector):
         """
         constructor
         """
+        RegionSelector.__init__(self)
 
     def region_select(self):
         """
@@ -76,4 +77,3 @@ class Slop(RegionSelector):
         slop_output = stdout.decode("UTF-8").strip().split(",")
 
         return self._parse_selection_output(slop_output)
-

@@ -2,7 +2,7 @@
 Wrapper for the slurp screen selector utility
 '''
 import subprocess
-from gscreenshot.selector import SelectionParseError, SelectionExecError, SelectionCancelled, RegionSelector
+from gscreenshot.selector import SelectionExecError, SelectionCancelled, RegionSelector
 from gscreenshot.util import find_executable
 
 
@@ -19,6 +19,7 @@ class Slurp(RegionSelector):
         """
         constructor
         """
+        RegionSelector.__init__(self)
 
     def region_select(self):
         """
@@ -49,8 +50,9 @@ class Slurp(RegionSelector):
         slurp
         """
         try:
-            # nodecorations=0 - this is the slurp default, but there's a bug
-            # so skipping the "=0" causes a segfault.
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, switch to using with here
+            #pylint: disable=consider-using-with
             process = subprocess.Popen(
                 ['slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h'],
                 stdout=subprocess.PIPE,
@@ -73,5 +75,3 @@ class Slurp(RegionSelector):
         slurp_output = stdout.decode("UTF-8").strip().split(",")
 
         return self._parse_selection_output(slurp_output)
-
-

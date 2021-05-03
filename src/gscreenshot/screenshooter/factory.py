@@ -24,7 +24,8 @@ class ScreenshooterFactory(object):
                 Grim
                 ]
 
-        if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'].lower() in ['wayland']:
+        if ('XDG_SESSION_TYPE' in os.environ and
+                os.environ['XDG_SESSION_TYPE'].lower() in ['wayland']):
             self.screenshooters = self.wayland_screenshooters
         else:
             self.screenshooters = self.xorg_screenshooters

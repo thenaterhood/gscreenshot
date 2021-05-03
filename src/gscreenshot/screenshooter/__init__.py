@@ -6,7 +6,8 @@ import subprocess
 import tempfile
 import PIL.Image
 
-from gscreenshot.selector import SelectionExecError, SelectionParseError, SelectionCancelled, NoSupportedSelectorError
+from gscreenshot.selector import SelectionExecError, SelectionParseError
+from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.selector.factory import SelectorFactory
 
 

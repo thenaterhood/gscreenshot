@@ -3,7 +3,6 @@ Integration for the Scrot screenshot utility
 '''
 from gscreenshot.util import find_executable
 from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.selector.slop import Slop
 
 
 class Scrot(Screenshooter):

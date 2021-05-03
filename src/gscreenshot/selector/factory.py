@@ -1,3 +1,6 @@
+'''
+Selector factory module
+'''
 import os
 
 from gscreenshot.selector.slop import Slop
@@ -18,7 +21,8 @@ class SelectorFactory(object):
                 Slurp
                 ]
 
-        if 'XDG_SESSION_TYPE' in os.environ and os.environ['XDG_SESSION_TYPE'].lower() in ['wayland']:
+        if ('XDG_SESSION_TYPE' in os.environ and
+                os.environ['XDG_SESSION_TYPE'].lower() in ['wayland']):
             self.selectors = self.wayland_selectors
         else:
             self.selectors = self.xorg_selectors

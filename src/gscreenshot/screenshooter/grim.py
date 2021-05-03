@@ -5,7 +5,6 @@ from time import sleep
 
 from gscreenshot.util import find_executable
 from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.selector.factory import SelectorFactory
 
 
 class Grim(Screenshooter):
