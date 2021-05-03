@@ -6,6 +6,7 @@ import os
 from gscreenshot.screenshooter.grim import Grim
 from gscreenshot.screenshooter.imagemagick import ImageMagick
 from gscreenshot.screenshooter.imlib_2 import Imlib2
+from gscreenshot.screenshooter.pil import PILWrapper
 from gscreenshot.screenshooter.scrot import Scrot
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
@@ -17,6 +18,7 @@ class ScreenshooterFactory(object):
         self.xorg_screenshooters = [
                 Scrot,
                 ImageMagick,
+                PILWrapper,
                 Imlib2
                 ]
 
