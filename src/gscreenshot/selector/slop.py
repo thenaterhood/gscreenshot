@@ -45,6 +45,7 @@ class Slop(object):
         try:
             # nodecorations=0 - this is the slop default, but there's a bug
             # so skipping the "=0" causes a segfault.
+            #pylint: disable=fixme
             # TODO: when dropping python2 support, switch to using with here
             #pylint: disable=consider-using-with
             process = subprocess.Popen(
