@@ -54,13 +54,12 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
-            cachefile = open(self.get_cache_file(), "r")
-            try:
-                self.cache = json.load(cachefile)
-            except json.JSONDecodeError:
-                self.cache = {"last_save_dir": os.path.expanduser("~")}
-                self.save_cache()
-            cachefile.close()
+            with open(self.get_cache_file(), "r") as cachefile:
+                try:
+                    self.cache = json.load(cachefile)
+                except json.JSONDecodeError:
+                    self.cache = {"last_save_dir": os.path.expanduser("~")}
+                    self.save_cache()
         else:
             self.save_cache()
 
@@ -109,9 +108,8 @@ class Gscreenshot(object):
     def save_cache(self):
         """Writes the cache to disk"""
         try:
-            cachefile = open(self.get_cache_file(), "w")
-            json.dump(self.cache, cachefile)
-            cachefile.close()
+            with open(self.get_cache_file(), "w") as cachefile:
+                json.dump(self.cache, cachefile)
         except FileNotFoundError:
             print(_("unable to save cache file"))
 
