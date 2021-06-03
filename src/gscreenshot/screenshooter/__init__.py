@@ -82,7 +82,8 @@ class Screenshooter(object):
             return
 
         self.grab_fullscreen(delay)
-        self._image = self._image.crop(crop_box)
+        if self._image is not None:
+            self._image = self._image.crop(crop_box)
 
     def grab_window(self, delay=0):
         """
