@@ -538,7 +538,7 @@ def main():
     waited = 0
     while application.get_last_image() is None and waited < 4:
         sleep(.01)
-        waited += .01
+        waited += .1
 
     view = View(builder.get_object('window_main'), builder)
 
