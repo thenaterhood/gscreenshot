@@ -264,11 +264,11 @@ class View(object):
         '''Run the view'''
         self._window.set_position(Gtk.WIN_POS_CENTER)
         # Set the initial size of the window
-        active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+        active_window = Gdk.get_default_root_window()
         while active_window is None:
             # There appears to be a race condition with getting the active window,
             # so we'll keep trying until we have it
-            active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+            active_window = Gdk.get_default_root_window()
 
         initial_screen = self._window.get_screen().get_monitor_at_window(active_window)
         geometry = self._window.get_screen().get_monitor_geometry(initial_screen)
