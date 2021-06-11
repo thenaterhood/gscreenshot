@@ -3,10 +3,11 @@
 [![Code Climate](https://codeclimate.com/github/thenaterhood/gscreenshot/badges/gpa.svg)](https://codeclimate.com/github/thenaterhood/gscreenshot)
 
 
-gscreenshot is a gtk frontend for scrot, an application for taking screenshots,
-written in python and pygtk. This is a fork of the original project (last
-updated in 2006) that updates it to use modern technologies and to provide
-updated functionality.
+gscreenshot is a GTK frontend for taking screenshots, with support for multiple
+screenshot and region selection backends. Built in Python and pygtk, with Glade.
+
+This is a fork of the original project (last updated in 2006) that updates it
+to use modern technologies and to provide updated functionality.
 
 This application was originally written by matej.horvath. The original project
 can be found at https://code.google.com/p/gscreenshot/ while Google Code is
