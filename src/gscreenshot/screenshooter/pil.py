@@ -24,7 +24,7 @@ class PILWrapper(Screenshooter):
         """
         Screenshooter.__init__(self)
 
-    def grab_fullscreen(self, delay=0):
+    def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
@@ -33,6 +33,9 @@ class PILWrapper(Screenshooter):
         """
         sleep(delay)
         self._image = ImageGrab.grab(None)
+
+        if capture_cursor:
+            self.add_fake_cursor()
 
     @staticmethod
     def can_run():

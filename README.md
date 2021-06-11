@@ -3,10 +3,11 @@
 [![Code Climate](https://codeclimate.com/github/thenaterhood/gscreenshot/badges/gpa.svg)](https://codeclimate.com/github/thenaterhood/gscreenshot)
 
 
-gscreenshot is a gtk frontend for scrot, an application for taking screenshots,
-written in python and pygtk. This is a fork of the original project (last
-updated in 2006) that updates it to use modern technologies and to provide
-updated functionality.
+gscreenshot is a GTK frontend for taking screenshots, with support for multiple
+screenshot and region selection backends. Built in Python and pygtk, with Glade.
+
+This is a fork of the original project (last updated in 2006) that updates it
+to use modern technologies and to provide updated functionality.
 
 This application was originally written by matej.horvath. The original project
 can be found at https://code.google.com/p/gscreenshot/ while Google Code is
@@ -19,23 +20,44 @@ gscreenshot is licensed under the GPLv2.
 ### Requirements
 _automatically installed by the setup script or your package manager_
 
-_Your preference for taking screenshots. You need at least one of these._
-* Scrot
-* ImageMagick
-* Imlib2_grab (the library Scrot uses)
-
-_These requirements_
+**These requirements:**
 * Python 2.7 or Python 3
 * python-pillow
 * python-gobject (may be called "python-gi" or "python3-gi")
 * Setuptools
 * gettext
+* Your choice of a combination of the utilities listed in the following sections:
 
-_Optional, but recommended_
-* Slop (used for improved region and window selection)
-  * There are some issues with the builtin selection functionality in scrot and some others
-* Xclip (for command line clipboard functionality)
-* xdg-open (for opening screenshots in your image viewer)
+**Recommended Setup for X11:**
+* Scrot (screenshot backend)
+* Slop (region selection + cursor capture)
+* xdg-open (for opening screenshots in your image viewer - optional)
+* xclip (for command line clipboard functionality - optional)
+
+**Alternative setups for X11, in order of recommendation:**
+* ImageMagick + slop + python-xlib (full functionality)
+* Imlib2_grab + slop + python-xlib (full functionality)
+* PIL/python-pillow + slop + python-xlib (full functionality)
+* Scrot (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
+* PIL/python-pillow + slop (no cursor capture)
+* ImageMagick (no cursor capture)
+* Imlib2_grab (no cursor capture)
+* ImageMagick + slop (no cursor capture)
+* Imlib2_grab + slop (no cursor capture)
+* PIL/python-pillow only (no region selection or cursor capture)
+
+**Setup for Wayland:**
+Wayland support is very limited, but available - your mileage will vary depending on
+how your system is configured and what desktop environment you're using.
+* grim (for screenshots)
+* slurp (for region selection)
+* xdg-open (for opening screenshots in your image viewer - optional)
+
+gscreenshot will automatically detect X11 versus Wayland and what utilities you have
+available on your system. It will use them in the order of its preference.
+
+Aside from the requirements, you can mix and match utilities. gscreenshot will gracefully degrade
+its functionality if utilities are missing or if they have limitations.
 
 ### Development Requirements
 The above, plus:

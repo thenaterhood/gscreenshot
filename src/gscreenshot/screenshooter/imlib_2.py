@@ -18,7 +18,7 @@ class Imlib2(Screenshooter):
         """
         Screenshooter.__init__(self)
 
-    def grab_fullscreen(self, delay=0):
+    def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
@@ -27,6 +27,9 @@ class Imlib2(Screenshooter):
         """
         sleep(delay)
         self._call_screenshooter('imlib2_grab', [self.tempfile])
+
+        if capture_cursor:
+            self.add_fake_cursor()
 
     @staticmethod
     def can_run():
