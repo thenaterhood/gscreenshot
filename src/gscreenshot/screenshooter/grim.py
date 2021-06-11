@@ -18,7 +18,7 @@ class Grim(Screenshooter):
         """
         Screenshooter.__init__(self)
 
-    def grab_fullscreen(self, delay=0):
+    def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
@@ -26,13 +26,23 @@ class Grim(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        self._call_screenshooter('grim', ['-o', self.tempfile])
+        params = ['-o', self.tempfile]
+
+        if capture_cursor:
+            params.append('-c')
+
+        self._call_screenshooter('grim', params)
 
     @staticmethod
     def can_run():
         """Whether scrot is available"""
         return find_executable('grim') is not None
 
-    def _grab_selection_fallback(self, delay=0):
+    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         sleep(delay)
-        self._call_screenshooter('grim', ['-o', self.tempfile])
+        params = ['-o', self.tempfile]
+
+        if capture_cursor:
+            params.append('-c')
+
+        self._call_screenshooter('grim', params)

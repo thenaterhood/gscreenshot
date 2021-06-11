@@ -15,20 +15,29 @@ class Scrot(Screenshooter):
         constructor
         """
         Screenshooter.__init__(self)
+        self.supports_native_cursor_capture = True
 
-    def grab_fullscreen(self, delay=0):
+    def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
         Parameters:
             int delay, in seconds
         """
-        self._call_screenshooter('scrot', ['-z', self.tempfile, '-d', str(delay)])
+        params = ['-z', self.tempfile, '-d', str(delay)]
+        if capture_cursor:
+            params.append('-p')
+
+        self._call_screenshooter('scrot', params)
 
     @staticmethod
     def can_run():
         """Whether scrot is available"""
         return find_executable('scrot') is not None
 
-    def _grab_selection_fallback(self, delay=0):
-        self._call_screenshooter('scrot', ['-z', self.tempfile, '-d', str(delay), '-s'])
+    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
+        params =  ['-z', self.tempfile, '-d', str(delay), '-s']
+        if capture_cursor:
+            params.append('-p')
+
+        self._call_screenshooter('scrot', params)

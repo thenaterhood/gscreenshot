@@ -74,6 +74,13 @@ def run():
             action='store_true',
             help=_("Show a notification when the screenshot is taken. Gscreenshot will automatically show a notification if a screenshot is taken from a different session, so some situations may not need this option.")
     )
+    parser.add_argument(
+            '-p',
+            '--pointer',
+            required=False,
+            action='store_true',
+            help=_("Capture the cursor.")
+    )
 
     args = parser.parse_args()
 
@@ -99,9 +106,9 @@ def run():
         sys.exit(0)
 
     if args.selection is not False:
-        gscreenshot.screenshot_selected(args.delay)
+        gscreenshot.screenshot_selected(args.delay, args.pointer)
     else:
-        gscreenshot.screenshot_full_display(args.delay)
+        gscreenshot.screenshot_full_display(args.delay, args.pointer)
 
     if gscreenshot.get_last_image() is None:
         print(_("No screenshot taken."))

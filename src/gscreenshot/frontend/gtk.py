@@ -28,7 +28,7 @@ class Presenter(object):
     '''Presenter class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view', '_keymappings')
+            '_pixbuf', '_view', '_keymappings', '_capture_cursor')
 
     def __init__(self, application, view):
         self._app = application
@@ -36,12 +36,13 @@ class Presenter(object):
         self._can_resize = True
         self._delay = 0
         self._hide = True
+        self._capture_cursor = False
         self._set_image(self._app.get_last_image())
         self._show_preview()
         self._keymappings = {}
 
     def _begin_take_screenshot(self, app_method):
-        screenshot = app_method(self._delay)
+        screenshot = app_method(self._delay, self._capture_cursor)
 
         # Re-enable UI on the UI thread.
         GObject.idle_add(self._end_take_screenshot, screenshot)
@@ -83,6 +84,10 @@ class Presenter(object):
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
         self._hide = widget.get_active()
+
+    def capture_cursor_toggled(self, widget):
+        '''Toggle capturing cursor'''
+        self._capture_cursor = widget.get_active()
 
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''
