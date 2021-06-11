@@ -28,18 +28,17 @@ _automatically installed by the setup script or your package manager_
 * Your choice of a combination of the utilities listed in the following sections:
 
 **Recommended Setup for X11:**
-* PIL/python-pillow (screenshot backend - already installed)
-* slop (for region selection)
-* python-xlib (for cursor capture)
+* Scrot (screenshot backend)
+* Slop (region selection + cursor capture)
 * xdg-open (for opening screenshots in your image viewer - optional)
 * xclip (for command line clipboard functionality - optional)
 
 **Alternative setups for X11, in order of recommendation:**
-* Scrot + slop (full functionality)
 * ImageMagick + slop + python-xlib (full functionality)
 * Imlib2_grab + slop + python-xlib (full functionality)
-* Scrot + slop + python-xlib (full functionality)
+* PIL/python-pillow + slop + python-xlip (full functionality)
 * Scrot (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
+* PIL/python-pillow + slop (no cursor capture)
 * ImageMagick (no cursor capture)
 * Imlib2_grab (no cursor capture)
 * ImageMagick + slop (no cursor capture)
