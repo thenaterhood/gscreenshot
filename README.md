@@ -36,7 +36,7 @@ _automatically installed by the setup script or your package manager_
 **Alternative setups for X11, in order of recommendation:**
 * ImageMagick + slop + python-xlib (full functionality)
 * Imlib2_grab + slop + python-xlib (full functionality)
-* PIL/python-pillow + slop + python-xlip (full functionality)
+* PIL/python-pillow + slop + python-xlib (full functionality)
 * Scrot (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
 * PIL/python-pillow + slop (no cursor capture)
 * ImageMagick (no cursor capture)
