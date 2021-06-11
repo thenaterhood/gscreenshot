@@ -141,7 +141,7 @@ class Screenshooter(object):
 
         cursor_pos = self.get_cursor_position()
         if cursor_pos is None:
-            print("Unable to get cursor position")
+            print("Unable to get cursor position - is xlib available?")
             return
 
         fname = resource_filename(
