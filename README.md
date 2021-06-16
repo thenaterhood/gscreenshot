@@ -35,7 +35,7 @@ _automatically installed by the setup script or your package manager_
 * xclip (for command line clipboard functionality - optional)
 
 **Alternative setups for X11, in order of recommendation:**
-* Scrot (1.0 or older) + slop + python-xlip (full functionality)
+* Scrot (1.0 or older) + slop + python-xlib (full functionality)
 * ImageMagick + slop + python-xlib (full functionality)
 * Imlib2_grab + slop + python-xlib (full functionality)
 * PIL/python-pillow + slop + python-xlib (full functionality)
