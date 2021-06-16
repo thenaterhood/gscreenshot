@@ -11,7 +11,6 @@ class Scrot(Screenshooter):
     Python class wrapper for the scrot screenshooter utility
     """
 
-    _scrot_version = 0
     _supports_native_cursor_capture = False
 
     def __init__(self):
