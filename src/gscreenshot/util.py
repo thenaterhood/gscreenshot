@@ -37,5 +37,5 @@ def find_executable(executable, path=None):
 
 def session_is_wayland():
     '''Determines if the session running is wayland'''
-    return not ('XDG_SESSION_TYPE' in os.environ and
+    return ('XDG_SESSION_TYPE' in os.environ and
             os.environ['XDG_SESSION_TYPE'].lower() == 'wayland')
