@@ -1,7 +1,6 @@
 '''
 Utilities for selecting a screenshot utility
 '''
-import os
 
 from gscreenshot.screenshooter.grim import Grim
 from gscreenshot.screenshooter.imagemagick import ImageMagick

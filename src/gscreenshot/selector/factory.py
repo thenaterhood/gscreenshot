@@ -1,7 +1,6 @@
 '''
 Selector factory module
 '''
-import os
 
 from gscreenshot.selector.slop import Slop
 from gscreenshot.selector.slurp import Slurp

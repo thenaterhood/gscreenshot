@@ -367,6 +367,9 @@ class Gscreenshot(object):
             image.save(png_data, "PNG")
 
             try:
+                #pylint: disable=fixme
+                # TODO: when dropping python2 support, switch to using with here
+                #pylint: disable=consider-using-with
                 clip = subprocess.Popen(
                     params,
                     close_fds=True,
