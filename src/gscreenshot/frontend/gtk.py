@@ -148,6 +148,10 @@ class Presenter(object):
         Copy the current screenshot to the clipboard
         """
         img = self._app.get_last_image()
+
+        if img is None:
+            return
+
         pixbuf = self._image_to_pixbuf(img)
 
         if not self._view.copy_to_clipboard(pixbuf):
