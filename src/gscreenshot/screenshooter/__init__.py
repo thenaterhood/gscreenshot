@@ -6,7 +6,16 @@ import subprocess
 import tempfile
 import PIL.Image
 
-from gscreenshot.selector import SelectionExecError, SelectionParseError, SelectionCancelled
+from pkg_resources import resource_filename
+from gscreenshot.selector import SelectionExecError, SelectionParseError
+from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
+from gscreenshot.selector.factory import SelectorFactory
+
+try:
+    from Xlib import display
+    XLIB_AVAILABLE = True
+except ImportError:
+    XLIB_AVAILABLE = False
 
 
 class Screenshooter(object):
@@ -20,13 +29,16 @@ class Screenshooter(object):
         """
         constructor
         """
+        try:
+            self.selector = SelectorFactory().create()
+        except NoSupportedSelectorError:
+            self.selector = None
 
         self._image = None
         self.tempfile = os.path.join(
                 tempfile.gettempdir(),
                 str(os.getpid()) + ".png"
                 )
-        self.selector = None
 
     @property
     def image(self):
@@ -38,7 +50,7 @@ class Screenshooter(object):
         """
         return self._image
 
-    def grab_fullscreen(self, delay=0):
+    def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
@@ -47,7 +59,7 @@ class Screenshooter(object):
         """
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
-    def grab_selection(self, delay=0):
+    def grab_selection(self, delay=0, capture_cursor=False):
         """
         Takes an interactive screenshot of a selected area with a
         given delay. This has some safety around the interactive selection:
@@ -58,6 +70,10 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
+        if self.selector is None:
+            self._grab_selection_fallback(delay, capture_cursor)
+            return
+
         try:
             crop_box = self.selector.region_select()
         except SelectionCancelled:
@@ -65,17 +81,19 @@ class Screenshooter(object):
             return
         except (OSError, SelectionExecError):
             print("Failed to call region selector -- Using fallback region selection")
-            self._grab_selection_fallback(delay)
+            self._grab_selection_fallback(delay, capture_cursor)
             return
         except SelectionParseError:
             print("Invalid selection data -- falling back to full screen")
-            self.grab_fullscreen(delay)
+            self.grab_fullscreen(delay, capture_cursor)
             return
 
-        self.grab_fullscreen(delay)
-        self._image = self._image.crop(crop_box)
+        self.grab_fullscreen(delay, capture_cursor)
 
-    def grab_window(self, delay=0):
+        if self._image is not None:
+            self._image = self._image.crop(crop_box)
+
+    def grab_window(self, delay=0, capture_cursor=False):
         """
         Takes an interactive screenshot of a selected window with a
         given delay
@@ -83,7 +101,7 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
-        self.grab_selection(delay)
+        self.grab_selection(delay, capture_cursor)
 
     @staticmethod
     def can_run():
@@ -92,7 +110,62 @@ class Screenshooter(object):
         """
         return False
 
-    def _grab_selection_fallback(self, delay=0):
+    def get_cursor_position(self):
+        """
+        Gets the current position of the mouse cursor, if able.
+        Returns (x, y) or None.
+        """
+        if not XLIB_AVAILABLE:
+            return None
+
+        try:
+            # This is a ctype
+            # pylint: disable=protected-access
+            mouse_data = display.Display().screen().root.query_pointer()._data
+        # pylint: disable=bare-except
+        except:
+            # We don't really care about the specific error here. If we can't
+            # get the pointer, then just move on.
+            return None
+
+        return (mouse_data["root_x"], mouse_data["root_y"])
+
+    def add_fake_cursor(self):
+        """
+        Stamps a fake cursor onto the screenshot.
+        This is intended for use with screenshot backends that don't
+        capture the cursor (or don't capture the cursor in some scenarios)
+        """
+        if self._image is None:
+            return
+
+        cursor_pos = self.get_cursor_position()
+        if cursor_pos is None:
+            print("Unable to get cursor position - is xlib available?")
+            return
+
+        fname = resource_filename(
+                  'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
+                )
+
+        cursor_img = PIL.Image.open(fname)
+        screenshot_img = self._image.copy()
+
+        screenshot_width, screenshot_height = screenshot_img.size
+
+        # scale the cursor stamp to a reasonable size
+        cursor_size_ratio = min(max(screenshot_width / 2000, .3), max(screenshot_height / 2000, .3))
+        cursor_height = cursor_img.size[0] * cursor_size_ratio
+        cursor_width = cursor_img.size[1] * cursor_size_ratio
+        cursor_img.thumbnail((cursor_width, cursor_height))
+
+        # Passing cursor_img twice is intentional. The second time it's used
+        # as a mask (PIL uses the alpha channel) so the cursor doesn't have
+        # a black box.
+        screenshot_img.paste(cursor_img, cursor_pos, cursor_img)
+        self._image = screenshot_img
+
+    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         """
         Fallback for grabbing the selection, in case the selection tool fails to
         run entirely. Defaults to giving up and just taking a full screen shot.
@@ -100,7 +173,7 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
-        self.grab_fullscreen(delay)
+        self.grab_fullscreen(delay, capture_cursor)
 
     def _call_screenshooter(self, screenshooter, params = None):
 
@@ -113,7 +186,7 @@ class Screenshooter(object):
             subprocess.check_output(params)
             self._image = PIL.Image.open(self.tempfile)
             os.unlink(self.tempfile)
-        except (subprocess.CalledProcessError, FileNotFoundError):
+        except (subprocess.CalledProcessError, IOError, OSError):
             self._image = None
             return False
 

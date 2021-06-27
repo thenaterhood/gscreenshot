@@ -1,15 +1,21 @@
 '''
-Integration for the imlib2 screenshot utility
+Integration for the PIL screenshot functionality
 '''
 from time import sleep
-
 from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.util import find_executable
+
+SUPPORTED_PLATFORM = False
+
+try:
+    from PIL import ImageGrab
+    SUPPORTED_PLATFORM = True
+except ImportError:
+    SUPPORTED_PLATFORM = False
 
 
-class Imlib2(Screenshooter):
+class PILWrapper(Screenshooter):
     """
-    Python class wrapper for the scrot screenshooter utility
+    Python class wrapper for PIL
     """
 
     def __init__(self):
@@ -26,7 +32,7 @@ class Imlib2(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        self._call_screenshooter('imlib2_grab', [self.tempfile])
+        self._image = ImageGrab.grab(None)
 
         if capture_cursor:
             self.add_fake_cursor()
@@ -34,4 +40,4 @@ class Imlib2(Screenshooter):
     @staticmethod
     def can_run():
         '''Whether this utility is available'''
-        return find_executable('imlib2_grab') is not None
+        return SUPPORTED_PLATFORM

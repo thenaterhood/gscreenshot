@@ -43,6 +43,10 @@ msgstr "Tomar captura de pantalla de..."
 msgid "Hide gscreenshot"
 msgstr "Esconde gscreenshot"
 
+#: src/gscreenshot/resources/gui/glade/main.glade
+msgid "Capture Cursor"
+msgstr "Capturar Cursor"
+
 #: src/gscreenshot/resources/gui/glade/main.glade:347
 msgid "Delay"
 msgstr "Demora"
@@ -92,6 +96,10 @@ msgstr ""
 "mostrará automáticamente una notificación si se toma una captura de pantalla "
 "de una sesión diferente, por lo que es posible que algunas situaciones no "
 "necesiten esta opción."
+
+#: src/gscreenshot/frontend/cli.py
+msgid "Capture the cursor."
+msgstr "Capturar el cursor."
 
 #: src/gscreenshot/frontend/cli.py:87
 msgid "No supported screenshot backend is available."

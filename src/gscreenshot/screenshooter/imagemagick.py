@@ -4,7 +4,6 @@ ImageMagick screenshot class
 from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.selector.slop import Slop
 from gscreenshot.util import find_executable
 
 
@@ -18,9 +17,8 @@ class ImageMagick(Screenshooter):
         constructor
         """
         Screenshooter.__init__(self)
-        self.selector = Slop()
 
-    def grab_fullscreen(self, delay=0):
+    def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
@@ -30,12 +28,15 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_screenshooter('import', ['-window', 'root', self.tempfile])
 
+        if capture_cursor:
+            self.add_fake_cursor()
+
     @staticmethod
     def can_run():
         '''Whether this utility is available'''
         return find_executable('import') is not None
 
-    def _grab_selection_fallback(self, delay=0):
+    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         sleep(delay)
         if not self._call_screenshooter('import', [self.tempfile]):
             #pylint: disable=super-with-arguments

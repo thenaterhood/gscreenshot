@@ -15,6 +15,7 @@ except:
 
 install_requires = [
     'pillow',
+    'xlib',
     ]
 
 test_requires = [

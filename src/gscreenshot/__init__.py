@@ -11,6 +11,7 @@
  - Further changes will be noted in release notes
 '''
 import gettext
+import io
 import json
 import locale
 import os
@@ -22,6 +23,7 @@ from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
+from gscreenshot.util import session_is_wayland
 
 _ = gettext.gettext
 
@@ -54,13 +56,12 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
-            cachefile = open(self.get_cache_file(), "r")
-            try:
-                self.cache = json.load(cachefile)
-            except json.JSONDecodeError:
-                self.cache = {"last_save_dir": os.path.expanduser("~")}
-                self.save_cache()
-            cachefile.close()
+            with open(self.get_cache_file(), "r") as cachefile:
+                try:
+                    self.cache = json.load(cachefile)
+                except json.JSONDecodeError:
+                    self.cache = {"last_save_dir": os.path.expanduser("~")}
+                    self.save_cache()
         else:
             self.save_cache()
 
@@ -109,9 +110,8 @@ class Gscreenshot(object):
     def save_cache(self):
         """Writes the cache to disk"""
         try:
-            cachefile = open(self.get_cache_file(), "w")
-            json.dump(self.cache, cachefile)
-            cachefile.close()
+            with open(self.get_cache_file(), "w") as cachefile:
+                json.dump(self.cache, cachefile)
         except FileNotFoundError:
             print(_("unable to save cache file"))
 
@@ -119,7 +119,7 @@ class Gscreenshot(object):
         """Gets the name of the current screenshooter"""
         return self.screenshooter.__class__.__name__
 
-    def screenshot_full_display(self, delay=0):
+    def screenshot_full_display(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full display with a
         given delay.
@@ -131,12 +131,12 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_fullscreen(delay)
+        self.screenshooter.grab_fullscreen(delay, capture_cursor)
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_selected(self, delay=0):
+    def screenshot_selected(self, delay=0, capture_cursor=False):
         """
         Interactively takes a screenshot of a selected area
         with a given delay.
@@ -148,12 +148,12 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_selection(delay)
+        self.screenshooter.grab_selection(delay, capture_cursor)
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_window(self, delay=0):
+    def screenshot_window(self, delay=0, capture_cursor=False):
         """
         Interactively takes a screenshot of a selected window
         with a given delay.
@@ -165,7 +165,7 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_window(delay)
+        self.screenshooter.grab_window(delay, capture_cursor)
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
@@ -343,26 +343,43 @@ class Gscreenshot(object):
         Returns:
             bool success
         """
-        tmp_file = os.path.join(
-                tempfile.gettempdir(),
-                'gscreenshot-cli-clip.png'
-                )
+        image = self.screenshooter.image
 
-        self.save_last_image(tmp_file)
-        params = [
-                'xclip',
-                '-i',
-                tmp_file,
-                '-selection',
-                'clipboard',
-                '-t',
-                'image/png'
-                ]
-        try:
-            subprocess.Popen(params, close_fds=True, stdin=None, stdout=None, stderr=None)
-            return True
-        except (subprocess.CalledProcessError, OSError):
+        if image is None:
             return False
+
+        params = [
+            'xclip',
+            '-selection',
+            'clipboard',
+            '-t',
+            'image/png'
+            ]
+
+        if session_is_wayland():
+            params = [
+                    'wl-copy',
+                    '-t',
+                    'image/png'
+                ]
+
+        with io.BytesIO() as png_data:
+            image.save(png_data, "PNG")
+
+            try:
+                #pylint: disable=fixme
+                # TODO: when dropping python2 support, switch to using with here
+                #pylint: disable=consider-using-with
+                clip = subprocess.Popen(
+                    params,
+                    close_fds=True,
+                    stdin=subprocess.PIPE,
+                    stdout=None,
+                    stderr=None)
+                clip.communicate(input=png_data.getvalue())
+                return True
+            except (subprocess.CalledProcessError, OSError):
+                return False
 
     def get_last_save_directory(self):
         """Returns the path of the last save directory"""

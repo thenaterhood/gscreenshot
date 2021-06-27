@@ -43,6 +43,10 @@ msgstr ""
 msgid "Hide gscreenshot"
 msgstr ""
 
+#: src/gscreenshot/resources/gui/glade/main.glade
+msgid "Capture Cursor"
+msgstr ""
+
 #: src/gscreenshot/resources/gui/glade/main.glade:347
 msgid "Delay"
 msgstr ""
@@ -82,6 +86,10 @@ msgid ""
 "Show a notification when the screenshot is taken. Gscreenshot will "
 "automatically show a notification if a screenshot is taken from a different "
 "session, so some situations may not need this option."
+msgstr ""
+
+#: src/gscreenshot/frontend/cli.py
+msgid "Capture the cursor."
 msgstr ""
 
 #: src/gscreenshot/frontend/cli.py:87

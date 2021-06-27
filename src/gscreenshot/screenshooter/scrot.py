@@ -1,9 +1,9 @@
 '''
 Integration for the Scrot screenshot utility
 '''
-from gscreenshot.util import find_executable
+import subprocess
+
 from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.selector.slop import Slop
 
 
 class Scrot(Screenshooter):
@@ -11,26 +11,51 @@ class Scrot(Screenshooter):
     Python class wrapper for the scrot screenshooter utility
     """
 
+    _supports_native_cursor_capture = False
+
     def __init__(self):
         """
         constructor
         """
         Screenshooter.__init__(self)
-        self.selector = Slop()
 
-    def grab_fullscreen(self, delay=0):
+    def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
         Parameters:
             int delay, in seconds
         """
-        self._call_screenshooter('scrot', ['-z', self.tempfile, '-d', str(delay)])
+        params = ['-z', self.tempfile, '-d', str(delay)]
+        if capture_cursor and Scrot._supports_native_cursor_capture:
+            params.append('-p')
+
+        self._call_screenshooter('scrot', params)
+        if capture_cursor and not Scrot._supports_native_cursor_capture:
+            self.add_fake_cursor()
 
     @staticmethod
     def can_run():
         """Whether scrot is available"""
-        return find_executable('scrot') is not None
+        try:
+            scrot_version_output = subprocess.check_output(['scrot', '--version'])
+            scrot_version_num = scrot_version_output.decode().strip().split(' ')[-1]
 
-    def _grab_selection_fallback(self, delay=0):
-        self._call_screenshooter('scrot', ['-z', self.tempfile, '-d', str(delay), '-s'])
+            if float(scrot_version_num) >= 1:
+                Scrot._supports_native_cursor_capture = True
+            else:
+                Scrot._supports_native_cursor_capture = False
+
+            return True
+        except (subprocess.CalledProcessError, IOError, OSError):
+            return False
+
+    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
+        params =  ['-z', self.tempfile, '-d', str(delay), '-s']
+        print("Unable to capture cursor - is slop available?")
+        if capture_cursor and Scrot._supports_native_cursor_capture:
+            params.append('-p')
+
+        self._call_screenshooter('scrot', params)
+        if capture_cursor and not Scrot._supports_native_cursor_capture:
+            self.add_fake_cursor()

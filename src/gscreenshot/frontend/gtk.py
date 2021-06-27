@@ -28,7 +28,7 @@ class Presenter(object):
     '''Presenter class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view', '_keymappings')
+            '_pixbuf', '_view', '_keymappings', '_capture_cursor')
 
     def __init__(self, application, view):
         self._app = application
@@ -36,12 +36,13 @@ class Presenter(object):
         self._can_resize = True
         self._delay = 0
         self._hide = True
+        self._capture_cursor = False
         self._set_image(self._app.get_last_image())
         self._show_preview()
         self._keymappings = {}
 
     def _begin_take_screenshot(self, app_method):
-        screenshot = app_method(self._delay)
+        screenshot = app_method(self._delay, self._capture_cursor)
 
         # Re-enable UI on the UI thread.
         GObject.idle_add(self._end_take_screenshot, screenshot)
@@ -83,6 +84,10 @@ class Presenter(object):
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
         self._hide = widget.get_active()
+
+    def capture_cursor_toggled(self, widget):
+        '''Toggle capturing cursor'''
+        self._capture_cursor = widget.get_active()
 
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''
@@ -143,6 +148,10 @@ class Presenter(object):
         Copy the current screenshot to the clipboard
         """
         img = self._app.get_last_image()
+
+        if img is None:
+            return
+
         pixbuf = self._image_to_pixbuf(img)
 
         if not self._view.copy_to_clipboard(pixbuf):
@@ -264,11 +273,11 @@ class View(object):
         '''Run the view'''
         self._window.set_position(Gtk.WIN_POS_CENTER)
         # Set the initial size of the window
-        active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+        active_window = Gdk.get_default_root_window()
         while active_window is None:
             # There appears to be a race condition with getting the active window,
             # so we'll keep trying until we have it
-            active_window = Gdk.get_default_root_window().get_screen().get_active_window()
+            active_window = Gdk.get_default_root_window()
 
         initial_screen = self._window.get_screen().get_monitor_at_window(active_window)
         geometry = self._window.get_screen().get_monitor_geometry(initial_screen)
@@ -538,7 +547,7 @@ def main():
     waited = 0
     while application.get_last_image() is None and waited < 4:
         sleep(.01)
-        waited += .01
+        waited += .1
 
     view = View(builder.get_object('window_main'), builder)
 
