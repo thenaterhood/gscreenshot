@@ -6,6 +6,7 @@ import os
 from gscreenshot.selector.slop import Slop
 from gscreenshot.selector.slurp import Slurp
 from gscreenshot.selector import NoSupportedSelectorError
+from gscreenshot.util import session_is_wayland
 
 
 class SelectorFactory(object):
@@ -21,8 +22,7 @@ class SelectorFactory(object):
                 Slurp
                 ]
 
-        if ('XDG_SESSION_TYPE' in os.environ and
-                os.environ['XDG_SESSION_TYPE'].lower() in ['wayland']):
+        if session_is_wayland():
             self.selectors = self.wayland_selectors
         else:
             self.selectors = self.xorg_selectors

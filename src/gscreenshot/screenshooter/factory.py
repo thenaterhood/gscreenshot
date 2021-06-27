@@ -9,6 +9,7 @@ from gscreenshot.screenshooter.imlib_2 import Imlib2
 from gscreenshot.screenshooter.pil import PILWrapper
 from gscreenshot.screenshooter.scrot import Scrot
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+from gscreenshot.util import session_is_wayland
 
 class ScreenshooterFactory(object):
     '''Selects and instantiates a usable screenshot class'''
@@ -26,8 +27,7 @@ class ScreenshooterFactory(object):
                 Grim
                 ]
 
-        if ('XDG_SESSION_TYPE' in os.environ and
-                os.environ['XDG_SESSION_TYPE'].lower() in ['wayland']):
+        if session_is_wayland():
             self.screenshooters = self.wayland_screenshooters
         else:
             self.screenshooters = self.xorg_screenshooters
