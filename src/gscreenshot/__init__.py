@@ -11,6 +11,7 @@
  - Further changes will be noted in release notes
 '''
 import gettext
+import io
 import json
 import locale
 import os
@@ -22,6 +23,7 @@ from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
+from gscreenshot.util import session_is_wayland
 
 _ = gettext.gettext
 
@@ -341,26 +343,40 @@ class Gscreenshot(object):
         Returns:
             bool success
         """
-        tmp_file = os.path.join(
-                tempfile.gettempdir(),
-                'gscreenshot-cli-clip.png'
-                )
+        image = self.screenshooter.image
 
-        self.save_last_image(tmp_file)
-        params = [
-                'xclip',
-                '-i',
-                tmp_file,
-                '-selection',
-                'clipboard',
-                '-t',
-                'image/png'
-                ]
-        try:
-            subprocess.Popen(params, close_fds=True, stdin=None, stdout=None, stderr=None)
-            return True
-        except (subprocess.CalledProcessError, OSError):
+        if image is None:
             return False
+
+        params = [
+            'xclip',
+            '-selection',
+            'clipboard',
+            '-t',
+            'image/png'
+            ]
+
+        if session_is_wayland():
+            params = [
+                    'wl-copy',
+                    '-t',
+                    'image/png'
+                ]
+
+        with io.BytesIO() as png_data:
+            image.save(png_data, "PNG")
+
+            try:
+                clip = subprocess.Popen(
+                    params,
+                    close_fds=True,
+                    stdin=subprocess.PIPE,
+                    stdout=None,
+                    stderr=None)
+                clip.communicate(input=png_data.getvalue())
+                return True
+            except (subprocess.CalledProcessError, OSError):
+                return False
 
     def get_last_save_directory(self):
         """Returns the path of the last save directory"""
