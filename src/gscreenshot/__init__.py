@@ -150,7 +150,7 @@ class Gscreenshot(object):
 
         self.screenshooter._grab_fullscreen(
             delay,
-            capture_cursor=False,
+            capture_cursor,
             use_cursor=self.get_available_cursors()[cursor_name]
         )
         self.run_display_mismatch_warning()
