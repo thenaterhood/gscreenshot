@@ -76,6 +76,11 @@ class Gscreenshot(object):
                     resource_filename(
                         'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
                     )
+                ),
+                'prohibit': Image.open(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'cursor-prohibit.png'
+                    )
                 )
             }
 
