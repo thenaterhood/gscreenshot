@@ -39,7 +39,11 @@ class Scrot(Screenshooter):
         """Whether scrot is available"""
         try:
             scrot_version_output = subprocess.check_output(['scrot', '--version'])
-            scrot_version_num = scrot_version_output.decode().strip().split(' ')[-1]
+            #scrot_version_num = scrot_version_output.decode().strip().rsplit(' ', maxsplit=1)[-1]
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, switch to the line above
+            #pylint: disable=use-maxsplit-arg
+            scrot_version_num·=·scrot_version_output.decode().strip().split('·')[-1]
 
             if float(scrot_version_num) >= 1:
                 Scrot._supports_native_cursor_capture = True
