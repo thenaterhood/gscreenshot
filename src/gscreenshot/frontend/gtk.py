@@ -29,7 +29,8 @@ class Presenter(object):
     '''Presenter class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view', '_keymappings', '_capture_cursor')
+            '_pixbuf', '_view', '_keymappings', '_capture_cursor',
+            '_cursor_selection')
 
     def __init__(self, application, view):
         self._app = application
@@ -41,8 +42,11 @@ class Presenter(object):
         self._show_preview()
         self._keymappings = {}
 
+        cursors = self._app.get_available_cursors()
+        self._cursor_selection = cursors[0][0]
+
         self._view.update_available_cursors(
-                self._app.get_available_cursors()
+                cursors
                 )
 
     def _begin_take_screenshot(self, app_method):
@@ -95,6 +99,10 @@ class Presenter(object):
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''
         self._delay = widget.get_value()
+
+    def selected_cursor_changed(self, widget):
+        '''Handle a change to the selected cursor'''
+        self._cursor_selection = widget.get_model()[widget.get_active()][1]
 
     def on_button_all_clicked(self, *_):
         '''Take a screenshot of the full screen'''
