@@ -37,7 +37,6 @@ class Presenter(object):
         self._delay = 0
         self._hide = True
         self._capture_cursor = False
-        self._set_image(self._app.get_last_image())
         self._show_preview()
         self._keymappings = {}
 
@@ -48,7 +47,6 @@ class Presenter(object):
         GObject.idle_add(self._end_take_screenshot, screenshot)
 
     def _end_take_screenshot(self, screenshot):
-        self._set_image(screenshot)
         self._show_preview()
 
         self._view.unhide()
@@ -242,12 +240,6 @@ class Presenter(object):
         pixbuf = loader.get_pixbuf()
         loader.close()
         return pixbuf
-
-    def _set_image(self, image):
-        # create an image buffer (pixbuf) and insert the grabbed image
-        if image is None:
-            image = self._app.get_app_icon()
-        self._pixbuf = self._image_to_pixbuf(image)
 
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()
