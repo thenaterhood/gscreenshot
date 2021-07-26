@@ -72,6 +72,9 @@ class Gscreenshot(object):
         return a status as to whether it succeeded.
         '''
         try:
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, switch to using with here
+            #pylint: disable=consider-using-with
             subprocess.Popen([
                 'notify-send',
                 'gscreenshot',
@@ -329,6 +332,9 @@ class Gscreenshot(object):
         screenshot_fname = self.save_and_return_path()
 
         try:
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, switch to using with here
+            #pylint: disable=consider-using-with
             subprocess.Popen(['xdg-open', screenshot_fname])
             return True
         except (subprocess.CalledProcessError, IOError):
