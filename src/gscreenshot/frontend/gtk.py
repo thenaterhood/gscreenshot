@@ -50,7 +50,7 @@ class Presenter(object):
                 )
 
     def _begin_take_screenshot(self, app_method):
-        screenshot = app_method(self._delay, self._capture_cursor)
+        screenshot = app_method(self._delay, self._capture_cursor, self._cursor_selection)
 
         # Re-enable UI on the UI thread.
         GObject.idle_add(self._end_take_screenshot, screenshot)

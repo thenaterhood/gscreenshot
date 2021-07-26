@@ -138,7 +138,7 @@ class Gscreenshot(object):
         """Gets the name of the current screenshooter"""
         return self.screenshooter.__class__.__name__
 
-    def screenshot_full_display(self, delay=0, capture_cursor=False):
+    def screenshot_full_display(self, delay=0, capture_cursor=False, use_cursor=None):
         """
         Takes a screenshot of the full display with a
         given delay.
@@ -150,12 +150,12 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_fullscreen(delay, capture_cursor)
+        self.screenshooter.grab_fullscreen(delay, capture_cursor=False, use_cursor=None)
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_selected(self, delay=0, capture_cursor=False):
+    def screenshot_selected(self, delay=0, capture_cursor=False, use_cursor=None):
         """
         Interactively takes a screenshot of a selected area
         with a given delay.
