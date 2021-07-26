@@ -70,16 +70,14 @@ class Gscreenshot(object):
         Get the alternate pointer pixmaps gscreenshot can use
         Returns [(name, PIL.Image)]
         '''
-        return [
-                ("theme",
-                 None
-                ),
-                ("adwaita",
-                 Image.open(resource_filename(
-                    'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
-                    ))
+        return {
+                'theme': None,
+                'adwaita': Image.open(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
+                    )
                 )
-                ]
+            }
 
     def show_screenshot_notification(self):
         '''
@@ -138,7 +136,7 @@ class Gscreenshot(object):
         """Gets the name of the current screenshooter"""
         return self.screenshooter.__class__.__name__
 
-    def screenshot_full_display(self, delay=0, capture_cursor=False, use_cursor=None):
+    def screenshot_full_display(self, delay=0, capture_cursor=False, cursor_name='theme'):
         """
         Takes a screenshot of the full display with a
         given delay.
@@ -150,12 +148,16 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_fullscreen(delay, capture_cursor=False, use_cursor=None)
+        self.screenshooter._grab_fullscreen(
+            delay,
+            capture_cursor=False,
+            use_cursor=self.get_available_cursors()[cursor_name]
+        )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_selected(self, delay=0, capture_cursor=False, use_cursor=None):
+    def screenshot_selected(self, delay=0, capture_cursor=False, cursor_name='theme'):
         """
         Interactively takes a screenshot of a selected area
         with a given delay.
@@ -167,12 +169,16 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_selection(delay, capture_cursor)
+        self.screenshooter._grab_selection(
+            delay,
+            capture_cursor,
+            use_cursor=self.get_available_cursors()[cursor_name]
+        )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_window(self, delay=0, capture_cursor=False):
+    def screenshot_window(self, delay=0, capture_cursor=False, cursor_name='theme'):
         """
         Interactively takes a screenshot of a selected window
         with a given delay.
@@ -184,7 +190,11 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_window(delay, capture_cursor)
+        self.screenshooter._grab_window(
+            delay,
+            capture_cursor,
+            use_cursor=self.get_available_cursors()[cursor_name]
+        )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image

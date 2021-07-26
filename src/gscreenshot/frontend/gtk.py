@@ -43,7 +43,7 @@ class Presenter(object):
         self._keymappings = {}
 
         cursors = self._app.get_available_cursors()
-        self._cursor_selection = cursors[0][0]
+        self._cursor_selection = 'theme'
 
         self._view.update_available_cursors(
                 cursors
@@ -283,9 +283,9 @@ class View(object):
         '''
         self._cursor_selection_items.clear()
         for c in cursors:
-            if c[1] is not None:
+            if cursors[c] is not None:
                 descriptor = io.BytesIO()
-                image = c[1].convert("RGB")
+                image = cursors[c].convert("RGB")
                 image.thumbnail((self._cursor_selection.get_allocation().height*.42, self._cursor_selection.get_allocation().width*.42))
                 image.save(descriptor, "ppm")
                 contents = descriptor.getvalue()
@@ -295,9 +295,9 @@ class View(object):
                 pixbuf = loader.get_pixbuf()
                 loader.close()
 
-                self._cursor_selection_items.append([pixbuf, c[0]])
+                self._cursor_selection_items.append([pixbuf, c])
             else:
-                self._cursor_selection_items.append([None, c[0]])
+                self._cursor_selection_items.append([None, c])
 
     def run(self):
         '''Run the view'''

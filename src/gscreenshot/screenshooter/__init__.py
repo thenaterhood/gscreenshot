@@ -50,6 +50,16 @@ class Screenshooter(object):
         """
         return self._image
 
+    def _grab_fullscreen(self, delay=0, capture_cursor=False, use_cursor=None):
+        '''
+        Internal API method for grabbing the full screen
+        '''
+        if use_cursor is None:
+            self.grab_fullscreen(delay, capture_cursor)
+        else:
+            self.grab_fullscreen(delay, capture_cursor=False)
+            self.add_fake_cursor(use_cursor)
+
     def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
@@ -58,6 +68,16 @@ class Screenshooter(object):
             int delay, in seconds
         """
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
+
+    def _grab_selection(self, delay=0, capture_cursor=False, use_cursor=None):
+        '''
+        Internal API method for grabbing a selection
+        '''
+        if use_cursor is None:
+            self.grab_selection(delay, capture_cursor)
+        else:
+            self.grab_selection(delay, capture_cursor=False)
+            self.add_fake_cursor(use_cursor)
 
     def grab_selection(self, delay=0, capture_cursor=False):
         """
@@ -92,6 +112,16 @@ class Screenshooter(object):
 
         if self._image is not None:
             self._image = self._image.crop(crop_box)
+
+    def _grab_window(self, delay=0, capture_cursor=False, use_cursor=None):
+        '''
+        Internal API method for grabbing a window
+        '''
+        if use_cursor is None:
+            self.grab_window(delay, capture_cursor)
+        else:
+            self.grab_window(delay, capture_cursor=False)
+            self.add_fake_cursor(use_cursor)
 
     def grab_window(self, delay=0, capture_cursor=False):
         """
@@ -130,7 +160,7 @@ class Screenshooter(object):
 
         return (mouse_data["root_x"], mouse_data["root_y"])
 
-    def add_fake_cursor(self):
+    def add_fake_cursor(self, cursor_img=None):
         """
         Stamps a fake cursor onto the screenshot.
         This is intended for use with screenshot backends that don't
@@ -148,7 +178,9 @@ class Screenshooter(object):
                   'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
                 )
 
-        cursor_img = PIL.Image.open(fname)
+        if cursor_img is None:
+            cursor_img = PIL.Image.open(fname)
+
         screenshot_img = self._image.copy()
 
         screenshot_width, screenshot_height = screenshot_img.size
