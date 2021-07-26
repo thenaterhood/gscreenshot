@@ -14,6 +14,7 @@ from pkg_resources import resource_string, resource_filename
 from gi import pygtkcompat
 from gscreenshot import Gscreenshot
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+import PIL.Image
 
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
@@ -39,6 +40,10 @@ class Presenter(object):
         self._capture_cursor = False
         self._show_preview()
         self._keymappings = {}
+
+        self._view.update_available_cursors(
+                self._app.get_available_cursors()
+                )
 
     def _begin_take_screenshot(self, app_method):
         screenshot = app_method(self._delay, self._capture_cursor)
@@ -260,6 +265,31 @@ class View(object):
         self._header_bar = builder.get_object('header_bar')
         self._preview = builder.get_object('image1')
         self._control_grid = builder.get_object('control_box')
+        self._cursor_selection_items = builder.get_object('cursor_selection_items')
+        self._cursor_selection = builder.get_object('cursor_selection')
+
+    def update_available_cursors(self, cursors):
+        '''
+        Update the available cursor selection in the combolist
+        Params: self, [(name, PIL.Image)]
+        '''
+        self._cursor_selection_items.clear()
+        for c in cursors:
+            if c[1] is not None:
+                descriptor = io.BytesIO()
+                image = c[1].convert("RGB")
+                image.thumbnail((self._cursor_selection.get_allocation().height*.42, self._cursor_selection.get_allocation().width*.42))
+                image.save(descriptor, "ppm")
+                contents = descriptor.getvalue()
+                descriptor.close()
+                loader = Gtk.gdk.PixbufLoader("pnm")
+                loader.write(contents)
+                pixbuf = loader.get_pixbuf()
+                loader.close()
+
+                self._cursor_selection_items.append([pixbuf, c[0]])
+            else:
+                self._cursor_selection_items.append([None, c[0]])
 
     def run(self):
         '''Run the view'''

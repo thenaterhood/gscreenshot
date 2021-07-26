@@ -52,6 +52,14 @@ Version: 3.0.1
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
+  <object class="GtkListStore" id="cursor_selection_items">
+    <columns>
+      <!-- column-name cursor -->
+      <column type="GdkPixbuf"/>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+    </columns>
+  </object>
   <object class="GtkImage" id="icon_everything">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -258,9 +266,11 @@ Version: 3.0.1
                         </child>
                         <child>
                           <object class="GtkSpinButton" id="spinbutton1">
+                            <property name="width-request">70</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="halign">end</property>
+                            <property name="margin-right">2</property>
                             <property name="width-chars">3</property>
                             <property name="text">0</property>
                             <property name="caps-lock-warning">False</property>
@@ -387,6 +397,7 @@ Version: 3.0.1
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
+                        <property name="margin-top">5</property>
                         <property name="draw-indicator">True</property>
                         <signal name="toggled" handler="capture_cursor_toggled" swapped="no"/>
                       </object>
@@ -396,10 +407,52 @@ Version: 3.0.1
                       </packing>
                     </child>
                     <child>
-                      <placeholder/>
-                    </child>
-                    <child>
-                      <placeholder/>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-top">5</property>
+                        <property name="spacing">5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Pointer</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBox" id="cursor_selection">
+                            <property name="width-request">70</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="hexpand">True</property>
+                            <property name="model">cursor_selection_items</property>
+                            <property name="active">0</property>
+                            <property name="id-column">1</property>
+                            <child>
+                              <object class="GtkCellRendererPixbuf" id="Default"/>
+                              <attributes>
+                                <attribute name="pixbuf">0</attribute>
+                              </attributes>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="pack-type">end</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">4</property>
+                        <property name="width">2</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
@@ -417,6 +470,34 @@ Version: 3.0.1
             </child>
           </object>
         </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="resource">gscreenshot.resources.pixmaps.cursor-adwaita.png</property>
+  </object>
+  <object class="GtkMenu" id="cursor_menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <child>
+      <object class="GtkMenuItem" id="cursor_select_default">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Default</property>
+        <property name="use-underline">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="Adwaita Pointer">
+        <property name="label" translatable="yes">Adwaita</property>
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="tooltip-text" translatable="yes">Adwaita</property>
+        <property name="image">image2</property>
+        <property name="use-stock">False</property>
+        <property name="always-show-image">True</property>
       </object>
     </child>
   </object>

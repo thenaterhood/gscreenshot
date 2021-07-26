@@ -65,6 +65,22 @@ class Gscreenshot(object):
         else:
             self.save_cache()
 
+    def get_available_cursors(self):
+        '''
+        Get the alternate pointer pixmaps gscreenshot can use
+        Returns [(name, PIL.Image)]
+        '''
+        return [
+                ("theme",
+                 None
+                ),
+                ("adwaita",
+                 Image.open(resource_filename(
+                    'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
+                    ))
+                )
+                ]
+
     def show_screenshot_notification(self):
         '''
         Show a notification that a screenshot was taken.
