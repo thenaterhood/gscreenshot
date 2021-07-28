@@ -81,6 +81,11 @@ class Gscreenshot(object):
                     resource_filename(
                         'gscreenshot.resources.pixmaps', 'cursor-prohibit.png'
                     )
+                ),
+                'allow': Image.open(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'cursor-allow.png'
+                    )
                 )
             }
 
