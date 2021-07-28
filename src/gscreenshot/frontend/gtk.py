@@ -95,6 +95,7 @@ class Presenter(object):
     def capture_cursor_toggled(self, widget):
         '''Toggle capturing cursor'''
         self._capture_cursor = widget.get_active()
+        self._view.show_cursor_options(self._capture_cursor)
 
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''
@@ -275,6 +276,13 @@ class View(object):
         self._control_grid = builder.get_object('control_box')
         self._cursor_selection_items = builder.get_object('cursor_selection_items')
         self._cursor_selection = builder.get_object('cursor_selection')
+        self._cursor_selection_container = builder.get_object('pointer_options')
+
+    def show_cursor_options(self, show):
+        if show:
+            self._cursor_selection_container.set_opacity(1)
+        else:
+            self._cursor_selection_container.set_opacity(0)
 
     def update_available_cursors(self, cursors):
         '''

@@ -407,9 +407,10 @@ Version: 3.0.1
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkBox" id="pointer_options">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="opacity">0</property>
                         <property name="margin-top">5</property>
                         <property name="spacing">5</property>
                         <child>
