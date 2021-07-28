@@ -158,10 +158,15 @@ class Gscreenshot(object):
             PIL.Image
         """
 
+        if not capture_cursor:
+            use_cursor = None
+        else:
+            use_cursor = self.get_available_cursors()[cursor_name]
+
         self.screenshooter._grab_fullscreen(
             delay,
             capture_cursor,
-            use_cursor=self.get_available_cursors()[cursor_name]
+            use_cursor=use_cursor
         )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
@@ -179,10 +184,15 @@ class Gscreenshot(object):
             PIL.Image
         """
 
+        if not capture_cursor:
+            use_cursor = None
+        else:
+            use_cursor = self.get_available_cursors()[cursor_name]
+
         self.screenshooter._grab_selection(
             delay,
             capture_cursor,
-            use_cursor=self.get_available_cursors()[cursor_name]
+            use_cursor=use_cursor
         )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
@@ -200,10 +210,15 @@ class Gscreenshot(object):
             PIL.Image
         """
 
+        if not capture_cursor:
+            use_cursor = None
+        else:
+            use_cursor = self.get_available_cursors()[cursor_name]
+
         self.screenshooter._grab_window(
             delay,
             capture_cursor,
-            use_cursor=self.get_available_cursors()[cursor_name]
+            use_cursor=use_cursor
         )
         self.run_display_mismatch_warning()
         self.saved_last_image = False

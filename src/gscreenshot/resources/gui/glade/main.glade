@@ -247,57 +247,6 @@ Version: 3.0.1
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="halign">end</property>
-                        <property name="hexpand">True</property>
-                        <property name="spacing">5</property>
-                        <child>
-                          <object class="GtkLabel" id="label11">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">end</property>
-                            <property name="label" translatable="yes">Delay</property>
-                            <property name="justify">fill</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkSpinButton" id="spinbutton1">
-                            <property name="width-request">70</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="halign">end</property>
-                            <property name="margin-right">2</property>
-                            <property name="width-chars">3</property>
-                            <property name="text">0</property>
-                            <property name="caps-lock-warning">False</property>
-                            <property name="input-purpose">number</property>
-                            <property name="adjustment">adjustment1</property>
-                            <property name="climb-rate">1</property>
-                            <property name="numeric">True</property>
-                            <signal name="value-changed" handler="delay_value_changed" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="pack-type">end</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="left-attach">1</property>
-                        <property name="top-attach">3</property>
-                        <property name="width">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkBox">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
                         <property name="margin-top">15</property>
                         <property name="margin-bottom">5</property>
                         <property name="homogeneous">True</property>
@@ -407,29 +356,31 @@ Version: 3.0.1
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox" id="pointer_options">
+                      <!-- n-columns=2 n-rows=2 -->
+                      <object class="GtkGrid">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="opacity">0</property>
-                        <property name="margin-top">5</property>
-                        <property name="spacing">5</property>
+                        <property name="row-spacing">5</property>
+                        <property name="column-spacing">5</property>
+                        <property name="column-homogeneous">True</property>
                         <child>
-                          <object class="GtkLabel">
+                          <object class="GtkLabel" id="pointer_selection_label">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="halign">end</property>
                             <property name="label" translatable="yes">Pointer</property>
+                            <property name="justify">right</property>
                           </object>
                           <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">1</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkComboBox" id="cursor_selection">
-                            <property name="width-request">70</property>
+                          <object class="GtkComboBox" id="pointer_selection_dropdown">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="halign">baseline</property>
                             <property name="hexpand">True</property>
                             <property name="model">cursor_selection_items</property>
                             <property name="active">0</property>
@@ -443,17 +394,49 @@ Version: 3.0.1
                             </child>
                           </object>
                           <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="pack-type">end</property>
-                            <property name="position">1</property>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="label11">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="label" translatable="yes">Delay</property>
+                            <property name="justify">right</property>
+                          </object>
+                          <packing>
+                            <property name="left-attach">0</property>
+                            <property name="top-attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSpinButton" id="spinbutton1">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="halign">baseline</property>
+                            <property name="hexpand">True</property>
+                            <property name="width-chars">3</property>
+                            <property name="text">0</property>
+                            <property name="caps-lock-warning">False</property>
+                            <property name="input-purpose">number</property>
+                            <property name="adjustment">adjustment1</property>
+                            <property name="climb-rate">1</property>
+                            <property name="numeric">True</property>
+                            <signal name="value-changed" handler="delay_value_changed" swapped="no"/>
+                          </object>
+                          <packing>
+                            <property name="left-attach">1</property>
+                            <property name="top-attach">0</property>
                           </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
-                        <property name="top-attach">4</property>
+                        <property name="top-attach">3</property>
                         <property name="width">2</property>
+                        <property name="height">2</property>
                       </packing>
                     </child>
                   </object>
