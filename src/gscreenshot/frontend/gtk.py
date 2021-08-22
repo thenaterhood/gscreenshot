@@ -104,7 +104,7 @@ class Presenter(object):
 
     def selected_cursor_changed(self, widget):
         '''Handle a change to the selected cursor'''
-        self._cursor_selection = widget.get_model()[widget.get_active()][1]
+        self._cursor_selection = widget.get_model()[widget.get_active()][1].lower()
 
     def on_button_all_clicked(self, *_):
         '''Take a screenshot of the full screen'''
@@ -279,6 +279,19 @@ class View(object):
         self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
         self._cursor_selection_label = builder.get_object('pointer_selection_label')
 
+        self._init_cursor_combobox()
+
+    def _init_cursor_combobox(self):
+        combo = self._cursor_selection_dropdown
+        # This renderer is already set up on the Glade side
+        #renderer = Gtk.CellRendererPixbuf()
+        #combo.pack_start(renderer, False)
+        #combo.add_attribute(renderer, "pixbuf", 0)
+
+        renderer = Gtk.CellRendererText()
+        combo.pack_start(renderer, True)
+        combo.add_attribute(renderer, "text", 1)
+
     def show_cursor_options(self, show):
         if show:
             self._cursor_selection_dropdown.set_opacity(1)
@@ -308,9 +321,9 @@ class View(object):
                 pixbuf = loader.get_pixbuf()
                 loader.close()
 
-                self._cursor_selection_items.append([pixbuf, c])
+                self._cursor_selection_items.append([pixbuf, c.capitalize()])
             else:
-                self._cursor_selection_items.append([None, c])
+                self._cursor_selection_items.append([None, c.capitalize()])
 
     def run(self):
         '''Run the view'''
