@@ -52,15 +52,13 @@ Version: 3.0.1
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkMenu" id="cursor_menu">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-  </object>
   <object class="GtkListStore" id="cursor_selection_items">
     <columns>
       <!-- column-name cursor -->
       <column type="GdkPixbuf"/>
       <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name id -->
       <column type="gchararray"/>
     </columns>
   </object>

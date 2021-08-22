@@ -104,7 +104,7 @@ class Presenter(object):
 
     def selected_cursor_changed(self, widget):
         '''Handle a change to the selected cursor'''
-        self._cursor_selection = widget.get_model()[widget.get_active()][1].lower()
+        self._cursor_selection = widget.get_model()[widget.get_active()][2]
 
     def on_button_all_clicked(self, *_):
         '''Take a screenshot of the full screen'''
@@ -321,9 +321,9 @@ class View(object):
                 pixbuf = loader.get_pixbuf()
                 loader.close()
 
-                self._cursor_selection_items.append([pixbuf, c.capitalize()])
+                self._cursor_selection_items.append([pixbuf, i18n('cursor-' + c), c])
             else:
-                self._cursor_selection_items.append([None, c.capitalize()])
+                self._cursor_selection_items.append([None, i18n('cursor-' + c), c])
 
     def run(self):
         '''Run the view'''
