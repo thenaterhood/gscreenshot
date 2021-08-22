@@ -52,6 +52,10 @@ Version: 3.0.1
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
+  <object class="GtkMenu" id="cursor_menu">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+  </object>
   <object class="GtkListStore" id="cursor_selection_items">
     <columns>
       <!-- column-name cursor -->
@@ -455,34 +459,6 @@ Version: 3.0.1
             </child>
           </object>
         </child>
-      </object>
-    </child>
-  </object>
-  <object class="GtkImage" id="image2">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="resource">gscreenshot.resources.pixmaps.cursor-adwaita.png</property>
-  </object>
-  <object class="GtkMenu" id="cursor_menu">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <child>
-      <object class="GtkMenuItem" id="cursor_select_default">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Default</property>
-        <property name="use-underline">True</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkImageMenuItem" id="Adwaita Pointer">
-        <property name="label" translatable="yes">Adwaita</property>
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="tooltip-text" translatable="yes">Adwaita</property>
-        <property name="image">image2</property>
-        <property name="use-stock">False</property>
-        <property name="always-show-image">True</property>
       </object>
     </child>
   </object>

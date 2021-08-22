@@ -283,9 +283,11 @@ class View(object):
         if show:
             self._cursor_selection_dropdown.set_opacity(1)
             self._cursor_selection_label.set_opacity(1)
+            self._cursor_selection_dropdown.set_sensitive(1)
         else:
             self._cursor_selection_dropdown.set_opacity(0)
             self._cursor_selection_label.set_opacity(0)
+            self._cursor_selection_dropdown.set_sensitive(0)
 
     def update_available_cursors(self, cursors):
         '''
@@ -296,12 +298,12 @@ class View(object):
         for c in cursors:
             if cursors[c] is not None:
                 descriptor = io.BytesIO()
-                image = cursors[c].convert("RGB")
+                image = cursors[c]
                 image.thumbnail((self._cursor_selection_dropdown.get_allocation().height*.42, self._cursor_selection_dropdown.get_allocation().width*.42))
-                image.save(descriptor, "ppm")
+                image.save(descriptor, "png")
                 contents = descriptor.getvalue()
                 descriptor.close()
-                loader = Gtk.gdk.PixbufLoader("pnm")
+                loader = Gtk.gdk.PixbufLoader("png")
                 loader.write(contents)
                 pixbuf = loader.get_pixbuf()
                 loader.close()
