@@ -72,7 +72,7 @@ class Gscreenshot(object):
     def get_available_cursors(self):
         '''
         Get the alternate pointer pixmaps gscreenshot can use
-        Returns [(name, PIL.Image)]
+        Returns {name: PIL.Image}
         '''
         return {
                 'theme': None,

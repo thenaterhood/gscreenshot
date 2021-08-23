@@ -307,7 +307,7 @@ class View(object):
     def update_available_cursors(self, cursors):
         '''
         Update the available cursor selection in the combolist
-        Params: self, [(name, PIL.Image)]
+        Params: self, {name: PIL.Image}
         '''
         self._cursor_selection_items.clear()
         for cursor_name in cursors:
