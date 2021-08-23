@@ -193,7 +193,15 @@ class Screenshooter(object):
         cursor_size_ratio = min(max(screenshot_width / 2000, .3), max(screenshot_height / 2000, .3))
         cursor_height = cursor_img.size[0] * cursor_size_ratio
         cursor_width = cursor_img.size[1] * cursor_size_ratio
-        cursor_img.thumbnail((cursor_width, cursor_height))
+        cursor_img.thumbnail((cursor_width, cursor_height), PIL.Image.ANTIALIAS)
+
+        # If the cursor glyph is square, adjust its position slightly so it
+        # shows up where expected.
+        if cursor_img.size[0] == cursor_img.size[1]:
+            cursor_pos = (
+                cursor_pos[0] - 20 if cursor_pos[0] - 20 > 0 else cursor_pos[0],
+                cursor_pos[1] - 20 if cursor_pos[1] - 20 > 0 else cursor_pos[1]
+            )
 
         # Passing cursor_img twice is intentional. The second time it's used
         # as a mask (PIL uses the alpha channel) so the cursor doesn't have

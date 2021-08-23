@@ -176,7 +176,7 @@ class Presenter(object):
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
         success = self._app.open_last_screenshot()
-        if success:
+        if not success:
             dialog = WarningDialog(
                 i18n("Please install xdg-open to open files."),
                 self._view.get_window())
