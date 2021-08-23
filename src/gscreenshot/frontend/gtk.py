@@ -14,7 +14,6 @@ from pkg_resources import resource_string, resource_filename
 from gi import pygtkcompat
 from gscreenshot import Gscreenshot
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
-import PIL.Image
 
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
@@ -293,6 +292,9 @@ class View(object):
         combo.add_attribute(renderer, "text", 1)
 
     def show_cursor_options(self, show):
+        '''
+        Toggle the cursor combobox and label hidden/visible
+        '''
         if show:
             self._cursor_selection_dropdown.set_opacity(1)
             self._cursor_selection_label.set_opacity(1)
@@ -308,11 +310,14 @@ class View(object):
         Params: self, [(name, PIL.Image)]
         '''
         self._cursor_selection_items.clear()
-        for c in cursors:
-            if cursors[c] is not None:
+        for cursor_name in cursors:
+            if cursors[cursor_name] is not None:
                 descriptor = io.BytesIO()
-                image = cursors[c]
-                image.thumbnail((self._cursor_selection_dropdown.get_allocation().height*.42, self._cursor_selection_dropdown.get_allocation().width*.42))
+                image = cursors[cursor_name]
+                image.thumbnail((
+                    self._cursor_selection_dropdown.get_allocation().height*.42,
+                    self._cursor_selection_dropdown.get_allocation().width*.42
+                ))
                 image.save(descriptor, "png")
                 contents = descriptor.getvalue()
                 descriptor.close()
@@ -321,9 +326,13 @@ class View(object):
                 pixbuf = loader.get_pixbuf()
                 loader.close()
 
-                self._cursor_selection_items.append([pixbuf, i18n('cursor-' + c), c])
+                self._cursor_selection_items.append(
+                    [pixbuf, i18n('cursor-' + cursor_name), cursor_name]
+                )
             else:
-                self._cursor_selection_items.append([None, i18n('cursor-' + c), c])
+                self._cursor_selection_items.append(
+                    [None, i18n('cursor-' + cursor_name), cursor_name]
+                )
 
     def run(self):
         '''Run the view'''
