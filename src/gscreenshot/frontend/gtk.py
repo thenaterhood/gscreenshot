@@ -334,6 +334,11 @@ class View(object):
                     [None, i18n('cursor-' + cursor_name), cursor_name]
                 )
 
+            if cursor_name == "theme":
+                self._cursor_selection_dropdown.set_active(
+                    len(self._cursor_selection_items)-1
+                )
+
     def run(self):
         '''Run the view'''
         self._window.set_position(Gtk.WIN_POS_CENTER)
