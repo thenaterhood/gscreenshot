@@ -56,6 +56,10 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, add the encoding='UTF-8'
+            # param
+            #pylint: disable=unspecified-encoding
             with open(self.get_cache_file(), "r") as cachefile:
                 try:
                     self.cache = json.load(cachefile)
@@ -137,6 +141,10 @@ class Gscreenshot(object):
     def save_cache(self):
         """Writes the cache to disk"""
         try:
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, add the encoding='UTF-8'
+            # param
+            #pylint: disable=unspecified-encoding
             with open(self.get_cache_file(), "w") as cachefile:
                 json.dump(self.cache, cachefile)
         except FileNotFoundError:
@@ -163,7 +171,7 @@ class Gscreenshot(object):
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        self.screenshooter._grab_fullscreen(
+        self.screenshooter.grab_fullscreen_(
             delay,
             capture_cursor,
             use_cursor=use_cursor
@@ -189,7 +197,7 @@ class Gscreenshot(object):
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        self.screenshooter._grab_selection(
+        self.screenshooter.grab_selection_(
             delay,
             capture_cursor,
             use_cursor=use_cursor
@@ -215,7 +223,7 @@ class Gscreenshot(object):
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        self.screenshooter._grab_window(
+        self.screenshooter.grab_window_(
             delay,
             capture_cursor,
             use_cursor=use_cursor

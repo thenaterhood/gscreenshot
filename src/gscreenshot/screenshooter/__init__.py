@@ -50,9 +50,10 @@ class Screenshooter(object):
         """
         return self._image
 
-    def _grab_fullscreen(self, delay=0, capture_cursor=False, use_cursor=None):
+    def grab_fullscreen_(self, delay=0, capture_cursor=False, use_cursor=None):
         '''
-        Internal API method for grabbing the full screen
+        Internal API method for grabbing the full screen. This should not
+        be overridden by extending classes. Implement grab_fullscreen instead.
         '''
         if use_cursor is None:
             self.grab_fullscreen(delay, capture_cursor)
@@ -69,9 +70,10 @@ class Screenshooter(object):
         """
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
-    def _grab_selection(self, delay=0, capture_cursor=False, use_cursor=None):
+    def grab_selection_(self, delay=0, capture_cursor=False, use_cursor=None):
         '''
-        Internal API method for grabbing a selection
+        Internal API method for grabbing a selection. This should not
+        be overridden by extending classes. Implement grab_selection instead.
         '''
         if use_cursor is None:
             self.grab_selection(delay, capture_cursor)
@@ -113,9 +115,11 @@ class Screenshooter(object):
         if self._image is not None:
             self._image = self._image.crop(crop_box)
 
-    def _grab_window(self, delay=0, capture_cursor=False, use_cursor=None):
+    def grab_window_(self, delay=0, capture_cursor=False, use_cursor=None):
         '''
-        Internal API method for grabbing a window
+        Internal API method for grabbing a window. This should not
+        be overridden by extending classes. Implement grab_window instead.
+
         '''
         if use_cursor is None:
             self.grab_window(delay, capture_cursor)
