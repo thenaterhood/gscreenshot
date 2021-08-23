@@ -389,12 +389,6 @@ Version: 3.0.1
                             <property name="active">0</property>
                             <property name="id-column">1</property>
                             <signal name="changed" handler="selected_cursor_changed" swapped="no"/>
-                            <child>
-                              <object class="GtkCellRendererPixbuf" id="Default"/>
-                              <attributes>
-                                <attribute name="pixbuf">0</attribute>
-                              </attributes>
-                            </child>
                           </object>
                           <packing>
                             <property name="left-attach">1</property>

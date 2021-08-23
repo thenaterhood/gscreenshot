@@ -282,10 +282,9 @@ class View(object):
 
     def _init_cursor_combobox(self):
         combo = self._cursor_selection_dropdown
-        # This renderer is already set up on the Glade side
-        #renderer = Gtk.CellRendererPixbuf()
-        #combo.pack_start(renderer, False)
-        #combo.add_attribute(renderer, "pixbuf", 0)
+        renderer = Gtk.CellRendererPixbuf()
+        combo.pack_start(renderer, False)
+        combo.add_attribute(renderer, "pixbuf", 0)
 
         renderer = Gtk.CellRendererText()
         combo.pack_start(renderer, True)
