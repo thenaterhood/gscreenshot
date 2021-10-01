@@ -50,6 +50,17 @@ class Screenshooter(object):
         """
         return self._image
 
+    def grab_fullscreen_(self, delay=0, capture_cursor=False, use_cursor=None):
+        '''
+        Internal API method for grabbing the full screen. This should not
+        be overridden by extending classes. Implement grab_fullscreen instead.
+        '''
+        if use_cursor is None:
+            self.grab_fullscreen(delay, capture_cursor)
+        else:
+            self.grab_fullscreen(delay, capture_cursor=False)
+            self.add_fake_cursor(use_cursor)
+
     def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
@@ -58,6 +69,17 @@ class Screenshooter(object):
             int delay, in seconds
         """
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
+
+    def grab_selection_(self, delay=0, capture_cursor=False, use_cursor=None):
+        '''
+        Internal API method for grabbing a selection. This should not
+        be overridden by extending classes. Implement grab_selection instead.
+        '''
+        if use_cursor is None:
+            self.grab_selection(delay, capture_cursor)
+        else:
+            self.grab_selection(delay, capture_cursor=False)
+            self.add_fake_cursor(use_cursor)
 
     def grab_selection(self, delay=0, capture_cursor=False):
         """
@@ -92,6 +114,18 @@ class Screenshooter(object):
 
         if self._image is not None:
             self._image = self._image.crop(crop_box)
+
+    def grab_window_(self, delay=0, capture_cursor=False, use_cursor=None):
+        '''
+        Internal API method for grabbing a window. This should not
+        be overridden by extending classes. Implement grab_window instead.
+
+        '''
+        if use_cursor is None:
+            self.grab_window(delay, capture_cursor)
+        else:
+            self.grab_window(delay, capture_cursor=False)
+            self.add_fake_cursor(use_cursor)
 
     def grab_window(self, delay=0, capture_cursor=False):
         """
@@ -130,7 +164,7 @@ class Screenshooter(object):
 
         return (mouse_data["root_x"], mouse_data["root_y"])
 
-    def add_fake_cursor(self):
+    def add_fake_cursor(self, cursor_img=None):
         """
         Stamps a fake cursor onto the screenshot.
         This is intended for use with screenshot backends that don't
@@ -148,7 +182,9 @@ class Screenshooter(object):
                   'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
                 )
 
-        cursor_img = PIL.Image.open(fname)
+        if cursor_img is None:
+            cursor_img = PIL.Image.open(fname)
+
         screenshot_img = self._image.copy()
 
         screenshot_width, screenshot_height = screenshot_img.size
@@ -157,7 +193,15 @@ class Screenshooter(object):
         cursor_size_ratio = min(max(screenshot_width / 2000, .3), max(screenshot_height / 2000, .3))
         cursor_height = cursor_img.size[0] * cursor_size_ratio
         cursor_width = cursor_img.size[1] * cursor_size_ratio
-        cursor_img.thumbnail((cursor_width, cursor_height))
+        cursor_img.thumbnail((cursor_width, cursor_height), PIL.Image.ANTIALIAS)
+
+        # If the cursor glyph is square, adjust its position slightly so it
+        # shows up where expected.
+        if cursor_img.size[0] == cursor_img.size[1]:
+            cursor_pos = (
+                cursor_pos[0] - 20 if cursor_pos[0] - 20 > 0 else cursor_pos[0],
+                cursor_pos[1] - 20 if cursor_pos[1] - 20 > 0 else cursor_pos[1]
+            )
 
         # Passing cursor_img twice is intentional. The second time it's used
         # as a mask (PIL uses the alpha channel) so the cursor doesn't have

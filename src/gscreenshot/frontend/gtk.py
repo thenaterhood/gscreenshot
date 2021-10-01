@@ -28,7 +28,8 @@ class Presenter(object):
     '''Presenter class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view', '_keymappings', '_capture_cursor')
+            '_pixbuf', '_view', '_keymappings', '_capture_cursor',
+            '_cursor_selection')
 
     def __init__(self, application, view):
         self._app = application
@@ -38,10 +39,18 @@ class Presenter(object):
         self._hide = True
         self._capture_cursor = False
         self._show_preview()
+        self._view.show_cursor_options(self._capture_cursor)
         self._keymappings = {}
 
+        cursors = self._app.get_available_cursors()
+        self._cursor_selection = 'theme'
+
+        self._view.update_available_cursors(
+                cursors
+                )
+
     def _begin_take_screenshot(self, app_method):
-        screenshot = app_method(self._delay, self._capture_cursor)
+        screenshot = app_method(self._delay, self._capture_cursor, self._cursor_selection)
 
         # Re-enable UI on the UI thread.
         GObject.idle_add(self._end_take_screenshot, screenshot)
@@ -86,10 +95,15 @@ class Presenter(object):
     def capture_cursor_toggled(self, widget):
         '''Toggle capturing cursor'''
         self._capture_cursor = widget.get_active()
+        self._view.show_cursor_options(self._capture_cursor)
 
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''
         self._delay = widget.get_value()
+
+    def selected_cursor_changed(self, widget):
+        '''Handle a change to the selected cursor'''
+        self._cursor_selection = widget.get_model()[widget.get_active()][2]
 
     def on_button_all_clicked(self, *_):
         '''Take a screenshot of the full screen'''
@@ -162,7 +176,7 @@ class Presenter(object):
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
         success = self._app.open_last_screenshot()
-        if success:
+        if not success:
             dialog = WarningDialog(
                 i18n("Please install xdg-open to open files."),
                 self._view.get_window())
@@ -260,6 +274,69 @@ class View(object):
         self._header_bar = builder.get_object('header_bar')
         self._preview = builder.get_object('image1')
         self._control_grid = builder.get_object('control_box')
+        self._cursor_selection_items = builder.get_object('cursor_selection_items')
+        self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
+        self._cursor_selection_label = builder.get_object('pointer_selection_label')
+
+        self._init_cursor_combobox()
+
+    def _init_cursor_combobox(self):
+        combo = self._cursor_selection_dropdown
+        renderer = Gtk.CellRendererPixbuf()
+        combo.pack_start(renderer, False)
+        combo.add_attribute(renderer, "pixbuf", 0)
+
+        renderer = Gtk.CellRendererText()
+        combo.pack_start(renderer, True)
+        combo.add_attribute(renderer, "text", 1)
+
+    def show_cursor_options(self, show):
+        '''
+        Toggle the cursor combobox and label hidden/visible
+        '''
+        if show:
+            self._cursor_selection_dropdown.set_opacity(1)
+            self._cursor_selection_label.set_opacity(1)
+            self._cursor_selection_dropdown.set_sensitive(1)
+        else:
+            self._cursor_selection_dropdown.set_opacity(0)
+            self._cursor_selection_label.set_opacity(0)
+            self._cursor_selection_dropdown.set_sensitive(0)
+
+    def update_available_cursors(self, cursors):
+        '''
+        Update the available cursor selection in the combolist
+        Params: self, {name: PIL.Image}
+        '''
+        self._cursor_selection_items.clear()
+        for cursor_name in cursors:
+            if cursors[cursor_name] is not None:
+                descriptor = io.BytesIO()
+                image = cursors[cursor_name]
+                image.thumbnail((
+                    self._cursor_selection_dropdown.get_allocation().height*.42,
+                    self._cursor_selection_dropdown.get_allocation().width*.42
+                ))
+                image.save(descriptor, "png")
+                contents = descriptor.getvalue()
+                descriptor.close()
+                loader = Gtk.gdk.PixbufLoader("png")
+                loader.write(contents)
+                pixbuf = loader.get_pixbuf()
+                loader.close()
+
+                self._cursor_selection_items.append(
+                    [pixbuf, i18n('cursor-' + cursor_name), cursor_name]
+                )
+            else:
+                self._cursor_selection_items.append(
+                    [None, i18n('cursor-' + cursor_name), cursor_name]
+                )
+
+            if cursor_name == "theme":
+                self._cursor_selection_dropdown.set_active(
+                    len(self._cursor_selection_items)-1
+                )
 
     def run(self):
         '''Run the view'''

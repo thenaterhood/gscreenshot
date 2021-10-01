@@ -125,6 +125,22 @@ msgstr ""
 msgid "Choose an Application"
 msgstr ""
 
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-theme"
+msgstr "Theme"
+
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-adwaita"
+msgstr "Adwaita"
+
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-prohibit"
+msgstr "Prohibit"
+
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-allow"
+msgstr "Allow"
+
 msgid "Author(s)"
 msgstr ""
 
