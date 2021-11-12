@@ -178,3 +178,6 @@ msgstr "no se pudo mostrar la notificación de captura de pantalla: ¿funciona e
 
 msgid "unable to save cache file"
 msgstr "no se puede guardar el archivo de caché"
+
+msgid "Available features: {0}"
+msgstr "Funciones disponibles: {0}"

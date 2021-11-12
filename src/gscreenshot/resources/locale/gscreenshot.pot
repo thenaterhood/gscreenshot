@@ -167,3 +167,6 @@ msgstr ""
 
 msgid "unable to save cache file"
 msgstr ""
+
+msgid "Available features: {0}"
+msgstr ""
