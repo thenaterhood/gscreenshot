@@ -26,10 +26,10 @@ class Grim(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        params = ['-o', self.tempfile]
+        params = [self.tempfile]
 
         if capture_cursor:
-            params.append('-c')
+            params = ['-c', self.tempfile]
 
         self._call_screenshooter('grim', params)
 
@@ -40,9 +40,9 @@ class Grim(Screenshooter):
 
     def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         sleep(delay)
-        params = ['-o', self.tempfile]
+        params = [self.tempfile]
 
         if capture_cursor:
-            params.append('-c')
+            params = ['-c', self.tempfile]
 
         self._call_screenshooter('grim', params)
