@@ -69,6 +69,12 @@ class Gscreenshot(object):
         else:
             self.save_cache()
 
+    def get_capabilities(self):
+        '''
+        Get the features supported in the current setup
+        '''
+        return self.screenshooter.get_capabilities()
+
     def get_available_cursors(self):
         '''
         Get the alternate pointer pixmaps gscreenshot can use

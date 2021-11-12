@@ -3,7 +3,7 @@ Integration for the grim screenshot utility
 '''
 from time import sleep
 
-from gscreenshot.util import find_executable
+from gscreenshot.util import find_executable, GSCapabilities
 from gscreenshot.screenshooter import Screenshooter
 
 
@@ -37,6 +37,16 @@ class Grim(Screenshooter):
     def can_run():
         """Whether scrot is available"""
         return find_executable('grim') is not None
+
+    def get_capabilities(self):
+        """
+        Get supported features
+        """
+        capabilities = [
+            GSCapabilities.CURSOR_CAPTURE
+        ]
+
+        return capabilities + self.selector.get_capabilities()
 
     def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         sleep(delay)

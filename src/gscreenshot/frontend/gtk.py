@@ -13,6 +13,7 @@ from time import sleep
 from pkg_resources import resource_string, resource_filename
 from gi import pygtkcompat
 from gscreenshot import Gscreenshot
+from gscreenshot.util import GSCapabilities
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 pygtkcompat.enable()
@@ -195,6 +196,10 @@ class Presenter(object):
         description += "\n" + i18n("Using {0} screenshot backend").format(
             self._app.get_screenshooter_name()
         )
+        description += "\n" + i18n("Available features: {0}").format(
+            ", ".join(self._app.get_capabilities())
+        )
+
         about.set_comments(i18n(description))
 
         website = self._app.get_program_website()
@@ -266,10 +271,11 @@ class Presenter(object):
 class View(object):
     '''View class for the GTK frontend'''
 
-    def __init__(self, window, builder):
+    def __init__(self, window, builder, capabilities):
         self._window = window
         self._window_is_fullscreen = False
         self._was_maximized = False
+        self._capabilities = capabilities
         self._last_window_dimensions = self._window.get_size()
         self._header_bar = builder.get_object('header_bar')
         self._preview = builder.get_object('image1')
@@ -277,8 +283,14 @@ class View(object):
         self._cursor_selection_items = builder.get_object('cursor_selection_items')
         self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
         self._cursor_selection_label = builder.get_object('pointer_selection_label')
+        self._window_select_button = builder.get_object('button_window')
 
-        self._init_cursor_combobox()
+        if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
+            self._init_cursor_combobox()
+
+        if GSCapabilities.WINDOW_SELECTION not in self._capabilities:
+            self._window_select_button.set_opacity(0)
+            self._window_select_button.set_sensitive(0)
 
     def _init_cursor_combobox(self):
         combo = self._cursor_selection_dropdown
@@ -294,7 +306,7 @@ class View(object):
         '''
         Toggle the cursor combobox and label hidden/visible
         '''
-        if show:
+        if show and GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._cursor_selection_dropdown.set_opacity(1)
             self._cursor_selection_label.set_opacity(1)
             self._cursor_selection_dropdown.set_sensitive(1)
@@ -618,7 +630,8 @@ def main():
         sleep(.01)
         waited += .1
 
-    view = View(builder.get_object('window_main'), builder)
+    capabilities = application.get_capabilities()
+    view = View(builder.get_object('window_main'), builder, capabilities)
 
     presenter = Presenter(
             application,

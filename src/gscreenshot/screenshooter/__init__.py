@@ -10,6 +10,7 @@ from pkg_resources import resource_filename
 from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.selector.factory import SelectorFactory
+from gscreenshot.util import GSCapabilities
 
 try:
     from Xlib import display
@@ -49,6 +50,19 @@ class Screenshooter(object):
             PIL.Image or None
         """
         return self._image
+
+    def get_capabilities(self):
+        """
+        Get supported features
+        """
+        capabilities = [
+            GSCapabilities.CURSOR_CAPTURE
+        ]
+
+        if XLIB_AVAILABLE:
+            capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
+
+        return capabilities + self.selector.get_capabilities()
 
     def grab_fullscreen_(self, delay=0, capture_cursor=False, use_cursor=None):
         '''

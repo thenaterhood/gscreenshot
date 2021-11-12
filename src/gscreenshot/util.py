@@ -8,6 +8,21 @@ Functions:
 import os
 import sys
 
+
+class GSCapabilities(object):
+    '''
+    Define capability flags for use in gscreenshot.
+    These are used to determine what features gscreenshot
+    supports with the selection of utilities available to it.
+    These are returned from functions in screenshooters and
+    selectors.
+    '''
+
+    REGION_SELECTION = "region_selection"
+    WINDOW_SELECTION = "window_selection"
+    CURSOR_CAPTURE = "cursor_capture"
+    ALTERNATE_CURSOR = "alternate_cursor"
+
 # This is a direct copy and paste of distutil.spawn.is_executable.
 # We do this so that we don't need to add a dependency on distutils
 # for the use of a single simple function.

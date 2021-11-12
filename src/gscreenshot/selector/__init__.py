@@ -1,6 +1,8 @@
 '''
 Classes and exceptions related to screen region selection
 '''
+from gscreenshot.util import GSCapabilities
+
 
 class SelectionError(BaseException):
     '''Generic selection error'''
@@ -24,6 +26,15 @@ class RegionSelector():
         """
         constructor
         """
+
+    def get_capabilities(self):
+        """
+        Get the features this selector supports
+        """
+        return [
+            GSCapabilities.WINDOW_SELECTION,
+            GSCapabilities.REGION_SELECTION
+        ]
 
     def region_select(self):
         """
