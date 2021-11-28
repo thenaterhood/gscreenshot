@@ -3,7 +3,7 @@ Wrapper for the slurp screen selector utility
 '''
 import subprocess
 from gscreenshot.selector import SelectionExecError, SelectionCancelled, RegionSelector
-from gscreenshot.util import find_executable
+from gscreenshot.util import find_executable, GSCapabilities
 
 
 class Slurp(RegionSelector):
@@ -20,6 +20,14 @@ class Slurp(RegionSelector):
         constructor
         """
         RegionSelector.__init__(self)
+
+    def get_capabilities(self):
+        """
+        Get the features this selector supports
+        """
+        return [
+            GSCapabilities.REGION_SELECTION
+        ]
 
     def region_select(self):
         """

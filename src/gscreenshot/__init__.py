@@ -56,6 +56,10 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, add the encoding='UTF-8'
+            # param
+            #pylint: disable=unspecified-encoding
             with open(self.get_cache_file(), "r") as cachefile:
                 try:
                     self.cache = json.load(cachefile)
@@ -65,6 +69,36 @@ class Gscreenshot(object):
         else:
             self.save_cache()
 
+    def get_capabilities(self):
+        '''
+        Get the features supported in the current setup
+        '''
+        return self.screenshooter.get_capabilities()
+
+    def get_available_cursors(self):
+        '''
+        Get the alternate pointer pixmaps gscreenshot can use
+        Returns {name: PIL.Image}
+        '''
+        return {
+                'theme': None,
+                'adwaita': Image.open(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
+                    )
+                ),
+                'prohibit': Image.open(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'cursor-prohibit.png'
+                    )
+                ),
+                'allow': Image.open(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'cursor-allow.png'
+                    )
+                )
+            }
+
     def show_screenshot_notification(self):
         '''
         Show a notification that a screenshot was taken.
@@ -72,6 +106,9 @@ class Gscreenshot(object):
         return a status as to whether it succeeded.
         '''
         try:
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, switch to using with here
+            #pylint: disable=consider-using-with
             subprocess.Popen([
                 'notify-send',
                 'gscreenshot',
@@ -110,6 +147,10 @@ class Gscreenshot(object):
     def save_cache(self):
         """Writes the cache to disk"""
         try:
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, add the encoding='UTF-8'
+            # param
+            #pylint: disable=unspecified-encoding
             with open(self.get_cache_file(), "w") as cachefile:
                 json.dump(self.cache, cachefile)
         except FileNotFoundError:
@@ -119,7 +160,7 @@ class Gscreenshot(object):
         """Gets the name of the current screenshooter"""
         return self.screenshooter.__class__.__name__
 
-    def screenshot_full_display(self, delay=0, capture_cursor=False):
+    def screenshot_full_display(self, delay=0, capture_cursor=False, cursor_name='theme'):
         """
         Takes a screenshot of the full display with a
         given delay.
@@ -131,12 +172,21 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_fullscreen(delay, capture_cursor)
+        if not capture_cursor:
+            use_cursor = None
+        else:
+            use_cursor = self.get_available_cursors()[cursor_name]
+
+        self.screenshooter.grab_fullscreen_(
+            delay,
+            capture_cursor,
+            use_cursor=use_cursor
+        )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_selected(self, delay=0, capture_cursor=False):
+    def screenshot_selected(self, delay=0, capture_cursor=False, cursor_name='theme'):
         """
         Interactively takes a screenshot of a selected area
         with a given delay.
@@ -148,12 +198,21 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_selection(delay, capture_cursor)
+        if not capture_cursor:
+            use_cursor = None
+        else:
+            use_cursor = self.get_available_cursors()[cursor_name]
+
+        self.screenshooter.grab_selection_(
+            delay,
+            capture_cursor,
+            use_cursor=use_cursor
+        )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_window(self, delay=0, capture_cursor=False):
+    def screenshot_window(self, delay=0, capture_cursor=False, cursor_name='theme'):
         """
         Interactively takes a screenshot of a selected window
         with a given delay.
@@ -165,7 +224,16 @@ class Gscreenshot(object):
             PIL.Image
         """
 
-        self.screenshooter.grab_window(delay, capture_cursor)
+        if not capture_cursor:
+            use_cursor = None
+        else:
+            use_cursor = self.get_available_cursors()[cursor_name]
+
+        self.screenshooter.grab_window_(
+            delay,
+            capture_cursor,
+            use_cursor=use_cursor
+        )
         self.run_display_mismatch_warning()
         self.saved_last_image = False
         return self.screenshooter.image
@@ -329,6 +397,9 @@ class Gscreenshot(object):
         screenshot_fname = self.save_and_return_path()
 
         try:
+            #pylint: disable=fixme
+            # TODO: when dropping python2 support, switch to using with here
+            #pylint: disable=consider-using-with
             subprocess.Popen(['xdg-open', screenshot_fname])
             return True
         except (subprocess.CalledProcessError, IOError):

@@ -130,6 +130,22 @@ msgstr "Acerca de"
 msgid "Choose an Application"
 msgstr "Elige una aplicación"
 
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-theme"
+msgstr "Tema"
+
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-adwaita"
+msgstr "Adwaita"
+
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-prohibit"
+msgstr "Prohibir"
+
+#: src/gscreenshot/frontend/gtk.py
+msgid "cursor-allow"
+msgstr "Permitir"
+
 msgid "A simple screenshot tool supporting multiple backends."
 msgstr ""
 "Una herramienta de captura de pantalla simple que admite múltiples "
@@ -162,3 +178,6 @@ msgstr "no se pudo mostrar la notificación de captura de pantalla: ¿funciona e
 
 msgid "unable to save cache file"
 msgstr "no se puede guardar el archivo de caché"
+
+msgid "Available features: {0}"
+msgstr "Funciones disponibles: {0}"

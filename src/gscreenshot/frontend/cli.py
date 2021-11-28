@@ -96,6 +96,10 @@ def run():
         version = gscreenshot.get_program_version()
 
         print(_("Using {0} screenshot backend").format(gscreenshot.get_screenshooter_name()))
+        print(_("Available features: {0}").format(", ".join(gscreenshot.get_capabilities())))
+        #pylint: disable=fixme
+        # TODO: change to f-strings when dropping python2 support
+        #pylint: disable=consider-using-f-string
         print("{0} {1}; {2}".format(name, version, _(description)))
         print(website)
         print("")
