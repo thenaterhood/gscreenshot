@@ -62,7 +62,10 @@ class Screenshooter(object):
         if XLIB_AVAILABLE:
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
 
-        return capabilities + self.selector.get_capabilities()
+        if self.selector is not None:
+            return capabilities + self.selector.get_capabilities()
+
+        return capabilities
 
     def grab_fullscreen_(self, delay=0, capture_cursor=False, use_cursor=None):
         '''
