@@ -98,16 +98,6 @@ class Screenshooter(object):
         """
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
-    def grab_selection(self, delay=0, capture_cursor=False):
-        '''
-        Takes a screenshot of the full screen with a given delay
-
-        Parameters:
-            int delay: delay in seconds
-            bool capture_cursor: whether to capture the cursor
-        '''
-        raise Exception("Not implemented. Selection grab called with delay" + str(delay))
-
     def grab_selection_(self, delay=0, capture_cursor=False, use_cursor=None):
         """
         Internal API method for grabbing a selection. This should not
