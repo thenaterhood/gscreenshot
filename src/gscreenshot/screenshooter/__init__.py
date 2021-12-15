@@ -59,7 +59,7 @@ class Screenshooter(object):
         Returns:
             [GSCapabilities]
         """
-        return [GSCapabilities.CURSOR_CAPTURE]
+        return []
 
     def get_capabilities_(self):
         """
@@ -70,6 +70,7 @@ class Screenshooter(object):
 
         if XLIB_AVAILABLE:
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
+            capabilities.append(GSCapabilities.CURSOR_CAPTURE)
 
         if self.selector is not None:
             return capabilities + self.selector.get_capabilities()
@@ -81,11 +82,12 @@ class Screenshooter(object):
         Internal API method for grabbing the full screen. This should not
         be overridden by extending classes. Implement grab_fullscreen instead.
         '''
-        if use_cursor is None:
+        if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
             self.grab_fullscreen(delay, capture_cursor)
         else:
             self.grab_fullscreen(delay, capture_cursor=False)
-            self.add_fake_cursor(use_cursor)
+            if capture_cursor:
+                self.add_fake_cursor(use_cursor)
 
     def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
@@ -101,11 +103,12 @@ class Screenshooter(object):
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
         '''
-        if use_cursor is None:
+        if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
             self.grab_selection(delay, capture_cursor)
         else:
             self.grab_selection(delay, capture_cursor=False)
-            self.add_fake_cursor(use_cursor)
+            if capture_cursor:
+                self.add_fake_cursor(use_cursor)
 
     def grab_selection(self, delay=0, capture_cursor=False):
         """
@@ -147,11 +150,12 @@ class Screenshooter(object):
         be overridden by extending classes. Implement grab_window instead.
 
         '''
-        if use_cursor is None:
+        if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
             self.grab_window(delay, capture_cursor)
         else:
             self.grab_window(delay, capture_cursor=False)
-            self.add_fake_cursor(use_cursor)
+            if capture_cursor:
+                self.add_fake_cursor(use_cursor)
 
     def grab_window(self, delay=0, capture_cursor=False):
         """
