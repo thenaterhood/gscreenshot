@@ -98,20 +98,21 @@ class Screenshooter(object):
         """
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
-    def grab_selection_(self, delay=0, capture_cursor=False, use_cursor=None):
+    def grab_selection(self, delay=0, capture_cursor=False):
         '''
+        Takes a screenshot of the full screen with a given delay
+
+        Parameters:
+            int delay: delay in seconds
+            bool capture_cursor: whether to capture the cursor
+        '''
+        raise Exception("Not implemented. Selection grab called with delay" + str(delay))
+
+    def grab_selection_(self, delay=0, capture_cursor=False, use_cursor=None):
+        """
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
-        '''
-        if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
-            self.grab_selection(delay, capture_cursor)
-        else:
-            self.grab_selection(delay, capture_cursor=False)
-            if capture_cursor:
-                self.add_fake_cursor(use_cursor)
 
-    def grab_selection(self, delay=0, capture_cursor=False):
-        """
         Takes an interactive screenshot of a selected area with a
         given delay. This has some safety around the interactive selection:
         if it fails to run, it will call a fallback method (which defaults to
@@ -136,10 +137,10 @@ class Screenshooter(object):
             return
         except SelectionParseError:
             print("Invalid selection data -- falling back to full screen")
-            self.grab_fullscreen(delay, capture_cursor)
+            self.grab_fullscreen_(delay, capture_cursor, use_cursor)
             return
 
-        self.grab_fullscreen(delay, capture_cursor)
+        self.grab_fullscreen_(delay, capture_cursor, use_cursor)
 
         if self._image is not None:
             self._image = self._image.crop(crop_box)
