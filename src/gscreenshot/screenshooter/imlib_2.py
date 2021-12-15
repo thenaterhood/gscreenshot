@@ -28,10 +28,6 @@ class Imlib2(Screenshooter):
         sleep(delay)
         self._call_screenshooter('imlib2_grab', [self.tempfile])
 
-    def get_capabilities(self):
-        '''List of capabilities'''
-        return []
-
     @staticmethod
     def can_run():
         '''Whether this utility is available'''

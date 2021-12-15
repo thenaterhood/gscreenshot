@@ -151,12 +151,15 @@ class Screenshooter(object):
     def grab_window(self, delay=0, capture_cursor=False):
         """
         Takes an interactive screenshot of a selected window with a
-        given delay
+        given delay. This has a full implementation and may not need
+        to be overridden in a child class. By default it will just
+        use the selection method, as most region selection and screenshot
+        tools don't differentiate.
 
         Parameters:
             int delay: seconds
         """
-        self.grab_selection(delay, capture_cursor)
+        self.grab_selection_(delay, capture_cursor)
 
     @staticmethod
     def can_run():
