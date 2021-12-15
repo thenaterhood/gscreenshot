@@ -73,7 +73,7 @@ class Gscreenshot(object):
         '''
         Get the features supported in the current setup
         '''
-        return self.screenshooter.get_capabilities()
+        return set(self.screenshooter.get_capabilities_())
 
     def get_available_cursors(self):
         '''

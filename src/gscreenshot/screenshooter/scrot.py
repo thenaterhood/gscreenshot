@@ -4,6 +4,7 @@ Integration for the Scrot screenshot utility
 import subprocess
 
 from gscreenshot.screenshooter import Screenshooter
+from gscreenshot.util import GSCapabilities
 
 
 class Scrot(Screenshooter):
@@ -33,6 +34,14 @@ class Scrot(Screenshooter):
         self._call_screenshooter('scrot', params)
         if capture_cursor and not Scrot._supports_native_cursor_capture:
             self.add_fake_cursor()
+
+    def get_capabilities(self):
+        '''List of capabilities'''
+        return [
+            GSCapabilities.CURSOR_CAPTURE,
+            GSCapabilities.REGION_SELECTION,
+            GSCapabilities.WINDOW_SELECTION
+        ]
 
     @staticmethod
     def can_run():

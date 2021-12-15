@@ -53,11 +53,20 @@ class Screenshooter(object):
 
     def get_capabilities(self):
         """
-        Get supported features
+        Get supported features. Note that under-the-hood the capabilities
+        of the selector (if applicable) will be added to this.
+
+        Returns:
+            [GSCapabilities]
         """
-        capabilities = [
-            GSCapabilities.CURSOR_CAPTURE
-        ]
+        return [GSCapabilities.CURSOR_CAPTURE]
+
+    def get_capabilities_(self):
+        """
+        Get supported features. This should not be overridden by extending
+        classes. Implement get_capabilities instead.
+        """
+        capabilities = self.get_capabilities()
 
         if XLIB_AVAILABLE:
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)

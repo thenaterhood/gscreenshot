@@ -28,8 +28,9 @@ class Imlib2(Screenshooter):
         sleep(delay)
         self._call_screenshooter('imlib2_grab', [self.tempfile])
 
-        if capture_cursor:
-            self.add_fake_cursor()
+    def get_capabilities(self):
+        '''List of capabilities'''
+        return []
 
     @staticmethod
     def can_run():
