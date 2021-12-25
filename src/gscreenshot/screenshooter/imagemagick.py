@@ -5,6 +5,7 @@ from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import find_executable
+from gscreenshot.util import GSCapabilities
 
 
 class ImageMagick(Screenshooter):
@@ -28,8 +29,12 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_screenshooter('import', ['-window', 'root', self.tempfile])
 
-        if capture_cursor:
-            self.add_fake_cursor()
+    def get_capabilities(self):
+        '''List of capabilities'''
+        return [
+            GSCapabilities.REGION_SELECTION,
+            GSCapabilities.WINDOW_SELECTION
+        ]
 
     @staticmethod
     def can_run():

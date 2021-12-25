@@ -53,27 +53,43 @@ class Screenshooter(object):
 
     def get_capabilities(self):
         """
-        Get supported features
+        Get supported features. Note that under-the-hood the capabilities
+        of the selector (if applicable) will be added to this.
+
+        Returns:
+            [GSCapabilities]
         """
-        capabilities = [
-            GSCapabilities.CURSOR_CAPTURE
-        ]
+        return []
+
+    def get_capabilities_(self):
+        """
+        Get supported features. This should not be overridden by extending
+        classes. Implement get_capabilities instead.
+        """
+        capabilities = self.get_capabilities()
+        # If we're running, this is the bare minimum
+        capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
 
         if XLIB_AVAILABLE:
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
+            capabilities.append(GSCapabilities.CURSOR_CAPTURE)
 
-        return capabilities + self.selector.get_capabilities()
+        if self.selector is not None:
+            return capabilities + self.selector.get_capabilities()
+
+        return capabilities
 
     def grab_fullscreen_(self, delay=0, capture_cursor=False, use_cursor=None):
         '''
         Internal API method for grabbing the full screen. This should not
         be overridden by extending classes. Implement grab_fullscreen instead.
         '''
-        if use_cursor is None:
+        if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
             self.grab_fullscreen(delay, capture_cursor)
         else:
             self.grab_fullscreen(delay, capture_cursor=False)
-            self.add_fake_cursor(use_cursor)
+            if capture_cursor:
+                self.add_fake_cursor(use_cursor)
 
     def grab_fullscreen(self, delay=0, capture_cursor=False):
         """
@@ -85,18 +101,10 @@ class Screenshooter(object):
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
     def grab_selection_(self, delay=0, capture_cursor=False, use_cursor=None):
-        '''
+        """
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
-        '''
-        if use_cursor is None:
-            self.grab_selection(delay, capture_cursor)
-        else:
-            self.grab_selection(delay, capture_cursor=False)
-            self.add_fake_cursor(use_cursor)
 
-    def grab_selection(self, delay=0, capture_cursor=False):
-        """
         Takes an interactive screenshot of a selected area with a
         given delay. This has some safety around the interactive selection:
         if it fails to run, it will call a fallback method (which defaults to
@@ -121,10 +129,10 @@ class Screenshooter(object):
             return
         except SelectionParseError:
             print("Invalid selection data -- falling back to full screen")
-            self.grab_fullscreen(delay, capture_cursor)
+            self.grab_fullscreen_(delay, capture_cursor, use_cursor)
             return
 
-        self.grab_fullscreen(delay, capture_cursor)
+        self.grab_fullscreen_(delay, capture_cursor, use_cursor)
 
         if self._image is not None:
             self._image = self._image.crop(crop_box)
@@ -135,21 +143,25 @@ class Screenshooter(object):
         be overridden by extending classes. Implement grab_window instead.
 
         '''
-        if use_cursor is None:
+        if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
             self.grab_window(delay, capture_cursor)
         else:
             self.grab_window(delay, capture_cursor=False)
-            self.add_fake_cursor(use_cursor)
+            if capture_cursor:
+                self.add_fake_cursor(use_cursor)
 
     def grab_window(self, delay=0, capture_cursor=False):
         """
         Takes an interactive screenshot of a selected window with a
-        given delay
+        given delay. This has a full implementation and may not need
+        to be overridden in a child class. By default it will just
+        use the selection method, as most region selection and screenshot
+        tools don't differentiate.
 
         Parameters:
             int delay: seconds
         """
-        self.grab_selection(delay, capture_cursor)
+        self.grab_selection_(delay, capture_cursor)
 
     @staticmethod
     def can_run():

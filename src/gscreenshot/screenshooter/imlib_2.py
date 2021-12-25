@@ -28,9 +28,6 @@ class Imlib2(Screenshooter):
         sleep(delay)
         self._call_screenshooter('imlib2_grab', [self.tempfile])
 
-        if capture_cursor:
-            self.add_fake_cursor()
-
     @staticmethod
     def can_run():
         '''Whether this utility is available'''

@@ -34,8 +34,9 @@ class PILWrapper(Screenshooter):
         sleep(delay)
         self._image = ImageGrab.grab(None)
 
-        if capture_cursor:
-            self.add_fake_cursor()
+    def get_capabilities(self):
+        '''List of capabilities'''
+        return []
 
     @staticmethod
     def can_run():

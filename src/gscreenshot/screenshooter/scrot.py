@@ -4,6 +4,7 @@ Integration for the Scrot screenshot utility
 import subprocess
 
 from gscreenshot.screenshooter import Screenshooter
+from gscreenshot.util import GSCapabilities
 
 
 class Scrot(Screenshooter):
@@ -34,6 +35,18 @@ class Scrot(Screenshooter):
         if capture_cursor and not Scrot._supports_native_cursor_capture:
             self.add_fake_cursor()
 
+    def get_capabilities(self):
+        '''List of capabilities'''
+        capabilities = [
+            GSCapabilities.REGION_SELECTION,
+            GSCapabilities.WINDOW_SELECTION
+        ]
+
+        if self._supports_native_cursor_capture:
+            capabilities.append(GSCapabilities.CURSOR_CAPTURE)
+
+        return capabilities
+
     @staticmethod
     def can_run():
         """Whether scrot is available"""
@@ -55,8 +68,11 @@ class Scrot(Screenshooter):
             return False
 
     def _grab_selection_fallback(self, delay=0, capture_cursor=False):
+        """
+        Fallback for selection which uses scrot's builtin
+        region selection
+        """
         params =  ['-z', self.tempfile, '-d', str(delay), '-s']
-        print("Unable to capture cursor - is slop available?")
         if capture_cursor and Scrot._supports_native_cursor_capture:
             params.append('-p')
 
