@@ -68,8 +68,11 @@ class Scrot(Screenshooter):
             return False
 
     def _grab_selection_fallback(self, delay=0, capture_cursor=False):
+        """
+        Fallback for selection which uses scrot's builtin
+        region selection
+        """
         params =  ['-z', self.tempfile, '-d', str(delay), '-s']
-        print("Unable to capture cursor - is slop available?")
         if capture_cursor and Scrot._supports_native_cursor_capture:
             params.append('-p')
 
