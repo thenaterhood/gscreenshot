@@ -37,11 +37,15 @@ class Scrot(Screenshooter):
 
     def get_capabilities(self):
         '''List of capabilities'''
-        return [
-            GSCapabilities.CURSOR_CAPTURE,
+        capabilities = [
             GSCapabilities.REGION_SELECTION,
             GSCapabilities.WINDOW_SELECTION
         ]
+
+        if self._supports_native_cursor_capture:
+            capabilities.append(GSCapabilities.CURSOR_CAPTURE)
+
+        return capabilities
 
     @staticmethod
     def can_run():

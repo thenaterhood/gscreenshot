@@ -67,6 +67,8 @@ class Screenshooter(object):
         classes. Implement get_capabilities instead.
         """
         capabilities = self.get_capabilities()
+        # If we're running, this is the bare minimum
+        capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
 
         if XLIB_AVAILABLE:
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)

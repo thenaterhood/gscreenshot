@@ -283,14 +283,24 @@ class View(object):
         self._cursor_selection_items = builder.get_object('cursor_selection_items')
         self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
         self._cursor_selection_label = builder.get_object('pointer_selection_label')
-        self._window_select_button = builder.get_object('button_window')
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
 
         if GSCapabilities.WINDOW_SELECTION not in self._capabilities:
-            self._window_select_button.set_opacity(0)
-            self._window_select_button.set_sensitive(0)
+            window_select_button = builder.get_object('button_window')
+            window_select_button.set_opacity(0)
+            window_select_button.set_sensitive(0)
+
+        if GSCapabilities.REGION_SELECTION not in self._capabilities:
+            region_select_button = builder.get_object('button_selectarea')
+            region_select_button.set_opacity(0)
+            region_select_button.set_sensitive(0)
+
+        if GSCapabilities.CURSOR_CAPTURE not in self._capabilities:
+            checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
+            checkbox_capture_cursor.set_opacity(0)
+            checkbox_capture_cursor.set_sensitive(0)
 
     def _init_cursor_combobox(self):
         combo = self._cursor_selection_dropdown

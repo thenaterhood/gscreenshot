@@ -343,7 +343,7 @@ Version: 3.0.1
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton">
+                      <object class="GtkCheckButton" id="checkbox_capture_cursor">
                         <property name="label" translatable="yes">Capture Cursor</property>
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
