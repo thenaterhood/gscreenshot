@@ -60,6 +60,7 @@ class Presenter(object):
         self._show_preview()
 
         self._view.unhide()
+        self._view.set_ready()
 
     def set_keymappings(self, keymappings):
         '''Set the keymappings'''
@@ -71,6 +72,8 @@ class Presenter(object):
 
     def take_screenshot(self, app_method):
         '''Take a screenshot using the passed app method'''
+        self._view.set_busy()
+
         if self._hide:
             self._view.hide()
 
@@ -301,6 +304,23 @@ class View(object):
             checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
             checkbox_capture_cursor.set_opacity(0)
             checkbox_capture_cursor.set_sensitive(0)
+
+    def set_busy(self):
+        """
+        Sets the window as busy with visual indicators
+        """
+        cursor = Gdk.Cursor.new(Gdk.CursorType.WATCH)
+        self._window.get_window().set_cursor(cursor)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+
+    def set_ready(self):
+        """
+        Sets the window as ready with visual indicators
+        """
+        self._window.get_window().set_cursor(None)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
     def _init_cursor_combobox(self):
         combo = self._cursor_selection_dropdown
@@ -641,7 +661,7 @@ def main():
         waited += .1
 
     capabilities = application.get_capabilities()
-    view = View(builder.get_object('window_main'), builder, capabilities)
+    view = View(window, builder, capabilities)
 
     presenter = Presenter(
             application,
