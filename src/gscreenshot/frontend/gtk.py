@@ -92,6 +92,14 @@ class Presenter(object):
         if event.keyval in self._keymappings:
             self._keymappings[event.keyval]()
 
+    def handle_preview_click_event(self, widget, event, *args):
+        '''
+        Handle a click on the screenshot preview widget
+        '''
+        # 3 is right click
+        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+            self._view.show_actions_menu()
+
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
         self._hide = widget.get_active()
@@ -286,6 +294,7 @@ class View(object):
         self._cursor_selection_items = builder.get_object('cursor_selection_items')
         self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
         self._cursor_selection_label = builder.get_object('pointer_selection_label')
+        self._actions_menu = builder.get_object('menu_saveas_additional_actions')
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
@@ -408,6 +417,12 @@ class View(object):
         self._window.set_size_request(gscreenshot_width, gscreenshot_height)
 
         self._window.show_all()
+
+    def show_actions_menu(self):
+        '''
+        Show the actions/saveas menu at the pointer
+        '''
+        self._actions_menu.popup_at_pointer()
 
     def get_window(self):
         '''Returns the associated window'''
