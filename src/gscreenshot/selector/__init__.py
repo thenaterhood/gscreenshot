@@ -54,7 +54,8 @@ class RegionSelector():
         """
         raise SelectionError("Not implemented")
 
-    def can_run(self):
+    @staticmethod
+    def can_run():
         """
         Returns whether this is capable of running.
         """
