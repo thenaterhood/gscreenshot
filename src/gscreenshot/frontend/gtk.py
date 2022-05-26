@@ -174,7 +174,7 @@ class Presenter(object):
         img = self._app.get_last_image()
 
         if img is None:
-            return
+            return False
 
         pixbuf = self._image_to_pixbuf(img)
 
@@ -184,6 +184,17 @@ class Presenter(object):
                     i18n("Your clipboard doesn't support persistence and xclip isn't available."),
                     self._view.get_window())
                 self._view.run_dialog(warning_dialog)
+                return False
+
+        return True
+
+    def on_button_copy_and_close_clicked(self, *_):
+        """
+        Copy the current screenshot to the clipboard and
+        close gscreenshot
+        """
+        if self.on_button_copy_clicked():
+            self.quit(None)
 
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
@@ -690,7 +701,17 @@ def main():
             0, presenter.on_button_copy_clicked)
     accel.connect(Gdk.keyval_from_name('O'), Gdk.ModifierType.CONTROL_MASK,
             0, presenter.on_button_open_clicked)
-    window.add_accel_group(accel)
+    accel.connect(Gdk.keyval_from_name('O'),
+            Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK,
+            0,
+            presenter.on_button_openwith_clicked)
+    accel.connect(Gdk.keyval_from_name('C'),
+            Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK,
+            0,
+            presenter.on_button_copy_and_close_clicked)
+    # These are set up in glade, so adding them here is redundant.
+    # We'll keep the code for reference.
+    #window.add_accel_group(accel)
 
     window.connect("key-press-event", presenter.handle_keypress)
 

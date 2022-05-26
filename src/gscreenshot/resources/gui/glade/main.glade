@@ -15,7 +15,7 @@ Version: 3.0.1
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <child>
-      <object class="GtkImageMenuItem">
+      <object class="GtkImageMenuItem" id="action_copy">
         <property name="label">gtk-copy</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
@@ -23,10 +23,11 @@ Version: 3.0.1
         <property name="use-stock">True</property>
         <property name="accel-group">accelgroup-copy</property>
         <signal name="activate" handler="on_button_copy_clicked" swapped="no"/>
+        <accelerator key="c" signal="activate" modifiers="GDK_CONTROL_MASK"/>
       </object>
     </child>
     <child>
-      <object class="GtkImageMenuItem">
+      <object class="GtkImageMenuItem" id="action_open">
         <property name="label">gtk-open</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
@@ -34,16 +35,25 @@ Version: 3.0.1
         <property name="use-stock">True</property>
         <property name="accel-group">accelgroup-open</property>
         <signal name="activate" handler="on_button_open_clicked" swapped="no"/>
+        <accelerator key="o" signal="activate" modifiers="GDK_CONTROL_MASK"/>
       </object>
     </child>
     <child>
-      <object class="GtkImageMenuItem">
-        <property name="label" translatable="yes">Open With</property>
+      <object class="GtkMenuItem" id="action_copy_and_close">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="use-stock">False</property>
-        <property name="accel-group">accelgroup-open</property>
-        <signal name="activate" handler="on_button_openwith_clicked" swapped="no"/>
+        <property name="label" translatable="yes">Copy and Close</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="on_button_copy_and_close_clicked" swapped="no"/>
+        <accelerator key="c" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="action_open_with">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Open With</property>
+        <accelerator key="o" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
       </object>
     </child>
   </object>
