@@ -302,6 +302,7 @@ Version: 3.0.1
                                 <property name="use-underline">True</property>
                                 <property name="use-stock">True</property>
                                 <signal name="clicked" handler="on_button_saveas_clicked" swapped="no"/>
+                                <accelerator key="s" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
                               </object>
                               <packing>
                                 <property name="expand">True</property>
