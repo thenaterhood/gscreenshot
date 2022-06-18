@@ -154,8 +154,12 @@ class Presenter(object):
             else:
                 cancelled = True
 
+        if saved:
+            self._view.flash_status_icon("document-save")
+
     def on_button_openwith_clicked(self, *_):
         '''Handle the "open with" button'''
+        self._view.flash_status_icon(Gtk.STOCK_EXECUTE)
         fname = self._app.save_and_return_path()
         appchooser = OpenWithDialog()
 
@@ -186,6 +190,7 @@ class Presenter(object):
                 self._view.run_dialog(warning_dialog)
                 return False
 
+        self._view.flash_status_icon("edit-copy")
         return True
 
     def on_button_copy_and_close_clicked(self, *_):
@@ -205,6 +210,7 @@ class Presenter(object):
                 self._view.get_window())
             self._view.run_dialog(dialog)
         else:
+            self._view.flash_status_icon("document-open")
             self.quit(None)
 
     def on_button_about_clicked(self, *_):
@@ -306,6 +312,7 @@ class View(object):
         self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
         self._cursor_selection_label = builder.get_object('pointer_selection_label')
         self._actions_menu = builder.get_object('menu_saveas_additional_actions')
+        self._status_icon = builder.get_object('status_icon')
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
@@ -324,6 +331,22 @@ class View(object):
             checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
             checkbox_capture_cursor.set_opacity(0)
             checkbox_capture_cursor.set_sensitive(0)
+
+    def flash_status_icon(self, stock_name="emblem-ok", duration=1):
+
+        self._status_icon.set_from_icon_name(stock_name, Gtk.IconSize.BUTTON)
+
+        self._status_icon.set_opacity(1)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+
+        _thread = threading.Thread(target=self._finish_flash_status_icon)
+        _thread.daemon = True
+        _thread.start()
+
+    def _finish_flash_status_icon(self):
+        sleep(1)
+        self._status_icon.set_opacity(0)
 
     def set_busy(self):
         """
