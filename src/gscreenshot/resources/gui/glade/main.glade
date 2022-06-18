@@ -8,7 +8,7 @@ Version: 3.0.1
 
 -->
 <interface>
-  <requires lib="gtk+" version="3.10"/>
+  <requires lib="gtk+" version="3.14"/>
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">100</property>
     <property name="step-increment">1</property>
@@ -27,12 +27,12 @@ Version: 3.0.1
   <object class="GtkImage" id="icon_everything">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
-    <property name="stock">gtk-fullscreen</property>
+    <property name="icon-name">view-fullscreen</property>
   </object>
   <object class="GtkImage" id="icon_selection">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
-    <property name="stock">gtk-select-all</property>
+    <property name="icon-name">edit-select-all</property>
   </object>
   <object class="GtkImage" id="icon_window">
     <property name="visible">True</property>
@@ -91,7 +91,6 @@ Version: 3.0.1
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="window-position">center</property>
-    <property name="has-resize-grip">True</property>
     <signal name="check-resize" handler="on_window_resize" swapped="no"/>
     <signal name="destroy" handler="on_window_main_destroy" swapped="no"/>
     <child>
@@ -136,8 +135,8 @@ Version: 3.0.1
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="margin-left">10</property>
-                    <property name="margin-right">10</property>
+                    <property name="margin-start">10</property>
+                    <property name="margin-end">10</property>
                     <property name="margin-top">5</property>
                     <property name="margin-bottom">5</property>
                     <property name="hexpand">True</property>
@@ -248,7 +247,7 @@ Version: 3.0.1
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="receives-default">False</property>
-                        <property name="margin-right">15</property>
+                        <property name="margin-end">15</property>
                         <property name="use-underline">True</property>
                         <property name="image-position">bottom</property>
                         <property name="active">True</property>
@@ -310,7 +309,6 @@ Version: 3.0.1
                               <object class="GtkMenuButton">
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
-                                <property name="focus-on-click">False</property>
                                 <property name="receives-default">True</property>
                                 <property name="halign">start</property>
                                 <property name="popup">menu_saveas_additional_actions</property>
@@ -338,7 +336,8 @@ Version: 3.0.1
                             <property name="sensitive">False</property>
                             <property name="can-focus">False</property>
                             <property name="opacity">0</property>
-                            <property name="stock">gtk-missing-image</property>
+                            <property name="icon-name">image-missing</property>
+                            <property name="use-fallback">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
