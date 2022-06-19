@@ -60,6 +60,7 @@ class Presenter(object):
         self._show_preview()
 
         self._view.unhide()
+        self._view.set_ready()
 
     def set_keymappings(self, keymappings):
         '''Set the keymappings'''
@@ -71,6 +72,8 @@ class Presenter(object):
 
     def take_screenshot(self, app_method):
         '''Take a screenshot using the passed app method'''
+        self._view.set_busy()
+
         if self._hide:
             self._view.hide()
 
@@ -88,6 +91,14 @@ class Presenter(object):
         """
         if event.keyval in self._keymappings:
             self._keymappings[event.keyval]()
+
+    def handle_preview_click_event(self, widget, event, *args):
+        '''
+        Handle a click on the screenshot preview widget
+        '''
+        # 3 is right click
+        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+            self._view.show_actions_menu()
 
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
@@ -163,7 +174,7 @@ class Presenter(object):
         img = self._app.get_last_image()
 
         if img is None:
-            return
+            return False
 
         pixbuf = self._image_to_pixbuf(img)
 
@@ -173,6 +184,17 @@ class Presenter(object):
                     i18n("Your clipboard doesn't support persistence and xclip isn't available."),
                     self._view.get_window())
                 self._view.run_dialog(warning_dialog)
+                return False
+
+        return True
+
+    def on_button_copy_and_close_clicked(self, *_):
+        """
+        Copy the current screenshot to the clipboard and
+        close gscreenshot
+        """
+        if self.on_button_copy_clicked():
+            self.quit(None)
 
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
@@ -283,6 +305,7 @@ class View(object):
         self._cursor_selection_items = builder.get_object('cursor_selection_items')
         self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
         self._cursor_selection_label = builder.get_object('pointer_selection_label')
+        self._actions_menu = builder.get_object('menu_saveas_additional_actions')
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
@@ -301,6 +324,23 @@ class View(object):
             checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
             checkbox_capture_cursor.set_opacity(0)
             checkbox_capture_cursor.set_sensitive(0)
+
+    def set_busy(self):
+        """
+        Sets the window as busy with visual indicators
+        """
+        cursor = Gdk.Cursor.new(Gdk.CursorType.WATCH)
+        self._window.get_window().set_cursor(cursor)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
+
+    def set_ready(self):
+        """
+        Sets the window as ready with visual indicators
+        """
+        self._window.get_window().set_cursor(None)
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
     def _init_cursor_combobox(self):
         combo = self._cursor_selection_dropdown
@@ -388,6 +428,12 @@ class View(object):
         self._window.set_size_request(gscreenshot_width, gscreenshot_height)
 
         self._window.show_all()
+
+    def show_actions_menu(self):
+        '''
+        Show the actions/saveas menu at the pointer
+        '''
+        self._actions_menu.popup_at_pointer()
 
     def get_window(self):
         '''Returns the associated window'''
@@ -641,7 +687,7 @@ def main():
         waited += .1
 
     capabilities = application.get_capabilities()
-    view = View(builder.get_object('window_main'), builder, capabilities)
+    view = View(window, builder, capabilities)
 
     presenter = Presenter(
             application,
@@ -655,7 +701,17 @@ def main():
             0, presenter.on_button_copy_clicked)
     accel.connect(Gdk.keyval_from_name('O'), Gdk.ModifierType.CONTROL_MASK,
             0, presenter.on_button_open_clicked)
-    window.add_accel_group(accel)
+    accel.connect(Gdk.keyval_from_name('O'),
+            Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK,
+            0,
+            presenter.on_button_openwith_clicked)
+    accel.connect(Gdk.keyval_from_name('C'),
+            Gdk.ModifierType.CONTROL_MASK | Gdk.ModifierType.SHIFT_MASK,
+            0,
+            presenter.on_button_copy_and_close_clicked)
+    # These are set up in glade, so adding them here is redundant.
+    # We'll keep the code for reference.
+    #window.add_accel_group(accel)
 
     window.connect("key-press-event", presenter.handle_keypress)
 

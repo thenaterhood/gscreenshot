@@ -19,6 +19,10 @@ msgstr ""
 msgid "Open With"
 msgstr "Abrir Con"
 
+#: src/gscreenshot/resources/gui/glade/main.glade
+msgid "Copy and Close"
+msgstr "Copiar y cerrar"
+
 #: src/gscreenshot/resources/gui/glade/main.glade:123
 msgid "Options"
 msgstr "Opciones"
