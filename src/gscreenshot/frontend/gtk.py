@@ -332,7 +332,16 @@ class View(object):
             checkbox_capture_cursor.set_opacity(0)
             checkbox_capture_cursor.set_sensitive(0)
 
-    def flash_status_icon(self, stock_name="emblem-ok", duration=1):
+    def flash_status_icon(self, stock_name="emblem-ok"):
+        """
+        Shows the status/confirmation icon in the UI after an action
+        for a second.
+
+        By default this will show the "ok" icon but another one can be
+        passed also.
+
+        This is non-blocking.
+        """
 
         self._status_icon.set_from_icon_name(stock_name, Gtk.IconSize.BUTTON)
 
@@ -345,6 +354,10 @@ class View(object):
         _thread.start()
 
     def _finish_flash_status_icon(self):
+        """
+        Lets the status icon be visible for a second, then hides the widget
+        by setting its opacity to 0.
+        """
         sleep(1)
         self._status_icon.set_opacity(0)
 
