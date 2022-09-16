@@ -18,8 +18,8 @@ class ScreenshooterFactory(object):
         self.xorg_screenshooters = [
                 Scrot,
                 ImageMagick,
-                PILWrapper,
-                Imlib2
+                #PILWrapper,
+                #Imlib2
                 ]
 
         self.wayland_screenshooters = [
@@ -41,5 +41,6 @@ class ScreenshooterFactory(object):
                 return shooter()
 
         raise NoSupportedScreenshooterError(
-                "No supported screenshot backend available"
+                "No supported screenshot backend available",
+                [x.__utilityname__ for x in self.screenshooters if x.__utilityname__ is not None]
                 )

@@ -12,6 +12,8 @@ class Grim(Screenshooter):
     Python class wrapper for the grim screenshooter utility
     """
 
+    __utilityname__ = "grim"
+
     def __init__(self):
         """
         constructor
