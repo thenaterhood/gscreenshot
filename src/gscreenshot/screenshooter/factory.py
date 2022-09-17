@@ -18,8 +18,8 @@ class ScreenshooterFactory(object):
         self.xorg_screenshooters = [
                 Scrot,
                 ImageMagick,
-                #PILWrapper,
-                #Imlib2
+                PILWrapper,
+                Imlib2
                 ]
 
         self.wayland_screenshooters = [
