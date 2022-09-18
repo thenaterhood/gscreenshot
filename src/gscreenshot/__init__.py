@@ -160,8 +160,9 @@ class Gscreenshot(object):
 
     def get_screenshooter_name(self):
         """Gets the name of the current screenshooter"""
-        if self.screenshooter.__utilityname__ is not None:
-            return self.screenshooter.__utilityname__
+        if hasattr(self.screenshooter, '__utilityname__'):
+            if self.screenshooter.__utilityname__ is not None:
+                return self.screenshooter.__utilityname__
 
         return self.screenshooter.__class__.__name__
 
