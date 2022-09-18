@@ -120,7 +120,6 @@ class Gscreenshot(object):
             ])
         except OSError:
             print(_("failed to show screenshot notification - is notify-send working?"))
-            return
 
     def run_display_mismatch_warning(self):
         '''
@@ -132,6 +131,7 @@ class Gscreenshot(object):
 
         if 'XDG_SESSION_TYPE' not in os.environ:
             self.show_screenshot_notification()
+            return
 
         session_type = os.environ['XDG_SESSION_TYPE']
         if session_type.lower() not in ('x11', 'mir', 'wayland'):
