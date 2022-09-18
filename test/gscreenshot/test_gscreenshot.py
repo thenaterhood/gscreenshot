@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import Mock
+import mock
 
 from src.gscreenshot import Gscreenshot
 
@@ -173,3 +174,42 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_image.save.side_effect = IOError("mocked IOError")
         success = self.gscreenshot.save_last_image("potato.png")
         self.assertFalse(success)
+
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_show_screenshot_notification(self, mock_subprocess):
+
+        self.gscreenshot.show_screenshot_notification()
+        mock_subprocess.Popen.assert_called_once_with(
+            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot']
+        )
+
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_show_screenshot_notification_error(self, mock_subprocess):
+        mock_subprocess.Popen.side_effect = OSError("fake error")
+        self.gscreenshot.show_screenshot_notification()
+        mock_subprocess.Popen.assert_called_once_with(
+            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot']
+        )
+
+    @mock.patch('src.gscreenshot.os')
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_display_mismatch_warning_no_session_id(self, mock_subprocess, mock_os):
+        mock_os.environ = {}
+        self.gscreenshot.run_display_mismatch_warning()
+        mock_subprocess.Popen.assert_not_called()
+
+    @mock.patch('src.gscreenshot.os')
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_display_mismatch_warning_no_session_type(self, mock_subprocess, mock_os):
+        mock_os.environ = {'XDG_SESSION_ID': 0}
+        self.gscreenshot.run_display_mismatch_warning()
+        mock_subprocess.Popen.assert_called_once()
+
+    @mock.patch('src.gscreenshot.os')
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_display_mismatch_warning_show_notification(self, mock_subprocess, mock_os):
+        mock_os.environ = {'XDG_SESSION_ID': 0, 'XDG_SESSION_TYPE': 'fake'}
+        self.gscreenshot.run_display_mismatch_warning()
+        # We have a dedicated test for interactions with notify-send, so don't
+        # get into specifics here
+        mock_subprocess.Popen.assert_called_once()
