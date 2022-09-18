@@ -31,6 +31,9 @@ jobs:
           args: '"pylint src/ --disable=import-error --disable=no-self-use --disable=no-else-return --disable=too-many-public-methods --disable=too-many-instance-attributes --disable=duplicate-code --disable=useless-object-inheritance --disable=too-few-public-methods"'
 
   pytest:
+
+    runs-on: ubuntu-latest
+
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
