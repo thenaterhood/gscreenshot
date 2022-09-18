@@ -156,5 +156,20 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.__utilityname__ = "fake"
         self.assertEqual("fake", self.gscreenshot.get_screenshooter_name())
 
+    def test_save_last_image_success(self):
 
+        success = self.gscreenshot.save_last_image("potato.png")
+        self.fake_image.save.assert_called_with("potato.png", "PNG", exif=unittest.mock.ANY)
+        self.assertTrue(success)
 
+    def test_save_last_image_bad_extension(self):
+
+        success = self.gscreenshot.save_last_image("potato.nopenope")
+        self.fake_image.save.assert_not_called()
+        self.assertFalse(success)
+
+    def test_save_last_image_ioerror(self):
+
+        self.fake_image.save.side_effect = IOError("mocked IOError")
+        success = self.gscreenshot.save_last_image("potato.png")
+        self.assertFalse(success)
