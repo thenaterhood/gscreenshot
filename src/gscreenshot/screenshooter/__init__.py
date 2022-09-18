@@ -25,6 +25,7 @@ class Screenshooter(object):
     """
 
     __slots__ = ('_image', 'tempfile', 'selector')
+    __utilityname__ = None
 
     def __init__(self):
         """

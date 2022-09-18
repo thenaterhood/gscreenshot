@@ -694,11 +694,19 @@ def main():
 
     try:
         application = Gscreenshot()
-    except NoSupportedScreenshooterError:
+    except NoSupportedScreenshooterError as gscreenshot_error:
         warning = WarningDialog(
             i18n("No supported screenshot backend is available."),
             None
             )
+
+        if gscreenshot_error.required is not None:
+            warning = WarningDialog(
+                    i18n("Please install one of the following to use gscreenshot:")
+                    + ", ".join(gscreenshot_error.required),
+                    None
+                )
+
         warning.run()
         sys.exit(1)
 

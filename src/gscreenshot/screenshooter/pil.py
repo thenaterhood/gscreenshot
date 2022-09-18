@@ -18,6 +18,8 @@ class PILWrapper(Screenshooter):
     Python class wrapper for PIL
     """
 
+    __utilityname__ = "python-pillow"
+
     def __init__(self):
         """
         constructor

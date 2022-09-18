@@ -12,6 +12,8 @@ class Imlib2(Screenshooter):
     Python class wrapper for the scrot screenshooter utility
     """
 
+    __utilityname__ = "imlib_2"
+
     def __init__(self):
         """
         constructor

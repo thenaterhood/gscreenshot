@@ -13,6 +13,8 @@ class ImageMagick(Screenshooter):
     Python class wrapper for the scrot screenshooter utility
     """
 
+    __utilityname__ = "imagemagick"
+
     def __init__(self):
         """
         constructor
