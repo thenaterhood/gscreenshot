@@ -33,6 +33,8 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
+    __slots__ = ['screenshooter', 'saved_last_image', 'last_save_file', 'cache']
+
     # generated using piexif
     EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
 
@@ -49,8 +51,8 @@ class Gscreenshot(object):
         gettext.bindtextdomain('gscreenshot', locale_path)
         gettext.textdomain('gscreenshot')
 
-        self.screenshooter_factory = ScreenshooterFactory(screenshooter)
-        self.screenshooter = self.screenshooter_factory.create()
+        screenshooter_factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = screenshooter_factory.create()
 
         self.saved_last_image = False
         self.last_save_file = None
