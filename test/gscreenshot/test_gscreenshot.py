@@ -1,3 +1,4 @@
+import subprocess
 import unittest
 from unittest.mock import Mock
 import mock
@@ -213,3 +214,72 @@ class GscreenshotTest(unittest.TestCase):
         # We have a dedicated test for interactions with notify-send, so don't
         # get into specifics here
         mock_subprocess.Popen.assert_called_once()
+
+    @mock.patch('src.gscreenshot.os')
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_display_mismatch_warning_no_show_notification(self, mock_subprocess, mock_os):
+        mock_os.environ = {'XDG_SESSION_ID': 0, 'XDG_SESSION_TYPE': 'X11'}
+        self.gscreenshot.run_display_mismatch_warning()
+        mock_subprocess.Popen.assert_not_called()
+
+    @mock.patch('src.gscreenshot.session_is_wayland')
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_copy_to_clipboard_x11(self, mock_subprocess, mock_util):
+        mock_util.return_value = False
+        success = self.gscreenshot.copy_last_screenshot_to_clipboard()
+
+        mock_subprocess.Popen.assert_called_once_with([
+            'xclip',
+            '-selection',
+            'clipboard',
+            '-t',
+            'image/png'
+            ],
+            close_fds=True,
+            stdin=mock_subprocess.PIPE,
+            stdout=None,
+            stderr=None
+        )
+
+        self.assertTrue(success)
+
+    @mock.patch('src.gscreenshot.session_is_wayland')
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_copy_to_clipboard_wayland(self, mock_subprocess, mock_util):
+        mock_util.return_value = True
+        success = self.gscreenshot.copy_last_screenshot_to_clipboard()
+
+        mock_subprocess.Popen.assert_called_once_with([
+            'wl-copy',
+            '-t',
+            'image/png'
+            ],
+            close_fds=True,
+            stdin=mock_subprocess.PIPE,
+            stdout=None,
+            stderr=None
+        )
+
+        self.assertTrue(success)
+
+    @mock.patch('src.gscreenshot.session_is_wayland')
+    @mock.patch('src.gscreenshot.subprocess')
+    def test_copy_to_clipboard_process_error(self, mock_subprocess, mock_util):
+        mock_util.return_value = False
+        mock_subprocess.Popen.side_effect = OSError
+        success = self.gscreenshot.copy_last_screenshot_to_clipboard()
+
+        mock_subprocess.Popen.assert_called_once_with([
+            'xclip',
+            '-selection',
+            'clipboard',
+            '-t',
+            'image/png'
+            ],
+            close_fds=True,
+            stdin=mock_subprocess.PIPE,
+            stdout=None,
+            stderr=None
+        )
+
+        self.assertFalse(success)

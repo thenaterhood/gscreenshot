@@ -455,7 +455,7 @@ class Gscreenshot(object):
                     stderr=None)
                 clip.communicate(input=png_data.getvalue())
                 return True
-            except (subprocess.CalledProcessError, OSError):
+            except OSError:
                 return False
 
     def get_last_save_directory(self):
