@@ -30,3 +30,13 @@ jobs:
         uses: cclauss/GitHub-Action-for-pylint@0.7.0
         with:
           args: '"pylint src/ --disable=import-error --disable=no-self-use --disable=no-else-return --disable=too-many-public-methods --disable=too-many-instance-attributes --disable=duplicate-code --disable=useless-object-inheritance --disable=too-few-public-methods"'
+
+      - name: Install pytest
+        run: |
+          python -m pip install --upgrade pytest
+
+      - name: Run pytest
+        run: |
+          cd src
+          python -m pytest ../test
+
