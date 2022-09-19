@@ -40,11 +40,12 @@ jobs:
 
       - name: Install pytest
         run: |
-          python -m pip install --upgrade pytest mock
+          python -m pip install --upgrade pytest mock coverage
 
       - name: Run pytest
         run: |
           python -m pip install -e .
           cd src
-          python -m pytest ../test
+          coverage run --source gscreenshot -m pytest ../test
+          coverage report -m
 

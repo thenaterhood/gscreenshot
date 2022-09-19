@@ -1,8 +1,7 @@
-import subprocess
-import unittest
-from unittest.mock import Mock
 import mock
+import unittest
 
+from unittest.mock import Mock
 from src.gscreenshot import Gscreenshot
 
 class GscreenshotTest(unittest.TestCase):
@@ -227,6 +226,7 @@ class GscreenshotTest(unittest.TestCase):
     def test_copy_to_clipboard_x11(self, mock_subprocess, mock_util):
         mock_util.return_value = False
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
+        self.fake_image.save.assert_called_once()
 
         mock_subprocess.Popen.assert_called_once_with([
             'xclip',
@@ -248,6 +248,7 @@ class GscreenshotTest(unittest.TestCase):
     def test_copy_to_clipboard_wayland(self, mock_subprocess, mock_util):
         mock_util.return_value = True
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
+        self.fake_image.save.assert_called_once()
 
         mock_subprocess.Popen.assert_called_once_with([
             'wl-copy',
@@ -268,6 +269,8 @@ class GscreenshotTest(unittest.TestCase):
         mock_util.return_value = False
         mock_subprocess.Popen.side_effect = OSError
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
+
+        self.fake_image.save.assert_called_once()
 
         mock_subprocess.Popen.assert_called_once_with([
             'xclip',

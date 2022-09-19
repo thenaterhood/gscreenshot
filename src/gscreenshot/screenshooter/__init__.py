@@ -183,6 +183,8 @@ class Screenshooter(object):
             # This is a ctype
             # pylint: disable=protected-access
             mouse_data = display.Display().screen().root.query_pointer()._data
+            if 'root_x' not in mouse_data or 'root_y' not in mouse_data:
+                return None
         # pylint: disable=bare-except
         except:
             # We don't really care about the specific error here. If we can't
