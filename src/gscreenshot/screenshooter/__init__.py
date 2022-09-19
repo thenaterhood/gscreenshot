@@ -14,9 +14,8 @@ from gscreenshot.util import GSCapabilities
 
 try:
     from Xlib import display
-    XLIB_AVAILABLE = True
 except ImportError:
-    XLIB_AVAILABLE = False
+    display = None
 
 
 class Screenshooter(object):
@@ -71,7 +70,7 @@ class Screenshooter(object):
         # If we're running, this is the bare minimum
         capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
 
-        if XLIB_AVAILABLE:
+        if display is not None:
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
             capabilities.append(GSCapabilities.CURSOR_CAPTURE)
 
@@ -176,7 +175,7 @@ class Screenshooter(object):
         Gets the current position of the mouse cursor, if able.
         Returns (x, y) or None.
         """
-        if not XLIB_AVAILABLE:
+        if display is None:
             return None
 
         try:
@@ -186,7 +185,7 @@ class Screenshooter(object):
             if 'root_x' not in mouse_data or 'root_y' not in mouse_data:
                 return None
         # pylint: disable=bare-except
-        except:
+        except Exception as e:
             # We don't really care about the specific error here. If we can't
             # get the pointer, then just move on.
             return None

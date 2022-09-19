@@ -7,7 +7,7 @@ from unittest.mock import Mock
 from pkg_resources import resource_filename
 from PIL import Image
 from PIL import ImageChops
-from src.gscreenshot.screenshooter import XLIB_AVAILABLE, Screenshooter
+from src.gscreenshot.screenshooter import Screenshooter
 
 
 class BaseScreenshooter(Screenshooter):
@@ -52,7 +52,6 @@ class ScreenshooterTest(unittest.TestCase):
     @mock.patch('src.gscreenshot.screenshooter.PIL')
     @mock.patch('src.gscreenshot.screenshooter.display')
     def test_grab_fullscreen_capture_cursor(self, mock_xlib, mock_pil):
-        XLIB_AVAILABLE = True
         mock_xlib.Display().screen().root.query_pointer()._data = {'root_x': 20, 'root_y': 40}
         mock_cursor = Mock()
         mock_cursor.size = (20, 30)
@@ -68,7 +67,6 @@ class ScreenshooterTest(unittest.TestCase):
     @mock.patch('src.gscreenshot.screenshooter.PIL')
     @mock.patch('src.gscreenshot.screenshooter.display')
     def test_grab_selection_capture_cursor(self, mock_xlib, mock_pil):
-        XLIB_AVAILABLE = True
         mock_xlib.Display().screen().root.query_pointer()._data = {'root_x': 20, 'root_y': 40}
         mock_cursor = Mock()
         mock_cursor.size = (20, 30)
@@ -87,7 +85,6 @@ class ScreenshooterTest(unittest.TestCase):
     @mock.patch('src.gscreenshot.screenshooter.PIL')
     @mock.patch('src.gscreenshot.screenshooter.display')
     def test_grab_window_capture_cursor(self, mock_xlib, mock_pil):
-        XLIB_AVAILABLE = True
         mock_xlib.Display().screen().root.query_pointer()._data = {'root_x': 20, 'root_y': 40}
         mock_cursor = Mock()
         mock_cursor.size = (20, 30)
@@ -97,7 +94,6 @@ class ScreenshooterTest(unittest.TestCase):
 
     @mock.patch('src.gscreenshot.screenshooter.display')
     def test_add_fake_cursor(self, mock_xlib):
-        XLIB_AVAILABLE = True
         mock_xlib.Display().screen().root.query_pointer()._data = {'root_x': 20, 'root_y': 40}
 
         original_img = Image.open(
@@ -122,7 +118,7 @@ class ScreenshooterTest(unittest.TestCase):
 
     @mock.patch('src.gscreenshot.screenshooter.display')
     def test_add_fake_cursor_xlib_missing(self, mock_xlib):
-        XLIB_AVAILABLE = False
+        mock_xlib = None
         original_img = Image.open(
                 resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
             )
@@ -143,7 +139,6 @@ class ScreenshooterTest(unittest.TestCase):
 
     @mock.patch('src.gscreenshot.screenshooter.display')
     def test_add_fake_cursor_xlib_bad_data(self, mock_xlib):
-        XLIB_AVAILABLE = True
         mock_xlib.Display().screen().root.query_pointer()._data = {'root_x': 20}
 
         original_img = Image.open(
