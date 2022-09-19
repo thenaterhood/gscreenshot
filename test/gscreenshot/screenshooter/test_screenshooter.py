@@ -135,7 +135,7 @@ class ScreenshooterTest(unittest.TestCase):
         self.assertLess(
             len(set(ImageChops.difference(original_img, self.screenshooter.image).getdata())),
             100,
-            "cursor was not stamped onto the test image correctly")
+            "original and actual image should not differ")
 
     @mock.patch('src.gscreenshot.screenshooter.display')
     def test_add_fake_cursor_xlib_bad_data(self, mock_xlib):
@@ -157,4 +157,4 @@ class ScreenshooterTest(unittest.TestCase):
         self.assertLess(
             len(set(ImageChops.difference(original_img, self.screenshooter.image).getdata())),
             100,
-            "cursor was not stamped onto the test image correctly")
+            "original and actual image should not differ")
