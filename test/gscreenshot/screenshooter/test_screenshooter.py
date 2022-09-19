@@ -19,16 +19,19 @@ class BaseScreenshooter(Screenshooter):
         self._image = Mock()
         self._image.size = (20, 30)
         self._image.copy.return_value = self._image
+        self.called = "fullscreen"
 
     def grab_selection(self, delay=0, capture_cursor=False):
         self._image = Mock()
         self._image.size = (20, 30)
         self._image.copy.return_value = self._image
+        self.called = "selection"
 
     def grab_window(self, delay=0, capture_cursor=False):
         self._image = Mock()
         self._image.size = (20, 30)
         self._image.copy.return_value = self._image
+        self.called = "window"
 
     def set_image(self, image):
         self._image = image
@@ -43,6 +46,7 @@ class ScreenshooterTest(unittest.TestCase):
     def setUp(self):
         self.screenshooter = BaseScreenshooter()
         self.screenshooter.selector = Mock()
+        self.screenshooter.selector.get_capabilities.return_value = []
 
     def test_grab_fullscreen(self):
         self.assertIsNone(self.screenshooter.image)
@@ -158,3 +162,44 @@ class ScreenshooterTest(unittest.TestCase):
             len(set(ImageChops.difference(original_img, self.screenshooter.image).getdata())),
             100,
             "original and actual image should not differ")
+
+    def test_get_capabilities(self):
+        self.assertIsInstance(self.screenshooter.get_capabilities_(), list)
+
+    @mock.patch('src.gscreenshot.screenshooter.subprocess')
+    @mock.patch('src.gscreenshot.screenshooter.PIL')
+    @mock.patch('src.gscreenshot.screenshooter.os')
+    def test_call_screenshooter_success(self, mock_os, mock_pil, mock_subprocess):
+        success = self.screenshooter._call_screenshooter('potato', ['pancake'])
+        mock_subprocess.check_output.assert_called_once_with(
+            ['potato', 'pancake']
+        )
+        self.assertTrue(success)
+
+    @mock.patch('src.gscreenshot.screenshooter.subprocess')
+    @mock.patch('src.gscreenshot.screenshooter.PIL')
+    @mock.patch('src.gscreenshot.screenshooter.os')
+    def test_call_screenshooter_subprocess_no_params(self, mock_os, mock_pil, mock_subprocess):
+        mock_subprocess.check_output.side_effect = OSError()
+        success = self.screenshooter._call_screenshooter('potato')
+        mock_subprocess.check_output.assert_called_once_with(
+            ['potato']
+        )
+        self.assertFalse(success)
+
+    @mock.patch('src.gscreenshot.screenshooter.subprocess')
+    @mock.patch('src.gscreenshot.screenshooter.PIL')
+    @mock.patch('src.gscreenshot.screenshooter.os')
+    def test_call_screenshooter_subprocess_error(self, mock_os, mock_pil, mock_subprocess):
+        mock_subprocess.check_output.side_effect = OSError()
+        success = self.screenshooter._call_screenshooter('potato', ['pancake'])
+        mock_subprocess.check_output.assert_called_once_with(
+            ['potato', 'pancake']
+        )
+        self.assertFalse(success)
+
+    def test_grab_selection_fallback(self):
+        self.screenshooter.selector = None
+        self.screenshooter.grab_selection_()
+        self.assertIsNotNone(self.screenshooter.image)
+        self.assertEqual("fullscreen", self.screenshooter.called)

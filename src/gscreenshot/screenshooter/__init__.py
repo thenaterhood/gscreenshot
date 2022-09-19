@@ -258,7 +258,7 @@ class Screenshooter(object):
             subprocess.check_output(params)
             self._image = PIL.Image.open(self.tempfile)
             os.unlink(self.tempfile)
-        except (subprocess.CalledProcessError, IOError, OSError):
+        except (IOError, OSError):
             self._image = None
             return False
 
