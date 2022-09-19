@@ -1,7 +1,7 @@
-import mock
 import unittest
-
 from unittest.mock import Mock
+
+import mock
 from src.gscreenshot import Gscreenshot
 
 class GscreenshotTest(unittest.TestCase):
@@ -152,7 +152,10 @@ class GscreenshotTest(unittest.TestCase):
         self.assertEqual(self.fake_image, self.gscreenshot.get_last_image())
 
     def test_get_screenshooter_name(self):
-        self.assertEqual(self.fake_screenshooter.__class__.__name__, self.gscreenshot.get_screenshooter_name())
+        self.assertEqual(
+            self.fake_screenshooter.__class__.__name__,
+            self.gscreenshot.get_screenshooter_name()
+            )
 
         self.fake_screenshooter.__utilityname__ = "fake"
         self.assertEqual("fake", self.gscreenshot.get_screenshooter_name())

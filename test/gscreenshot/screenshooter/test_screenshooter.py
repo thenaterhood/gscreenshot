@@ -1,8 +1,6 @@
-import os
-import mock
 import unittest
-
 from unittest.mock import Mock
+import mock
 
 from pkg_resources import resource_filename
 from PIL import Image
@@ -13,7 +11,8 @@ from src.gscreenshot.screenshooter import Screenshooter
 class BaseScreenshooter(Screenshooter):
 
     def __init__(self):
-        super().__init__()
+        Screenshooter.__init__(self)
+        self.called = None
 
     def grab_fullscreen(self, delay=0, capture_cursor=False):
         self._image = Mock()
