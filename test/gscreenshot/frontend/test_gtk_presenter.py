@@ -85,7 +85,3 @@ class GtkPresenterTest(unittest.TestCase):
         self.app.screenshot_selected.assert_called_once()
         self.app.get_thumbnail.assert_called_once()
         self.view.update_preview.assert_called_once()
-
-    def test_on_button_openwith_clicked(self):
-        self.presenter.on_button_openwith_clicked()
-        self.view.run_dialog.assert_called_once()
