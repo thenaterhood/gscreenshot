@@ -44,6 +44,7 @@ jobs:
 
       - name: Run pytest
         run: |
+          apt install gtk3 -y
           python -m pip install -e .
           cd src
           coverage run --source gscreenshot -m pytest ../test
