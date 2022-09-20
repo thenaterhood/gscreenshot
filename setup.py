@@ -15,7 +15,7 @@ except:
 
 install_requires = [
     'pillow',
-    'gobject
+    'gobject'
     ]
 
 test_requires = [
