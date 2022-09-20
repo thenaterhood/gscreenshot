@@ -5,6 +5,7 @@ import mock
 from pkg_resources import resource_filename
 from PIL import Image
 from PIL import ImageChops
+from gscreenshot.selector import SelectionCancelled, SelectionParseError
 from src.gscreenshot.screenshooter import Screenshooter
 
 
@@ -199,6 +200,24 @@ class ScreenshooterTest(unittest.TestCase):
 
     def test_grab_selection_fallback(self):
         self.screenshooter.selector = None
+        self.screenshooter.grab_selection_()
+        self.assertIsNotNone(self.screenshooter.image)
+        self.assertEqual("fullscreen", self.screenshooter.called)
+
+    def test_grab_selection_cancelled(self):
+        self.screenshooter.selector.region_select.side_effect = SelectionCancelled()
+        self.screenshooter.grab_selection_()
+        self.assertIsNotNone(self.screenshooter.image)
+        self.assertEqual("fullscreen", self.screenshooter.called)
+
+    def test_grab_selection_exec_error(self):
+        self.screenshooter.selector.region_select.side_effect = OSError()
+        self.screenshooter.grab_selection_()
+        self.assertIsNotNone(self.screenshooter.image)
+        self.assertEqual("fullscreen", self.screenshooter.called)
+
+    def test_grab_selection_parse_error(self):
+        self.screenshooter.selector.region_select.side_effect = SelectionParseError()
         self.screenshooter.grab_selection_()
         self.assertIsNotNone(self.screenshooter.image)
         self.assertEqual("fullscreen", self.screenshooter.called)

@@ -122,6 +122,7 @@ class Screenshooter(object):
             crop_box = self.selector.region_select()
         except SelectionCancelled:
             print("Selection was cancelled")
+            self.grab_fullscreen_(delay, capture_cursor, use_cursor)
             return
         except (OSError, SelectionExecError):
             print("Failed to call region selector -- Using fallback region selection")
