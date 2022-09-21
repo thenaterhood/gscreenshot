@@ -21,6 +21,7 @@ pygtkcompat.enable_gtk(version='3.0')
 from gi.repository import Gdk
 from gi.repository import Gtk
 from gi.repository import GObject
+from gi.repository import GLib
 
 i18n = gettext.gettext
 
@@ -285,7 +286,10 @@ class Presenter(object):
         loader = Gtk.gdk.PixbufLoader("pnm")
         loader.write(contents)
         pixbuf = loader.get_pixbuf()
-        loader.close()
+        try:
+            loader.close()
+        except GLib.GError:
+            pass
         return pixbuf
 
     def _show_preview(self):

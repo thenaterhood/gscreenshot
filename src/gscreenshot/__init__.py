@@ -120,7 +120,6 @@ class Gscreenshot(object):
             ])
         except OSError:
             print(_("failed to show screenshot notification - is notify-send working?"))
-            return
 
     def run_display_mismatch_warning(self):
         '''
@@ -132,6 +131,7 @@ class Gscreenshot(object):
 
         if 'XDG_SESSION_TYPE' not in os.environ:
             self.show_screenshot_notification()
+            return
 
         session_type = os.environ['XDG_SESSION_TYPE']
         if session_type.lower() not in ('x11', 'mir', 'wayland'):
@@ -160,8 +160,9 @@ class Gscreenshot(object):
 
     def get_screenshooter_name(self):
         """Gets the name of the current screenshooter"""
-        if self.screenshooter.__utilityname__ is not None:
-            return self.screenshooter.__utilityname__
+        if hasattr(self.screenshooter, '__utilityname__'):
+            if self.screenshooter.__utilityname__ is not None:
+                return self.screenshooter.__utilityname__
 
         return self.screenshooter.__class__.__name__
 
@@ -454,7 +455,7 @@ class Gscreenshot(object):
                     stderr=None)
                 clip.communicate(input=png_data.getvalue())
                 return True
-            except (subprocess.CalledProcessError, OSError):
+            except OSError:
                 return False
 
     def get_last_save_directory(self):

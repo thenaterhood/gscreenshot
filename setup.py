@@ -91,9 +91,7 @@ def compile_locales():
         try:
             subprocess.check_output(['msgfmt', basename, '-o', outname])
         except:
-            print("===> Failed to compile " + po)
-            os.chdir(original_dir)
-            sys.exit(1)
+            print("===> WARNING ====> Failed to compile " + po)
         os.chdir(original_dir)
 
 pkg_version = get_version_from_specfile()
