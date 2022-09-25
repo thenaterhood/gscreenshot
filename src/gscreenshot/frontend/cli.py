@@ -23,7 +23,7 @@ def run():
             print(_("Please install one to use gscreenshot."))
         else:
             print(_("Please install one of the following to use gscreenshot:"))
-            print(*gscreenshot_error.required, sep = ", ")
+            print(", ".join(gscreenshot_error.required))
         sys.exit(1)
 
     parser = argparse.ArgumentParser()
