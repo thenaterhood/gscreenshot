@@ -32,6 +32,10 @@ class SignalHandler(object):
 
 def delegate():
     '''Choose the appropriate frontend and run it'''
+    if sys.version_info.major < 3:
+        print(" ==> WARNING: Running gscreenshot with Python 2 is deprecated")
+        print(" ==> WARNING: Please upgrade to Python 3.5 or newer")
+
     with SignalHandler():
         if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not GTK_CAPABLE:
             gscreenshot.frontend.cli.run()
