@@ -32,8 +32,8 @@ class SignalHandler(object):
 
 def delegate():
     '''Choose the appropriate frontend and run it'''
-    if sys.version_info.major < 3:
-        print(" ==> WARNING: Running gscreenshot with Python 2 is deprecated")
+    if sys.version_info.major < 3 or (sys.version_info.major == 3 and  sys.version_info.minor < 5):
+        print(" ==> WARNING: gscreenshot no longer supports Python versions older than Python 3.5")
         print(" ==> WARNING: Please upgrade to Python 3.5 or newer")
 
     with SignalHandler():
