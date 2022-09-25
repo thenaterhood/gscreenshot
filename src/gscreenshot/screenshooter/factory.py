@@ -41,5 +41,6 @@ class ScreenshooterFactory(object):
                 return shooter()
 
         raise NoSupportedScreenshooterError(
-                "No supported screenshot backend available"
+                "No supported screenshot backend available",
+                [x.__utilityname__ for x in self.screenshooters if x.__utilityname__ is not None]
                 )

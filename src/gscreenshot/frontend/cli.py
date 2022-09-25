@@ -17,9 +17,13 @@ def run():
     '''Run the CLI frontend'''
     try:
         gscreenshot = Gscreenshot()
-    except NoSupportedScreenshooterError:
+    except NoSupportedScreenshooterError as gscreenshot_error:
         print(_("No supported screenshot backend is available."))
-        print(_("Please install one to use gscreenshot."))
+        if gscreenshot_error.required is None:
+            print(_("Please install one to use gscreenshot."))
+        else:
+            print(_("Please install one of the following to use gscreenshot:"))
+            print(", ".join(gscreenshot_error.required))
         sys.exit(1)
 
     parser = argparse.ArgumentParser()

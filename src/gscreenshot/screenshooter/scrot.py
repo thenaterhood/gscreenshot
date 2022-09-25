@@ -13,6 +13,7 @@ class Scrot(Screenshooter):
     """
 
     _supports_native_cursor_capture = False
+    __utilityname__ = "scrot"
 
     def __init__(self):
         """

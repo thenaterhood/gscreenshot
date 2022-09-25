@@ -33,6 +33,8 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
+    __slots__ = ['screenshooter', 'saved_last_image', 'last_save_file', 'cache']
+
     # generated using piexif
     EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
 
@@ -49,8 +51,8 @@ class Gscreenshot(object):
         gettext.bindtextdomain('gscreenshot', locale_path)
         gettext.textdomain('gscreenshot')
 
-        self.screenshooter_factory = ScreenshooterFactory(screenshooter)
-        self.screenshooter = self.screenshooter_factory.create()
+        screenshooter_factory = ScreenshooterFactory(screenshooter)
+        self.screenshooter = screenshooter_factory.create()
 
         self.saved_last_image = False
         self.last_save_file = None
@@ -118,7 +120,6 @@ class Gscreenshot(object):
             ])
         except OSError:
             print(_("failed to show screenshot notification - is notify-send working?"))
-            return
 
     def run_display_mismatch_warning(self):
         '''
@@ -130,6 +131,7 @@ class Gscreenshot(object):
 
         if 'XDG_SESSION_TYPE' not in os.environ:
             self.show_screenshot_notification()
+            return
 
         session_type = os.environ['XDG_SESSION_TYPE']
         if session_type.lower() not in ('x11', 'mir', 'wayland'):
@@ -158,6 +160,10 @@ class Gscreenshot(object):
 
     def get_screenshooter_name(self):
         """Gets the name of the current screenshooter"""
+        if hasattr(self.screenshooter, '__utilityname__'):
+            if self.screenshooter.__utilityname__ is not None:
+                return self.screenshooter.__utilityname__
+
         return self.screenshooter.__class__.__name__
 
     def screenshot_full_display(self, delay=0, capture_cursor=False, cursor_name='theme'):
@@ -449,7 +455,7 @@ class Gscreenshot(object):
                     stderr=None)
                 clip.communicate(input=png_data.getvalue())
                 return True
-            except (subprocess.CalledProcessError, OSError):
+            except OSError:
                 return False
 
     def get_last_save_directory(self):

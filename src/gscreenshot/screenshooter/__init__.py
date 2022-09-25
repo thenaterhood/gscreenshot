@@ -14,9 +14,8 @@ from gscreenshot.util import GSCapabilities
 
 try:
     from Xlib import display
-    XLIB_AVAILABLE = True
 except ImportError:
-    XLIB_AVAILABLE = False
+    display = None
 
 
 class Screenshooter(object):
@@ -25,6 +24,7 @@ class Screenshooter(object):
     """
 
     __slots__ = ('_image', 'tempfile', 'selector')
+    __utilityname__ = None
 
     def __init__(self):
         """
@@ -70,7 +70,7 @@ class Screenshooter(object):
         # If we're running, this is the bare minimum
         capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
 
-        if XLIB_AVAILABLE:
+        if display is not None:
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
             capabilities.append(GSCapabilities.CURSOR_CAPTURE)
 
@@ -122,6 +122,7 @@ class Screenshooter(object):
             crop_box = self.selector.region_select()
         except SelectionCancelled:
             print("Selection was cancelled")
+            self.grab_fullscreen_(delay, capture_cursor, use_cursor)
             return
         except (OSError, SelectionExecError):
             print("Failed to call region selector -- Using fallback region selection")
@@ -175,13 +176,15 @@ class Screenshooter(object):
         Gets the current position of the mouse cursor, if able.
         Returns (x, y) or None.
         """
-        if not XLIB_AVAILABLE:
+        if display is None:
             return None
 
         try:
             # This is a ctype
             # pylint: disable=protected-access
             mouse_data = display.Display().screen().root.query_pointer()._data
+            if 'root_x' not in mouse_data or 'root_y' not in mouse_data:
+                return None
         # pylint: disable=bare-except
         except:
             # We don't really care about the specific error here. If we can't
@@ -256,7 +259,7 @@ class Screenshooter(object):
             subprocess.check_output(params)
             self._image = PIL.Image.open(self.tempfile)
             os.unlink(self.tempfile)
-        except (subprocess.CalledProcessError, IOError, OSError):
+        except (IOError, OSError):
             self._image = None
             return False
 
