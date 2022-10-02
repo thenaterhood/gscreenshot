@@ -7,6 +7,7 @@ from gscreenshot.screenshooter.imagemagick import ImageMagick
 from gscreenshot.screenshooter.imlib_2 import Imlib2
 from gscreenshot.screenshooter.pil import PILWrapper
 from gscreenshot.screenshooter.scrot import Scrot
+from gscreenshot.screenshooter.xdg_desktop_portal import XdgDesktopPortal
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from gscreenshot.util import session_is_wayland
 
@@ -23,7 +24,8 @@ class ScreenshooterFactory(object):
                 ]
 
         self.wayland_screenshooters = [
-                Grim
+                Grim,
+                XdgDesktopPortal,
                 ]
 
         if session_is_wayland():
