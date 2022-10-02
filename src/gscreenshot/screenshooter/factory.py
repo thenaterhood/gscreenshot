@@ -20,7 +20,8 @@ class ScreenshooterFactory(object):
                 Scrot,
                 ImageMagick,
                 PILWrapper,
-                Imlib2
+                Imlib2,
+                XdgDesktopPortal
                 ]
 
         self.wayland_screenshooters = [

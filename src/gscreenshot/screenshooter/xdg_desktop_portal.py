@@ -1,13 +1,14 @@
 #!/usr/bin/python3
-
-# this used to live at https://gitlab.gnome.org/snippets/814
-# but has since been deleted, the original author is unknown
-# reuploading here for safe keeping
-
 '''
 Wayland integration using xdg-desktop-portal
 
 Based on code from https://gitlab.gnome.org/snippets/814
+
+This script is structured as two parts - an importable
+module for gscreenshot and an executable script that takes
+a screenshot with xdg-desktop-portal. The module runs the
+script as a subprocess due to issues with the DBus loop and
+async call.
 '''
 try:
     import dbus
