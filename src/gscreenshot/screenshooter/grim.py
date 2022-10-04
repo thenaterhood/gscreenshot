@@ -2,6 +2,7 @@
 Integration for the grim screenshot utility
 '''
 from time import sleep
+import subprocess
 
 from gscreenshot.util import find_executable, GSCapabilities
 from gscreenshot.screenshooter import Screenshooter
@@ -37,8 +38,18 @@ class Grim(Screenshooter):
 
     @staticmethod
     def can_run():
-        """Whether scrot is available"""
-        return find_executable('grim') is not None
+        """Whether grim is available"""
+        if find_executable('grim') is None:
+            return False
+
+        # Grim doesn't work in all situations. In some we would rather
+        # use the xdg-desktop-portal method so we'll do another check
+        try:
+            subprocess.check_output(["grim", "-"])
+        except subprocess.CalledProcessError:
+            return False
+
+        return True
 
     def get_capabilities(self):
         """

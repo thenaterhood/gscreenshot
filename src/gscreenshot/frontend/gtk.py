@@ -730,7 +730,7 @@ def main():
     window = builder.get_object('window_main')
 
     waited = 0
-    while application.get_last_image() is None and waited < 4:
+    while application.get_last_image() is None and waited < 8:
         sleep(.01)
         waited += .1
 

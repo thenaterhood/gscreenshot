@@ -10,7 +10,7 @@ from pkg_resources import resource_filename
 from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.selector.factory import SelectorFactory
-from gscreenshot.util import GSCapabilities
+from gscreenshot.util import session_is_wayland, GSCapabilities
 
 try:
     from Xlib import display
@@ -70,7 +70,7 @@ class Screenshooter(object):
         # If we're running, this is the bare minimum
         capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
 
-        if display is not None:
+        if display is not None and not session_is_wayland():
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
             capabilities.append(GSCapabilities.CURSOR_CAPTURE)
 
