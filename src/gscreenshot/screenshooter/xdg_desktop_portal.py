@@ -20,6 +20,7 @@ import re
 import os
 import sys
 import shutil
+import subprocess
 
 from time import sleep
 from gi.repository import GLib
@@ -107,7 +108,16 @@ class XdgDesktopPortal(Screenshooter):
     @staticmethod
     def can_run():
         """Whether dbus is available"""
-        return dbus is not None
+        if dbus is None:
+            return False
+
+        try:
+            subprocess.check_output(["pidof", "xdg-desktop-portal"])
+        except (subprocess.CalledProcessError, OSError):
+            return False
+
+        return True
+
 
 if __name__ == "__main__":
     loop = GLib.MainLoop()
