@@ -38,6 +38,7 @@ _automatically installed by the setup script or your package manager_
 * Scrot (1.0 or older) + slop + python-xlib
 * ImageMagick + slop + python-xlib
 * Imlib2_grab + slop + python-xlib
+* xdg-desktop-portal + slop + python-xlib
 * PIL/python-pillow + slop + python-xlib
 * Scrot only (any version) (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
 
@@ -48,6 +49,9 @@ how your system is configured and what desktop environment you're using.
 * slurp (for region selection)
 * xdg-open (for opening screenshots in your image viewer - optional)
 * wl-clipboard (for copy to clipboard - optional)
+
+**Alternative setups for Wayland, in order of recommendation:**
+* xdg-desktop-portal + slurp
 
 gscreenshot will automatically detect X11 versus Wayland and what utilities you have
 available on your system. It will use them in the order of its preference.
