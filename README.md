@@ -51,7 +51,7 @@ how your system is configured and what desktop environment you're using.
 * wl-clipboard (for copy to clipboard - optional)
 
 **Alternative setups for Wayland, in order of recommendation:**
-* xdg-desktop-portal + slurp
+* xdg-desktop-portal + slurp + python-dbus
 
 gscreenshot will automatically detect X11 versus Wayland and what utilities you have
 available on your system. It will use them in the order of its preference.
