@@ -15,13 +15,14 @@ try:
 except ImportError:
     dbus = None
 
-import secrets
+import binascii
 import re
 import os
 import sys
 import shutil
 import subprocess
 
+from random import SystemRandom
 from time import sleep
 from gi.repository import GLib
 from dbus.mainloop.glib import DBusGMainLoop
@@ -45,10 +46,27 @@ class XdgPortalScreenshot:
 
     def request(self, parent_window = ''):
         '''Requests a screenshot. Note that xdg-desktop-portal is asynchronous'''
+
+        # The following three lines perform the same
+        # logic as secrets.token_hex without requiring
+        # python-secrets
+        sysrand = SystemRandom()
+
+        try:
+            # Python 3
+            token_bytes = sysrand.randbytes(16)
+        except AttributeError:
+            # Python 2
+            # This is not cryptographically secure, but
+            # is "good enough" for this purpose
+            token_bytes = os.urandom(16)
+
+        token_hex = binascii.hexlify(token_bytes).decode('ascii')
+
         #pylint: disable=fixme
         # TODO: change to f-strings when dropping python2 support
         #pylint: disable=consider-using-f-string
-        request_token = 'gscreenshot_%s' % secrets.token_hex(16)
+        request_token = 'gscreenshot_%s' % token_hex
 
         options = { 'handle_token': request_token }
 
