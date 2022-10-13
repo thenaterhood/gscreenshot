@@ -25,7 +25,11 @@ import subprocess
 from random import SystemRandom
 from time import sleep
 from gi.repository import GLib
-from dbus.mainloop.glib import DBusGMainLoop
+
+try:
+    from dbus.mainloop.glib import DBusGMainLoop
+except ImportError:
+    DBusGMainLoop = None
 
 from gscreenshot.screenshooter import Screenshooter
 
