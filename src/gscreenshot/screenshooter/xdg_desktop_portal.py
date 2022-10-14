@@ -125,7 +125,11 @@ class XdgDesktopPortal(Screenshooter):
 
         sleep(delay)
         script_path = os.path.realpath(__file__)
-        self._call_screenshooter("python", [script_path, self.tempfile])
+        py_call = "python3"
+        if sys.version_info.major < 3:
+            py_call = "python2"
+
+        self._call_screenshooter(py_call, [script_path, self.tempfile])
 
     @staticmethod
     def can_run():
