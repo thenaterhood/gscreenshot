@@ -38,7 +38,7 @@ _automatically installed by the setup script or your package manager_
 * Scrot (1.0 or older) + slop + python-xlib
 * ImageMagick + slop + python-xlib
 * Imlib2_grab + slop + python-xlib
-* xdg-desktop-portal + slop + python-xlib
+* xdg-desktop-portal + slop + python-xlib + python-dbus
 * PIL/python-pillow + slop + python-xlib
 * Scrot only (any version) (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
 
