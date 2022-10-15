@@ -225,9 +225,9 @@ class Screenshooter(object):
 
         antialias_algo = None
         try:
-            antialias_algo = Image.Resampling.LANCZOS
+            antialias_algo = PIL.Image.Resampling.LANCZOS
         except AttributeError: # PIL < 9.0
-            antialias_algo = Image.ANTIALIAS
+            antialias_algo = PIL.Image.ANTIALIAS
 
         cursor_img.thumbnail((cursor_width, cursor_height), antialias_algo)
 
