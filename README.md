@@ -17,11 +17,16 @@ gscreenshot is licensed under the GPLv2.
 
 ## Installation
 
+v2.20.0 is the last gscreenshot with support for Python versions older than
+Python 3.5. Minor bugfixes will be accepted for patch releases if necessary.
+
+v3.0.0 (not yet released) and newer is aimed at Python 3.5 and newer.
+
 ### Requirements
 _automatically installed by the setup script or your package manager_
 
 **These requirements:**
-* Python 2.7 or Python 3
+* Python 3.5 or newer
 * python-pillow
 * python-gobject (may be called "python-gi" or "python3-gi")
 * Setuptools
@@ -38,6 +43,7 @@ _automatically installed by the setup script or your package manager_
 * Scrot (1.0 or older) + slop + python-xlib
 * ImageMagick + slop + python-xlib
 * Imlib2_grab + slop + python-xlib
+* xdg-desktop-portal + slop + python-xlib + python-dbus
 * PIL/python-pillow + slop + python-xlib
 * Scrot only (any version) (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
 
@@ -48,6 +54,9 @@ how your system is configured and what desktop environment you're using.
 * slurp (for region selection)
 * xdg-open (for opening screenshots in your image viewer - optional)
 * wl-clipboard (for copy to clipboard - optional)
+
+**Alternative setups for Wayland, in order of recommendation:**
+* xdg-desktop-portal + slurp + python-dbus
 
 gscreenshot will automatically detect X11 versus Wayland and what utilities you have
 available on your system. It will use them in the order of its preference.
@@ -74,17 +83,12 @@ Manual installation:
 1. Download the latest version from [here](https://github.com/thenaterhood/gscreenshot/releases/latest)
 2. Unzip or untar the file (depending which you downloaded)
 3. From the command line, navigate to the unzipped files and run one of the following:
-   - `sudo python setup.py install --single-version-externally-managed` - install systemwide
-     - If this fails, exclude the `--single-version-externally-managed` flag -
-       but you'll need to manually install icons and menu entries
-   - `python setup.py install --user --single-version-externally-managed` - install to the current user
-     (binary at ~/.local/bin/gscreenshot). See the previous note about `--single-version-externally-managed`
-   - you can also install with `sudo pip install -e .` but this won't install pixmaps or menu entries
+   - Install systemwide with `sudo pip install -e .`
 
 Building a package:
 
-Generally, running one of the setup.py calls above with the --root parameter
-should work fine for building a packageable version.
+The following command should work for building a package:
+python setup.py install --root="$pkgdir/" --optimize=1 --force --single-version-externally-managed
 
 gscreenshot automatically retrieves its version number from specs/gscreenshot.spec
 and setup.py should generate appropriate menu entries and binaries.

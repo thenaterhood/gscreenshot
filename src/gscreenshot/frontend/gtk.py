@@ -11,7 +11,7 @@ import sys
 import threading
 from time import sleep
 from pkg_resources import resource_string, resource_filename
-from gi import pygtkcompat
+import pygtkcompat
 from gscreenshot import Gscreenshot
 from gscreenshot.util import GSCapabilities
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
@@ -55,7 +55,7 @@ class Presenter(object):
         screenshot = app_method(self._delay, self._capture_cursor, self._cursor_selection)
 
         # Re-enable UI on the UI thread.
-        GObject.idle_add(self._end_take_screenshot, screenshot)
+        GLib.idle_add(self._end_take_screenshot, screenshot)
 
     def _end_take_screenshot(self, screenshot):
         self._show_preview()
@@ -730,7 +730,7 @@ def main():
     window = builder.get_object('window_main')
 
     waited = 0
-    while application.get_last_image() is None and waited < 4:
+    while application.get_last_image() is None and waited < 8:
         sleep(.01)
         waited += .1
 

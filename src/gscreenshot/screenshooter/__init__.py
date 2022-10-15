@@ -10,7 +10,7 @@ from pkg_resources import resource_filename
 from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.selector.factory import SelectorFactory
-from gscreenshot.util import GSCapabilities
+from gscreenshot.util import session_is_wayland, GSCapabilities
 
 try:
     from Xlib import display
@@ -70,7 +70,7 @@ class Screenshooter(object):
         # If we're running, this is the bare minimum
         capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
 
-        if display is not None:
+        if display is not None and not session_is_wayland():
             capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
             capabilities.append(GSCapabilities.CURSOR_CAPTURE)
 
@@ -222,7 +222,14 @@ class Screenshooter(object):
         cursor_size_ratio = min(max(screenshot_width / 2000, .3), max(screenshot_height / 2000, .3))
         cursor_height = cursor_img.size[0] * cursor_size_ratio
         cursor_width = cursor_img.size[1] * cursor_size_ratio
-        cursor_img.thumbnail((cursor_width, cursor_height), PIL.Image.ANTIALIAS)
+
+        antialias_algo = None
+        try:
+            antialias_algo = PIL.Image.Resampling.LANCZOS
+        except AttributeError: # PIL < 9.0
+            antialias_algo = PIL.Image.ANTIALIAS
+
+        cursor_img.thumbnail((cursor_width, cursor_height), antialias_algo)
 
         # If the cursor glyph is square, adjust its position slightly so it
         # shows up where expected.
@@ -259,7 +266,7 @@ class Screenshooter(object):
             subprocess.check_output(params)
             self._image = PIL.Image.open(self.tempfile)
             os.unlink(self.tempfile)
-        except (IOError, OSError):
+        except (subprocess.CalledProcessError, IOError, OSError):
             self._image = None
             return False
 
