@@ -286,7 +286,13 @@ class Gscreenshot(object):
             thumbnail = image.copy()
 
         if thumbnail is not None:
-            thumbnail.thumbnail((width, height), Image.Resampling.LANCZOS)
+            antialias_algo = None
+            try:
+                antialias_algo = Image.Resampling.LANCZOS
+            except AttributeError: # PIL < 9.0
+                antialias_algo = Image.ANTIALIAS
+
+            thumbnail.thumbnail((width, height), antialias_algo)
             return thumbnail
 
         return self.get_app_icon()
