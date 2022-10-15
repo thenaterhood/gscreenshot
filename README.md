@@ -20,7 +20,7 @@ gscreenshot is licensed under the GPLv2.
 v2.20.0 is the last gscreenshot with support for Python versions older than
 Python 3.5. Minor bugfixes will be accepted for patch releases if necessary.
 
-v3.0.0 and newer is aimed at Python 3.5 and newer.
+v3.0.0 (not yet released) and newer is aimed at Python 3.5 and newer.
 
 ### Requirements
 _automatically installed by the setup script or your package manager_
