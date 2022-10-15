@@ -222,7 +222,7 @@ class Screenshooter(object):
         cursor_size_ratio = min(max(screenshot_width / 2000, .3), max(screenshot_height / 2000, .3))
         cursor_height = cursor_img.size[0] * cursor_size_ratio
         cursor_width = cursor_img.size[1] * cursor_size_ratio
-        cursor_img.thumbnail((cursor_width, cursor_height), PIL.Image.ANTIALIAS)
+        cursor_img.thumbnail((cursor_width, cursor_height), PIL.Image.Resampling.LANCZOS)
 
         # If the cursor glyph is square, adjust its position slightly so it
         # shows up where expected.

@@ -286,7 +286,7 @@ class Gscreenshot(object):
             thumbnail = image.copy()
 
         if thumbnail is not None:
-            thumbnail.thumbnail((width, height), Image.ANTIALIAS)
+            thumbnail.thumbnail((width, height), Image.Resampling.LANCZOS)
             return thumbnail
 
         return self.get_app_icon()
