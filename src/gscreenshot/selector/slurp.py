@@ -88,4 +88,3 @@ class Slurp(RegionSelector):
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slurp was not found") #from exception
-
