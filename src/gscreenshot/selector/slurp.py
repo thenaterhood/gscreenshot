@@ -73,18 +73,19 @@ class Slurp(RegionSelector):
                     raise SelectionExecError("Slurp selection timed out")
 
                 return_code = slurp.returncode
+
+                if return_code != 0:
+                    slurp_error = stderr.decode("UTF-8")
+
+                    if "cancelled" in slurp_error:
+                        raise SelectionCancelled("Selection was cancelled")
+
+                    raise SelectionExecError(slurp_error)
+
+                slurp_output = stdout.decode("UTF-8").strip().split(",")
+
+                return self._parse_selection_output(slurp_output)
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slurp was not found") #from exception
 
-        if return_code != 0:
-            slurp_error = stderr.decode("UTF-8")
-
-            if "cancelled" in slurp_error:
-                raise SelectionCancelled("Selection was cancelled")
-
-            raise SelectionExecError(slurp_error)
-
-        slurp_output = stdout.decode("UTF-8").strip().split(",")
-
-        return self._parse_selection_output(slurp_output)

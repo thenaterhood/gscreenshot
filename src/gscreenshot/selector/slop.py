@@ -66,18 +66,19 @@ class Slop(RegionSelector):
                     raise SelectionExecError("slop selection time out") #from exception
 
                 return_code = slop.returncode
+
+                if return_code != 0:
+                    slop_error = stderr.decode("UTF-8")
+
+                    if "cancelled" in slop_error:
+                        raise SelectionCancelled("Selection was cancelled")
+
+                    raise SelectionExecError(slop_error)
+
+                slop_output = stdout.decode("UTF-8").strip().split(",")
+
+                return self._parse_selection_output(slop_output)
+
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slop was not found") #from exception
-
-        if return_code != 0:
-            slop_error = stderr.decode("UTF-8")
-
-            if "cancelled" in slop_error:
-                raise SelectionCancelled("Selection was cancelled")
-
-            raise SelectionExecError(slop_error)
-
-        slop_output = stdout.decode("UTF-8").strip().split(",")
-
-        return self._parse_selection_output(slop_output)
