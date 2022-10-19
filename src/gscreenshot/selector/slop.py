@@ -52,32 +52,33 @@ class Slop(RegionSelector):
         try:
             # nodecorations=0 - this is the slop default, but there's a bug
             # so skipping the "=0" causes a segfault.
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, switch to using with here
-            #pylint: disable=consider-using-with
-            process = subprocess.Popen(
+            with subprocess.Popen(
                 ['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-                )
-            stdout, stderr = process.communicate(timeout=60)
-            return_code = process.returncode
+                ) as slop:
+
+                try:
+                    stdout, stderr = slop.communicate(timeout=60)
+                except subprocess.TimeoutExpired:
+                    slop.kill()
+                    #pylint: disable=raise-missing-from
+                    raise SelectionExecError("slop selection time out") #from exception
+
+                return_code = slop.returncode
+
+                if return_code != 0:
+                    slop_error = stderr.decode("UTF-8")
+
+                    if "cancelled" in slop_error:
+                        raise SelectionCancelled("Selection was cancelled")
+
+                    raise SelectionExecError(slop_error)
+
+                slop_output = stdout.decode("UTF-8").strip().split(",")
+
+                return self._parse_selection_output(slop_output)
+
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slop was not found") #from exception
-        except subprocess.TimeoutExpired:
-            process.kill()
-            #pylint: disable=raise-missing-from
-            raise SelectionExecError("slop selection time out") #from exception
-
-        if return_code != 0:
-            slop_error = stderr.decode("UTF-8")
-
-            if "cancelled" in slop_error:
-                raise SelectionCancelled("Selection was cancelled")
-
-            raise SelectionExecError(slop_error)
-
-        slop_output = stdout.decode("UTF-8").strip().split(",")
-
-        return self._parse_selection_output(slop_output)

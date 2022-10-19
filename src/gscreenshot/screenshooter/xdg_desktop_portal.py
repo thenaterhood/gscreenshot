@@ -67,10 +67,7 @@ class XdgPortalScreenshot:
 
         token_hex = binascii.hexlify(token_bytes).decode('ascii')
 
-        #pylint: disable=fixme
-        # TODO: change to f-strings when dropping python2 support
-        #pylint: disable=consider-using-f-string
-        request_token = 'gscreenshot_%s' % token_hex
+        request_token = f"gscreenshot_{token_hex}"
 
         options = { 'handle_token': request_token }
 
@@ -91,10 +88,7 @@ class XdgPortalScreenshot:
     def get_request_handle(self, token):
         '''get a request handle name'''
         sender_name = re.sub(r'\.', '_', self.bus.get_unique_name()).lstrip(':')
-        #pylint: disable=fixme
-        # TODO: change to f-strings when dropping python2 support
-        #pylint: disable=consider-using-f-string
-        return '/org/freedesktop/portal/desktop/request/%s/%s'%(sender_name, token)
+        return f"/org/freedesktop/portal/desktop/request/{sender_name}/{token}"
 
     @staticmethod
     def callback(response, result):

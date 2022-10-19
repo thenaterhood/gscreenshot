@@ -57,33 +57,34 @@ class Slurp(RegionSelector):
         Calls slurp and returns the boundary produced by
         slurp
         """
+
         try:
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, switch to using with here
-            #pylint: disable=consider-using-with
-            process = subprocess.Popen(
+            with subprocess.Popen(
                 ['slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h'],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-                )
-            stdout, stderr = process.communicate(timeout=60)
-            return_code = process.returncode
+                ) as slurp:
+
+                try:
+                    stdout, stderr = slurp.communicate(timeout=60)
+                except subprocess.TimeoutExpired:
+                    slurp.kill()
+                    #pylint: disable=raise-missing-from
+                    raise SelectionExecError("Slurp selection timed out")
+
+                return_code = slurp.returncode
+
+                if return_code != 0:
+                    slurp_error = stderr.decode("UTF-8")
+
+                    if "cancelled" in slurp_error:
+                        raise SelectionCancelled("Selection was cancelled")
+
+                    raise SelectionExecError(slurp_error)
+
+                slurp_output = stdout.decode("UTF-8").strip().split(",")
+
+                return self._parse_selection_output(slurp_output)
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slurp was not found") #from exception
-        except subprocess.TimeoutExpired:
-            process.kill()
-            #pylint: disable=raise-missing-from
-            raise SelectionExecError("slurp selection timed out") #from exception
-
-        if return_code != 0:
-            slurp_error = stderr.decode("UTF-8")
-
-            if "cancelled" in slurp_error:
-                raise SelectionCancelled("Selection was cancelled")
-
-            raise SelectionExecError(slurp_error)
-
-        slurp_output = stdout.decode("UTF-8").strip().split(",")
-
-        return self._parse_selection_output(slurp_output)

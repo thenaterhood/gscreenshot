@@ -58,11 +58,7 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, add the encoding='UTF-8'
-            # param
-            #pylint: disable=unspecified-encoding
-            with open(self.get_cache_file(), "r") as cachefile:
+            with open(self.get_cache_file(), "r", encoding="UTF-8") as cachefile:
                 try:
                     self.cache = json.load(cachefile)
                 except json.JSONDecodeError:
@@ -108,16 +104,13 @@ class Gscreenshot(object):
         return a status as to whether it succeeded.
         '''
         try:
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, switch to using with here
-            #pylint: disable=consider-using-with
-            subprocess.Popen([
+            subprocess.run([
                 'notify-send',
                 'gscreenshot',
                 _('a screenshot was taken from a script or terminal'),
                 '--icon',
                 'gscreenshot'
-            ])
+            ], check=True)
         except OSError:
             print(_("failed to show screenshot notification - is notify-send working?"))
 
@@ -149,11 +142,7 @@ class Gscreenshot(object):
     def save_cache(self):
         """Writes the cache to disk"""
         try:
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, add the encoding='UTF-8'
-            # param
-            #pylint: disable=unspecified-encoding
-            with open(self.get_cache_file(), "w") as cachefile:
+            with open(self.get_cache_file(), "w", encoding="UTF-8") as cachefile:
                 json.dump(self.cache, cachefile)
         except FileNotFoundError:
             print(_("unable to save cache file"))
@@ -409,10 +398,7 @@ class Gscreenshot(object):
         screenshot_fname = self.save_and_return_path()
 
         try:
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, switch to using with here
-            #pylint: disable=consider-using-with
-            subprocess.Popen(['xdg-open', screenshot_fname])
+            subprocess.run(['xdg-open', screenshot_fname], check=True)
             return True
         except (subprocess.CalledProcessError, IOError):
             return False
@@ -450,17 +436,15 @@ class Gscreenshot(object):
             image.save(png_data, "PNG")
 
             try:
-                #pylint: disable=fixme
-                # TODO: when dropping python2 support, switch to using with here
-                #pylint: disable=consider-using-with
-                clip = subprocess.Popen(
+                with subprocess.Popen(
                     params,
                     close_fds=True,
                     stdin=subprocess.PIPE,
                     stdout=None,
-                    stderr=None)
-                clip.communicate(input=png_data.getvalue())
-                return True
+                    stderr=None) as xclip:
+
+                    xclip.communicate(input=png_data.getvalue())
+                    return True
             except OSError:
                 return False
 
