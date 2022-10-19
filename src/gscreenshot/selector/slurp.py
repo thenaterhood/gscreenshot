@@ -64,15 +64,18 @@ class Slurp(RegionSelector):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
                 ) as slurp:
-                stdout, stderr = slurp.communicate(timeout=60)
+
+                try:
+                    stdout, stderr = slurp.communicate(timeout=60)
+                except subprocess.TimeoutExpired:
+                    slurp.kill()
+                    #pylint: disable=raise-missing-from
+                    raise SelectionExecError("Slurp selection timed out")
+
                 return_code = slurp.returncode
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slurp was not found") #from exception
-        except subprocess.TimeoutExpired:
-            process.kill()
-            #pylint: disable=raise-missing-from
-            raise SelectionExecError("slurp selection timed out") #from exception
 
         if return_code != 0:
             slurp_error = stderr.decode("UTF-8")
