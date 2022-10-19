@@ -46,6 +46,4 @@ class ImageMagick(Screenshooter):
     def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         sleep(delay)
         if not self._call_screenshooter('import', [self.tempfile]):
-            #pylint: disable=super-with-arguments
-            #disabling this until we don't support Python 2 anymore
-            super(ImageMagick, self)._grab_selection_fallback(delay=0)
+            super()._grab_selection_fallback(delay=0)

@@ -52,16 +52,14 @@ class Slop(RegionSelector):
         try:
             # nodecorations=0 - this is the slop default, but there's a bug
             # so skipping the "=0" causes a segfault.
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, switch to using with here
-            #pylint: disable=consider-using-with
-            process = subprocess.Popen(
+            with subprocess.Popen(
                 ['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
-                )
-            stdout, stderr = process.communicate(timeout=60)
-            return_code = process.returncode
+                ) as slop:
+
+                stdout, stderr = slop.communicate(timeout=60)
+                return_code = slop.returncode
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError("Slop was not found") #from exception
