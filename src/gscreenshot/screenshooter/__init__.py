@@ -5,6 +5,7 @@ import os
 import subprocess
 import tempfile
 import PIL.Image
+import typing
 
 from pkg_resources import resource_filename
 from gscreenshot.selector import SelectionExecError, SelectionParseError
@@ -24,7 +25,7 @@ class Screenshooter(object):
     """
 
     __slots__ = ('_image', 'tempfile', 'selector')
-    __utilityname__ = None
+    __utilityname__: typing.Optional[str] = None
 
     def __init__(self):
         """
@@ -42,7 +43,7 @@ class Screenshooter(object):
                 )
 
     @property
-    def image(self):
+    def image(self) -> PIL.Image:
         """
         Returns the last screenshot taken
 
@@ -51,7 +52,7 @@ class Screenshooter(object):
         """
         return self._image
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> list:
         """
         Get supported features. Note that under-the-hood the capabilities
         of the selector (if applicable) will be added to this.
@@ -61,7 +62,7 @@ class Screenshooter(object):
         """
         return []
 
-    def get_capabilities_(self):
+    def get_capabilities_(self) -> list:
         """
         Get supported features. This should not be overridden by extending
         classes. Implement get_capabilities instead.
@@ -165,13 +166,13 @@ class Screenshooter(object):
         self.grab_selection_(delay, capture_cursor)
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """
         Whether this utility can run
         """
         return False
 
-    def get_cursor_position(self):
+    def get_cursor_position(self) -> typing.Optional[tuple]:
         """
         Gets the current position of the mouse cursor, if able.
         Returns (x, y) or None.
@@ -255,7 +256,7 @@ class Screenshooter(object):
         """
         self.grab_fullscreen(delay, capture_cursor)
 
-    def _call_screenshooter(self, screenshooter, params = None):
+    def _call_screenshooter(self, screenshooter, params = None) -> bool:
 
         # This is safer than defaulting to []
         if params is None:

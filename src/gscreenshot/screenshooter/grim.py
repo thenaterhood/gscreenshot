@@ -37,7 +37,7 @@ class Grim(Screenshooter):
         self._call_screenshooter('grim', params)
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """Whether grim is available"""
         if find_executable('grim') is None:
             return False
@@ -51,7 +51,7 @@ class Grim(Screenshooter):
 
         return True
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> list:
         """
         Get supported features
         """
