@@ -50,3 +50,17 @@ jobs:
           coverage run --source gscreenshot -m pytest ../test
           coverage report -m
 
+  type-check:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install mypy
+        run: |
+          python3 -m pip install "mypy==0.982" "mypy_extensions==0.4.3"
+
+      - name: Run mypy
+          mypy src/
+
