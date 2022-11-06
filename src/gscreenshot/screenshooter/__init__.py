@@ -4,8 +4,8 @@ Interface class for integrating a screenshot utility
 import os
 import subprocess
 import tempfile
-import PIL.Image
 import typing
+import PIL.Image
 
 from pkg_resources import resource_filename
 from gscreenshot.selector import SelectionExecError, SelectionParseError
