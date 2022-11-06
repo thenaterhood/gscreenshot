@@ -260,7 +260,8 @@ class Gscreenshot(object):
         return supported_formats
 
     def get_thumbnail(self, width: int, height: int,
-                      image: Image=None) -> typing.Optional[Image.Image]:
+                      image: typing.Optional[Image.Image]=None
+                      ) -> typing.Optional[Image.Image]:
         """
         Gets a thumbnail of either the current image, or a passed one
 
