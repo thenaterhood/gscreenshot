@@ -172,7 +172,7 @@ class Screenshooter(object):
         """
         return False
 
-    def get_cursor_position(self) -> typing.Optional[tuple]:
+    def get_cursor_position(self) -> typing.Optional[typing.Tuple[int, int]]:
         """
         Gets the current position of the mouse cursor, if able.
         Returns (x, y) or None.

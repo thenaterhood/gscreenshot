@@ -2,6 +2,7 @@
 Wrapper for the slurp screen selector utility
 '''
 import subprocess
+import typing
 from gscreenshot.selector import SelectionExecError, SelectionCancelled, RegionSelector
 from gscreenshot.util import find_executable, GSCapabilities
 
@@ -29,7 +30,7 @@ class Slurp(RegionSelector):
             GSCapabilities.REGION_SELECTION
         ]
 
-    def region_select(self) -> tuple:
+    def region_select(self) -> typing.Tuple[int, int, int, int]:
         """
         Select an arbitrary region of the screen
 
@@ -38,7 +39,7 @@ class Slurp(RegionSelector):
         """
         return self._get_boundary_interactive()
 
-    def window_select(self) -> tuple:
+    def window_select(self) -> typing.Tuple[int, int, int, int]:
         """
         Selects a window from the screen
 
@@ -52,7 +53,7 @@ class Slurp(RegionSelector):
         """Whether slurp is available"""
         return find_executable('slurp') is not None
 
-    def _get_boundary_interactive(self) -> tuple:
+    def _get_boundary_interactive(self) -> typing.Tuple[int, int, int, int]:
         """
         Calls slurp and returns the boundary produced by
         slurp
