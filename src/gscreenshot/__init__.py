@@ -24,7 +24,6 @@ from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
-from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import session_is_wayland
 
 _ = gettext.gettext
