@@ -59,7 +59,7 @@ jobs:
 
       - name: Install mypy
         run: |
-          python3 -m pip install "mypy==0.982" "mypy_extensions==0.4.3"
+          python3 -m pip install "mypy==0.982" "mypy_extensions==0.4.3" types-setuptools
 
       - name: Run mypy
         run: |
