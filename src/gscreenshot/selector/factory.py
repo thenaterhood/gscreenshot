@@ -5,6 +5,7 @@ Selector factory module
 from gscreenshot.selector.slop import Slop
 from gscreenshot.selector.slurp import Slurp
 from gscreenshot.selector import NoSupportedSelectorError
+from gscreenshot.selector import RegionSelector
 from gscreenshot.util import session_is_wayland
 
 
@@ -26,7 +27,7 @@ class SelectorFactory(object):
         else:
             self.selectors = self.xorg_selectors
 
-    def create(self):
+    def create(self) -> RegionSelector:
         '''Returns a screenselector instance'''
         if self.screenselector is not None:
             return self.screenselector

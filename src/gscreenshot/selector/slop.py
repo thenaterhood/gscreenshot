@@ -21,7 +21,7 @@ class Slop(RegionSelector):
         """
         RegionSelector.__init__(self)
 
-    def region_select(self):
+    def region_select(self) -> tuple:
         """
         Select an arbitrary region of the screen
 
@@ -30,7 +30,7 @@ class Slop(RegionSelector):
         """
         return self._get_boundary_interactive()
 
-    def window_select(self):
+    def window_select(self) -> tuple:
         """
         Selects a window from the screen
 
@@ -40,11 +40,11 @@ class Slop(RegionSelector):
         return self._get_boundary_interactive()
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """Whether slop is available"""
         return find_executable('slop') is not None
 
-    def _get_boundary_interactive(self):
+    def _get_boundary_interactive(self) -> tuple:
         """
         Calls slop and returns the boundary produced by
         slop

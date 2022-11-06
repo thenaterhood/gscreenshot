@@ -27,7 +27,7 @@ class RegionSelector():
         constructor
         """
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> list:
         """
         Get the features this selector supports
         """
@@ -36,7 +36,7 @@ class RegionSelector():
             GSCapabilities.REGION_SELECTION
         ]
 
-    def region_select(self):
+    def region_select(self) -> tuple:
         """
         Select an arbitrary region of the screen
 
@@ -45,7 +45,7 @@ class RegionSelector():
         """
         raise SelectionError("Not implemented")
 
-    def window_select(self):
+    def window_select(self) -> tuple:
         """
         Selects a window from the screen
 
@@ -55,13 +55,13 @@ class RegionSelector():
         raise SelectionError("Not implemented")
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """
         Returns whether this is capable of running.
         """
         return False
 
-    def _parse_selection_output(self, region_output):
+    def _parse_selection_output(self, region_output) -> tuple:
         '''
         Parses output from a region selection tool in the format
         X=%x,Y=%y,W=%w,H=%h.
