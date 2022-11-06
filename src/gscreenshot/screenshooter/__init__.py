@@ -43,7 +43,7 @@ class Screenshooter(object):
                 )
 
     @property
-    def image(self) -> PIL.Image:
+    def image(self) -> PIL.Image.Image:
         """
         Returns the last screenshot taken
 

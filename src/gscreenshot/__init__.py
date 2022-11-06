@@ -75,7 +75,7 @@ class Gscreenshot(object):
         '''
         return set(self.screenshooter.get_capabilities_())
 
-    def get_available_cursors(self) -> typing.Dict[str, typing.Optional[Image]]:
+    def get_available_cursors(self) -> typing.Dict[str, typing.Optional[Image.Image]]:
         '''
         Get the alternate pointer pixmaps gscreenshot can use
         Returns {name: PIL.Image}
@@ -158,7 +158,7 @@ class Gscreenshot(object):
         return self.screenshooter.__class__.__name__
 
     def screenshot_full_display(self, delay: int=0, capture_cursor: bool=False,
-                                cursor_name: str='theme') -> typing.Optional[Image]:
+                                cursor_name: str='theme') -> typing.Optional[Image.Image]:
         """
         Takes a screenshot of the full display with a
         given delay.
@@ -185,7 +185,7 @@ class Gscreenshot(object):
         return self.screenshooter.image
 
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
-                            cursor_name: str='theme') -> typing.Optional[Image]:
+                            cursor_name: str='theme') -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected area
         with a given delay.
@@ -212,7 +212,7 @@ class Gscreenshot(object):
         return self.screenshooter.image
 
     def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
-                          cursor_name: str='theme') -> typing.Optional[Image]:
+                          cursor_name: str='theme') -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected window
         with a given delay.
@@ -238,7 +238,7 @@ class Gscreenshot(object):
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def get_last_image(self) -> typing.Optional[Image]:
+    def get_last_image(self) -> typing.Optional[Image.Image]:
         """
         Returns the last screenshot taken
 
@@ -260,7 +260,7 @@ class Gscreenshot(object):
 
         return supported_formats
 
-    def get_thumbnail(self, width: int, height: int, image: Image=None) -> typing.Optional[Image]:
+    def get_thumbnail(self, width: int, height: int, image: Image=None) -> typing.Optional[Image.Image]:
         """
         Gets a thumbnail of either the current image, or a passed one
 
