@@ -62,7 +62,8 @@ class RegionSelector():
         """
         return False
 
-    def _parse_selection_output(self, region_output) -> typing.Tuple[int, int, int, int]:
+    def _parse_selection_output(self, region_output: typing.List[str]
+                                ) -> typing.Tuple[int, int, int, int]:
         '''
         Parses output from a region selection tool in the format
         X=%x,Y=%y,W=%w,H=%h.

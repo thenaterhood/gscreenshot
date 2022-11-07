@@ -473,7 +473,7 @@ class Gscreenshot(object):
 
         return authors
 
-    def get_app_icon(self) -> Image:
+    def get_app_icon(self) -> Image.Image:
         """Returns the application icon"""
         return Image.open(
                 resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
