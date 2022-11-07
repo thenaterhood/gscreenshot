@@ -344,6 +344,9 @@ class Gscreenshot(object):
         if filename is None:
             filename = self.get_time_filename()
 
+        if self.screenshooter.image is None:
+            return False
+
         image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 

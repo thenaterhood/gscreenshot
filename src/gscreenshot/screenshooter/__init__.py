@@ -28,9 +28,9 @@ class Screenshooter(object):
     __slots__ = ('_image', 'tempfile', 'selector')
     __utilityname__: typing.Optional[str] = None
 
-    _image: PIL.Image.Image
+    _image: typing.Optional[PIL.Image.Image]
     tempfile: str
-    selector: RegionSelector
+    selector: typing.Optional[RegionSelector]
 
     def __init__(self):
         """
@@ -48,7 +48,7 @@ class Screenshooter(object):
                 )
 
     @property
-    def image(self) -> PIL.Image.Image:
+    def image(self) -> typing.Optional[PIL.Image.Image]:
         """
         Returns the last screenshot taken
 
@@ -202,7 +202,7 @@ class Screenshooter(object):
 
         return (mouse_data["root_x"], mouse_data["root_y"])
 
-    def add_fake_cursor(self, cursor_img: PIL.Image.Image=None):
+    def add_fake_cursor(self, cursor_img: typing.Optional[PIL.Image.Image]=None):
         """
         Stamps a fake cursor onto the screenshot.
         This is intended for use with screenshot backends that don't
@@ -238,7 +238,7 @@ class Screenshooter(object):
         except AttributeError: # PIL < 9.0
             antialias_algo = PIL.Image.ANTIALIAS
 
-        cursor_img.thumbnail((cursor_width, cursor_height), antialias_algo)
+        cursor_img.thumbnail((int(cursor_width), int(cursor_height)), antialias_algo)
 
         # If the cursor glyph is square, adjust its position slightly so it
         # shows up where expected.
