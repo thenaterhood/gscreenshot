@@ -23,6 +23,7 @@ import typing
 from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
+from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
 from gscreenshot.util import session_is_wayland
 
@@ -35,6 +36,11 @@ class Gscreenshot(object):
     """
 
     __slots__ = ['screenshooter', 'saved_last_image', 'last_save_file', 'cache']
+
+    screenshooter: Screenshooter
+    saved_last_image: bool
+    last_save_file: typing.Optional[str]
+    cache: typing.Dict[str, str]
 
     # generated using piexif
     EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
@@ -302,7 +308,7 @@ class Gscreenshot(object):
         now = datetime.now()
         return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
-    def save_and_return_path(self) -> str:
+    def save_and_return_path(self) -> typing.Optional[str]:
         """
         Saves the last screenshot to /tmp if it hasn't been saved
         and returns the path to it.
@@ -318,11 +324,11 @@ class Gscreenshot(object):
         if not self.saved_last_image:
             self.save_last_image(screenshot_fname)
         else:
-            screenshot_fname = self.last_save_file
+            return self.last_save_file
 
         return screenshot_fname
 
-    def save_last_image(self, filename: str= None) -> bool:
+    def save_last_image(self, filename: typing.Optional[str]= None) -> bool:
         """
         Saves the last screenshot taken with a given filename.
         Returns a boolean for success or fail. A supported file
@@ -402,6 +408,8 @@ class Gscreenshot(object):
             bool success
         """
         screenshot_fname = self.save_and_return_path()
+        if screenshot_fname is None:
+            return False
 
         try:
             subprocess.run(['xdg-open', screenshot_fname], check=True)

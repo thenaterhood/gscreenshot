@@ -478,6 +478,10 @@ class Presenter(object):
         '''Handle the "open with" button'''
         self._view.flash_status_icon(Gtk.STOCK_EXECUTE)
         fname = self._app.save_and_return_path()
+
+        if fname is None:
+            return
+
         appchooser = OpenWithDialog()
 
         self._view.run_dialog(appchooser)
