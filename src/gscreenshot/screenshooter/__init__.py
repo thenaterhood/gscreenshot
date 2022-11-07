@@ -57,7 +57,7 @@ class Screenshooter(object):
         """
         return self._image
 
-    def get_capabilities(self) -> list:
+    def get_capabilities(self) -> typing.List[str]:
         """
         Get supported features. Note that under-the-hood the capabilities
         of the selector (if applicable) will be added to this.
@@ -67,7 +67,7 @@ class Screenshooter(object):
         """
         return []
 
-    def get_capabilities_(self) -> list:
+    def get_capabilities_(self) -> typing.List[str]:
         """
         Get supported features. This should not be overridden by extending
         classes. Implement get_capabilities instead.
