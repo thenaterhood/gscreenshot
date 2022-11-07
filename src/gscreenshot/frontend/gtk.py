@@ -368,7 +368,7 @@ class Presenter(object):
                 )
 
     def _begin_take_screenshot(self, app_method):
-        screenshot = app_method(self._delay, self._capture_cursor, self._cursor_selection)
+        app_method(self._delay, self._capture_cursor, self._cursor_selection)
 
         # Re-enable UI on the UI thread.
         GLib.idle_add(self._end_take_screenshot)
