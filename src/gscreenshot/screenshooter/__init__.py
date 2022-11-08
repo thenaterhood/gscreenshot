@@ -4,9 +4,11 @@ Interface class for integrating a screenshot utility
 import os
 import subprocess
 import tempfile
+import typing
 import PIL.Image
 
 from pkg_resources import resource_filename
+from gscreenshot.selector import RegionSelector
 from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.selector.factory import SelectorFactory
@@ -24,7 +26,11 @@ class Screenshooter(object):
     """
 
     __slots__ = ('_image', 'tempfile', 'selector')
-    __utilityname__ = None
+    __utilityname__: typing.Optional[str] = None
+
+    _image: typing.Optional[PIL.Image.Image]
+    tempfile: str
+    selector: typing.Optional[RegionSelector]
 
     def __init__(self):
         """
@@ -42,7 +48,7 @@ class Screenshooter(object):
                 )
 
     @property
-    def image(self):
+    def image(self) -> typing.Optional[PIL.Image.Image]:
         """
         Returns the last screenshot taken
 
@@ -51,7 +57,7 @@ class Screenshooter(object):
         """
         return self._image
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> typing.List[str]:
         """
         Get supported features. Note that under-the-hood the capabilities
         of the selector (if applicable) will be added to this.
@@ -61,7 +67,7 @@ class Screenshooter(object):
         """
         return []
 
-    def get_capabilities_(self):
+    def get_capabilities_(self) -> typing.List[str]:
         """
         Get supported features. This should not be overridden by extending
         classes. Implement get_capabilities instead.
@@ -79,7 +85,8 @@ class Screenshooter(object):
 
         return capabilities
 
-    def grab_fullscreen_(self, delay=0, capture_cursor=False, use_cursor=None):
+    def grab_fullscreen_(self, delay: int=0, capture_cursor: bool=False,
+                         use_cursor: typing.Optional[PIL.Image.Image]=None):
         '''
         Internal API method for grabbing the full screen. This should not
         be overridden by extending classes. Implement grab_fullscreen instead.
@@ -91,7 +98,7 @@ class Screenshooter(object):
             if capture_cursor:
                 self.add_fake_cursor(use_cursor)
 
-    def grab_fullscreen(self, delay=0, capture_cursor=False):
+    def grab_fullscreen(self, delay: int=0, capture_cursor: bool=False):
         """
         Takes a screenshot of the full screen with a given delay
 
@@ -100,7 +107,8 @@ class Screenshooter(object):
         """
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
-    def grab_selection_(self, delay=0, capture_cursor=False, use_cursor=None):
+    def grab_selection_(self, delay: int=0, capture_cursor: bool=False,
+                        use_cursor: typing.Optional[PIL.Image.Image]=None):
         """
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
@@ -138,7 +146,8 @@ class Screenshooter(object):
         if self._image is not None:
             self._image = self._image.crop(crop_box)
 
-    def grab_window_(self, delay=0, capture_cursor=False, use_cursor=None):
+    def grab_window_(self, delay: int=0, capture_cursor: bool=False,
+                     use_cursor: typing.Optional[PIL.Image.Image]=None):
         '''
         Internal API method for grabbing a window. This should not
         be overridden by extending classes. Implement grab_window instead.
@@ -151,7 +160,7 @@ class Screenshooter(object):
             if capture_cursor:
                 self.add_fake_cursor(use_cursor)
 
-    def grab_window(self, delay=0, capture_cursor=False):
+    def grab_window(self, delay: int=0, capture_cursor: bool=False):
         """
         Takes an interactive screenshot of a selected window with a
         given delay. This has a full implementation and may not need
@@ -165,13 +174,13 @@ class Screenshooter(object):
         self.grab_selection_(delay, capture_cursor)
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """
         Whether this utility can run
         """
         return False
 
-    def get_cursor_position(self):
+    def get_cursor_position(self) -> typing.Optional[typing.Tuple[int, int]]:
         """
         Gets the current position of the mouse cursor, if able.
         Returns (x, y) or None.
@@ -193,7 +202,7 @@ class Screenshooter(object):
 
         return (mouse_data["root_x"], mouse_data["root_y"])
 
-    def add_fake_cursor(self, cursor_img=None):
+    def add_fake_cursor(self, cursor_img: typing.Optional[PIL.Image.Image]=None):
         """
         Stamps a fake cursor onto the screenshot.
         This is intended for use with screenshot backends that don't
@@ -229,7 +238,7 @@ class Screenshooter(object):
         except AttributeError: # PIL < 9.0
             antialias_algo = PIL.Image.ANTIALIAS
 
-        cursor_img.thumbnail((cursor_width, cursor_height), antialias_algo)
+        cursor_img.thumbnail((int(cursor_width), int(cursor_height)), antialias_algo)
 
         # If the cursor glyph is square, adjust its position slightly so it
         # shows up where expected.
@@ -245,7 +254,7 @@ class Screenshooter(object):
         screenshot_img.paste(cursor_img, cursor_pos, cursor_img)
         self._image = screenshot_img
 
-    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
+    def _grab_selection_fallback(self, delay: int=0, capture_cursor: bool=False):
         """
         Fallback for grabbing the selection, in case the selection tool fails to
         run entirely. Defaults to giving up and just taking a full screen shot.
@@ -255,7 +264,8 @@ class Screenshooter(object):
         """
         self.grab_fullscreen(delay, capture_cursor)
 
-    def _call_screenshooter(self, screenshooter, params = None):
+    def _call_screenshooter(self, screenshooter: str,
+                            params: typing.Optional[typing.List[str]]= None) -> bool:
 
         # This is safer than defaulting to []
         if params is None:

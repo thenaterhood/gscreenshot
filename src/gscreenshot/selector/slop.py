@@ -1,6 +1,7 @@
 '''
 Wrapper for the slop screen selector utility
 '''
+import typing
 import subprocess
 from gscreenshot.selector import SelectionExecError, SelectionCancelled, RegionSelector
 from gscreenshot.util import find_executable
@@ -21,7 +22,7 @@ class Slop(RegionSelector):
         """
         RegionSelector.__init__(self)
 
-    def region_select(self):
+    def region_select(self) -> typing.Tuple[int, int, int, int]:
         """
         Select an arbitrary region of the screen
 
@@ -30,7 +31,7 @@ class Slop(RegionSelector):
         """
         return self._get_boundary_interactive()
 
-    def window_select(self):
+    def window_select(self) -> typing.Tuple[int, int, int, int]:
         """
         Selects a window from the screen
 
@@ -40,11 +41,11 @@ class Slop(RegionSelector):
         return self._get_boundary_interactive()
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """Whether slop is available"""
         return find_executable('slop') is not None
 
-    def _get_boundary_interactive(self):
+    def _get_boundary_interactive(self) -> typing.Tuple[int, int, int, int]:
         """
         Calls slop and returns the boundary produced by
         slop

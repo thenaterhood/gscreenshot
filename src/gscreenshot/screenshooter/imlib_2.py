@@ -31,6 +31,6 @@ class Imlib2(Screenshooter):
         self._call_screenshooter('imlib2_grab', [self.tempfile])
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         '''Whether this utility is available'''
         return find_executable('imlib2_grab') is not None

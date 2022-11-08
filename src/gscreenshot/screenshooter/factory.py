@@ -2,6 +2,7 @@
 Utilities for selecting a screenshot utility
 '''
 
+from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.grim import Grim
 from gscreenshot.screenshooter.imagemagick import ImageMagick
 from gscreenshot.screenshooter.imlib_2 import Imlib2
@@ -34,7 +35,7 @@ class ScreenshooterFactory(object):
         else:
             self.screenshooters = self.xorg_screenshooters
 
-    def create(self):
+    def create(self) -> Screenshooter:
         '''Returns a screenshooter instance'''
         if self.screenshooter is not None:
             return self.screenshooter

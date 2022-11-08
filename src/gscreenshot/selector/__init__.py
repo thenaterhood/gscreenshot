@@ -1,6 +1,7 @@
 '''
 Classes and exceptions related to screen region selection
 '''
+import typing
 from gscreenshot.util import GSCapabilities
 
 
@@ -27,7 +28,7 @@ class RegionSelector():
         constructor
         """
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> typing.List[str]:
         """
         Get the features this selector supports
         """
@@ -36,7 +37,7 @@ class RegionSelector():
             GSCapabilities.REGION_SELECTION
         ]
 
-    def region_select(self):
+    def region_select(self) -> typing.Tuple[int, int, int, int]:
         """
         Select an arbitrary region of the screen
 
@@ -45,7 +46,7 @@ class RegionSelector():
         """
         raise SelectionError("Not implemented")
 
-    def window_select(self):
+    def window_select(self) -> typing.Tuple[int, int, int, int]:
         """
         Selects a window from the screen
 
@@ -55,13 +56,14 @@ class RegionSelector():
         raise SelectionError("Not implemented")
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """
         Returns whether this is capable of running.
         """
         return False
 
-    def _parse_selection_output(self, region_output):
+    def _parse_selection_output(self, region_output: typing.List[str]
+                                ) -> typing.Tuple[int, int, int, int]:
         '''
         Parses output from a region selection tool in the format
         X=%x,Y=%y,W=%w,H=%h.

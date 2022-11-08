@@ -31,7 +31,7 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_screenshooter('import', ['-window', 'root', self.tempfile])
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> list:
         '''List of capabilities'''
         return [
             GSCapabilities.REGION_SELECTION,
@@ -39,7 +39,7 @@ class ImageMagick(Screenshooter):
         ]
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         '''Whether this utility is available'''
         return find_executable('import') is not None
 

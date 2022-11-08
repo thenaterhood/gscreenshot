@@ -85,7 +85,7 @@ class XdgPortalScreenshot:
             dbus_interface='org.freedesktop.portal.Screenshot'
         )
 
-    def get_request_handle(self, token):
+    def get_request_handle(self, token) -> str:
         '''get a request handle name'''
         sender_name = re.sub(r'\.', '_', self.bus.get_unique_name()).lstrip(':')
         return f"/org/freedesktop/portal/desktop/request/{sender_name}/{token}"
@@ -126,7 +126,7 @@ class XdgDesktopPortal(Screenshooter):
         self._call_screenshooter(py_call, [script_path, self.tempfile])
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """Whether dbus is available"""
         if dbus is None:
             return False

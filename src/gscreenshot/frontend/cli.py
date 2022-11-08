@@ -143,6 +143,8 @@ def run():
             if not successful_clip:
                 tmp_file = gscreenshot.save_and_return_path()
                 print(_("Could not clip image! Xclip failed to run."))
-                print(_("Your screenshot was saved to {0}").format(tmp_file))
+
+                if tmp_file is not None:
+                    print(_("Your screenshot was saved to {0}").format(tmp_file))
                 exit_code = 1
         sys.exit(exit_code)

@@ -3,6 +3,7 @@ Integration for the grim screenshot utility
 '''
 from time import sleep
 import subprocess
+import typing
 
 from gscreenshot.util import find_executable, GSCapabilities
 from gscreenshot.screenshooter import Screenshooter
@@ -37,7 +38,7 @@ class Grim(Screenshooter):
         self._call_screenshooter('grim', params)
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """Whether grim is available"""
         if find_executable('grim') is None:
             return False
@@ -51,15 +52,13 @@ class Grim(Screenshooter):
 
         return True
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> typing.List[str]:
         """
         Get supported features
         """
-        capabilities = [
+        return [
             GSCapabilities.CURSOR_CAPTURE
         ]
-
-        return capabilities + self.selector.get_capabilities()
 
     def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         sleep(delay)
