@@ -92,3 +92,6 @@ class RegionSelector():
             raise SelectionParseError("Unexpected output") #from exception
 
         return crop_box
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'

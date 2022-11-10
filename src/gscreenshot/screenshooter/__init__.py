@@ -32,14 +32,17 @@ class Screenshooter(object):
     tempfile: str
     selector: typing.Optional[RegionSelector]
 
-    def __init__(self):
+    def __init__(self, selector: typing.Optional[RegionSelector]=None):
         """
         constructor
         """
-        try:
-            self.selector = SelectorFactory().create()
-        except NoSupportedSelectorError:
-            self.selector = None
+        if selector is None:
+            try:
+                self.selector = SelectorFactory().create()
+            except NoSupportedSelectorError:
+                self.selector = None
+        else:
+            self.selector = selector
 
         self._image = None
         self.tempfile = os.path.join(
@@ -281,3 +284,6 @@ class Screenshooter(object):
             return False
 
         return True
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}(selector={self.selector})'

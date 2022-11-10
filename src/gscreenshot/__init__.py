@@ -519,6 +519,9 @@ class Gscreenshot(object):
             padded_version = [v.rjust(2, "0") for v in version]
             return ".".join(padded_version)
 
+    def __repr__(self) -> str:
+        return f'Gscreenshot(screenshooter={self.screenshooter})'
+
     def quit(self):
         """
         Exits the application and interpreter
