@@ -115,8 +115,9 @@ class ScreenshooterTest(unittest.TestCase):
         self.screenshooter.set_image(original_img)
         self.screenshooter.add_fake_cursor(cursor_img)
 
+        self.assertIsNotNone(self.screenshooter.image)
         self.assertLess(
-            len(set(ImageChops.difference(expected_img, self.screenshooter.image).getdata())),
+            len(set(ImageChops.difference(expected_img, self.screenshooter.image).getdata())),  # type: ignore
             100,
             "cursor was not stamped onto the test image correctly")
 
@@ -136,8 +137,9 @@ class ScreenshooterTest(unittest.TestCase):
         self.screenshooter.set_image(original_img)
         self.screenshooter.add_fake_cursor(cursor_img)
 
+        self.assertIsNotNone(self.screenshooter.image)
         self.assertLess(
-            len(set(ImageChops.difference(original_img, self.screenshooter.image).getdata())),
+            len(set(ImageChops.difference(original_img, self.screenshooter.image).getdata())),  # type: ignore
             100,
             "original and actual image should not differ")
 
@@ -158,8 +160,9 @@ class ScreenshooterTest(unittest.TestCase):
         self.screenshooter.set_image(original_img)
         self.screenshooter.add_fake_cursor(cursor_img)
 
+        self.assertIsNotNone(self.screenshooter.image)
         self.assertLess(
-            len(set(ImageChops.difference(original_img, self.screenshooter.image).getdata())),
+            len(set(ImageChops.difference(original_img, self.screenshooter.image).getdata())),  # type: ignore
             100,
             "original and actual image should not differ")
 
