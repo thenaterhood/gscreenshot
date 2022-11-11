@@ -31,7 +31,7 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_screenshooter('import', ['-window', 'root', self.tempfile])
 
-    def grab_selection(self, delay=0, capture_cursor=False):
+    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         """
         Takes a screenshot of the full screen with a given delay
 
