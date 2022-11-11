@@ -252,6 +252,9 @@ class Gscreenshot(object):
         """
         return self.screenshooter.image
 
+    def uncrop(self):
+        self.screenshooter.uncrop()
+
     def get_supported_formats(self) -> typing.List[str]:
         """
         Returns the image formats supported for saving to
