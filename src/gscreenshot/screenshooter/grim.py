@@ -59,12 +59,3 @@ class Grim(Screenshooter):
         return [
             GSCapabilities.CURSOR_CAPTURE
         ]
-
-    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
-        sleep(delay)
-        params = [self.tempfile]
-
-        if capture_cursor:
-            params = ['-c', self.tempfile]
-
-        self._call_screenshooter('grim', params)
