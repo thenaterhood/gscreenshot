@@ -83,7 +83,7 @@ class Slurp(RegionSelector):
 
                     raise SelectionExecError(slurp_error)
 
-                slurp_output = stdout.decode("UTF-8").strip().split(",")
+                slurp_output = stdout.decode("UTF-8").strip().split("\n")
 
                 return self._parse_selection_output(slurp_output)
         except OSError:

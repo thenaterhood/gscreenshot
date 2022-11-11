@@ -66,7 +66,7 @@ class RegionSelector():
                                 ) -> typing.Tuple[int, int, int, int]:
         '''
         Parses output from a region selection tool in the format
-        X=%x,Y=%y,W=%w,H=%h.
+        X=%x,Y=%y,W=%w,H=%h OR X=%x\nY=%x\nW=%w\nH=%h.
 
         Returns a tuple of the X and Y coordinates of the corners:
         (X top left, Y top left, X bottom right, Y bottom right)
@@ -75,17 +75,18 @@ class RegionSelector():
         # We iterate through the output so we're not reliant
         # on the order or number of lines in the output
         for line in region_output:
-            if '=' in line:
-                spl = line.split("=")
-                region_parsed[spl[0]] = spl[1]
+            for s in line.split(","):
+                if '=' in s:
+                    spl = s.split("=")
+                    region_parsed[spl[0]] = int(spl[1])
 
         # (left, upper, right, lower)
         try:
             crop_box = (
-                int(region_parsed['X']),
-                int(region_parsed['Y']),
-                int(region_parsed['X']) + int(region_parsed['W']),
-                int(region_parsed['Y']) + int(region_parsed['H'])
+                region_parsed['X'],
+                region_parsed['Y'],
+                region_parsed['X'] + region_parsed['W'],
+                region_parsed['Y'] + region_parsed['H']
             )
         except KeyError:
             #pylint: disable=raise-missing-from

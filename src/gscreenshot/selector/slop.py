@@ -76,7 +76,7 @@ class Slop(RegionSelector):
 
                     raise SelectionExecError(slop_error)
 
-                slop_output = stdout.decode("UTF-8").strip().split(",")
+                slop_output = stdout.decode("UTF-8").strip().split("\n")
 
                 return self._parse_selection_output(slop_output)
 
