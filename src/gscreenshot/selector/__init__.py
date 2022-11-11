@@ -1,6 +1,7 @@
 '''
 Classes and exceptions related to screen region selection
 '''
+import subprocess
 import typing
 from gscreenshot.util import GSCapabilities
 
@@ -61,6 +62,44 @@ class RegionSelector():
         Returns whether this is capable of running.
         """
         return False
+
+    def _get_boundary_interactive(self, params: typing.List[str]
+                                ) -> typing.Tuple[int, int, int, int]:
+        """
+        Runs the selector and returns the parsed output. This accepts a list
+        that will be passed directly to subprocess.Popen and expects the
+        utility to be capable of returning a string parseable by _parse_selection_output.
+        """
+        try:
+            with subprocess.Popen(
+                params,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+                ) as selector_process:
+
+                try:
+                    stdout, stderr = selector_process.communicate(timeout=60)
+                except subprocess.TimeoutExpired:
+                    selector_process.kill()
+                    #pylint: disable=raise-missing-from
+                    raise SelectionExecError(f"{params[0]} selection timed out")
+
+                return_code = selector_process.returncode
+
+                if return_code != 0:
+                    selector_error = stderr.decode("UTF-8")
+
+                    if "cancelled" in selector_error:
+                        raise SelectionCancelled("Selection was cancelled")
+
+                    raise SelectionExecError(selector_error)
+
+                selector_output = stdout.decode("UTF-8").strip().split("\n")
+
+                return self._parse_selection_output(selector_output)
+        except OSError:
+            #pylint: disable=raise-missing-from
+            raise SelectionExecError(f"{params[0]} was not found") #from exception
 
     def _parse_selection_output(self, region_output: typing.List[str]
                                 ) -> typing.Tuple[int, int, int, int]:
