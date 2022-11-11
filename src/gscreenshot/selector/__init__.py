@@ -114,9 +114,9 @@ class RegionSelector():
         # We iterate through the output so we're not reliant
         # on the order or number of lines in the output
         for line in region_output:
-            for s in line.split(","):
-                if '=' in s:
-                    spl = s.split("=")
+            for comma_split in line.split(","):
+                if '=' in comma_split:
+                    spl = comma_split.split("=")
                     region_parsed[spl[0]] = int(spl[1])
 
         # (left, upper, right, lower)
