@@ -31,13 +31,6 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_screenshooter('import', ['-window', 'root', self.tempfile])
 
-    def get_capabilities(self) -> list:
-        '''List of capabilities'''
-        return [
-            GSCapabilities.REGION_SELECTION,
-            GSCapabilities.WINDOW_SELECTION
-        ]
-
     @staticmethod
     def can_run() -> bool:
         '''Whether this utility is available'''
