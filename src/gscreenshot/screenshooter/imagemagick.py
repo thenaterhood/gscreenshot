@@ -5,7 +5,6 @@ from time import sleep
 
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import find_executable
-from gscreenshot.util import GSCapabilities
 
 
 class ImageMagick(Screenshooter):
