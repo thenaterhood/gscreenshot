@@ -2,8 +2,7 @@
 Wrapper for the slop screen selector utility
 '''
 import typing
-import subprocess
-from gscreenshot.selector import SelectionExecError, SelectionCancelled, RegionSelector
+from gscreenshot.selector import RegionSelector
 from gscreenshot.util import find_executable
 
 

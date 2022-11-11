@@ -1,9 +1,8 @@
 '''
 Wrapper for the slurp screen selector utility
 '''
-import subprocess
 import typing
-from gscreenshot.selector import SelectionExecError, SelectionCancelled, RegionSelector
+from gscreenshot.selector import RegionSelector
 from gscreenshot.util import find_executable, GSCapabilities
 
 
