@@ -454,6 +454,11 @@ class Presenter(object):
             self._app.screenshot_selected
             )
 
+    def on_action_uncrop_clicked(self, *_):
+        '''Handle the uncrop button'''
+        self._app.uncrop()
+        self._show_preview()
+
     def on_button_saveas_clicked(self, *_):
         '''Handle the saveas button'''
         saved = False

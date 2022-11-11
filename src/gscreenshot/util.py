@@ -23,6 +23,7 @@ class GSCapabilities(object):
     CURSOR_CAPTURE = "cursor_capture"
     ALTERNATE_CURSOR = "alternate_cursor"
     CAPTURE_FULLSCREEN = "capture_full_screen"
+    UNCROP = "uncrop"
 
 # This is a direct copy and paste of distutil.spawn.is_executable.
 # We do this so that we don't need to add a dependency on distutils

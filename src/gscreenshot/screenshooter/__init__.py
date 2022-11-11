@@ -25,10 +25,11 @@ class Screenshooter(object):
     Python interface for a screenshooter
     """
 
-    __slots__ = ('_image', 'tempfile', 'selector')
+    __slots__ = ('_image', '_cropped_image', 'tempfile', 'selector')
     __utilityname__: typing.Optional[str] = None
 
     _image: typing.Optional[PIL.Image.Image]
+    _cropped_image: typing.Optional[PIL.Image.Image]
     tempfile: str
     selector: typing.Optional[RegionSelector]
 
@@ -45,6 +46,7 @@ class Screenshooter(object):
             self.selector = selector
 
         self._image = None
+        self._cropped_image = None
         self.tempfile = os.path.join(
                 tempfile.gettempdir(),
                 str(os.getpid()) + ".png"
@@ -58,7 +60,10 @@ class Screenshooter(object):
         Returns:
             PIL.Image or None
         """
-        return self._image
+        return self._cropped_image or self._image
+
+    def uncrop(self):
+        self._cropped_image = None
 
     def get_capabilities(self) -> typing.List[str]:
         """
@@ -84,7 +89,8 @@ class Screenshooter(object):
             capabilities.append(GSCapabilities.CURSOR_CAPTURE)
 
         if self.selector is not None:
-            return capabilities + self.selector.get_capabilities()
+            capabilities = capabilities + self.selector.get_capabilities()
+            capabilities.append(GSCapabilities.UNCROP)
 
         return capabilities
 
@@ -147,7 +153,7 @@ class Screenshooter(object):
         self.grab_fullscreen_(delay, capture_cursor, use_cursor)
 
         if self._image is not None:
-            self._image = self._image.crop(crop_box)
+            self._cropped_image = self._image.crop(crop_box)
 
     def grab_window_(self, delay: int=0, capture_cursor: bool=False,
                      use_cursor: typing.Optional[PIL.Image.Image]=None):
