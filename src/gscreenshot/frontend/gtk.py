@@ -31,6 +31,7 @@ class View(object):
     '''View class for the GTK frontend'''
 
     def __init__(self, window, builder, capabilities):
+        self._builder = builder
         self._window = window
         self._window_is_fullscreen = False
         self._was_maximized = False
@@ -44,6 +45,8 @@ class View(object):
         self._cursor_selection_label = builder.get_object('pointer_selection_label')
         self._actions_menu = builder.get_object('menu_saveas_additional_actions')
         self._status_icon = builder.get_object('status_icon')
+        self._preview_overlay = builder.get_object('image_overlay')
+        self._uncrop_btn = None
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
@@ -62,6 +65,36 @@ class View(object):
             checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
             checkbox_capture_cursor.set_opacity(0)
             checkbox_capture_cursor.set_sensitive(0)
+
+        if GSCapabilities.UNCROP in self._capabilities:
+            self._uncrop_btn = Gtk.Button('Uncrop')
+            self._uncrop_btn.set_size_request(20, 20)
+            self._uncrop_btn.set_hexpand(False)
+            self._uncrop_btn.set_vexpand(False)
+            self._uncrop_btn.set_halign(Gtk.Align(3))
+            self._uncrop_btn.set_valign(Gtk.Align(2))
+            self._uncrop_btn.set_opacity(.5)
+            self._uncrop_btn.connect('enter', self._uncrop_hover)
+            self._uncrop_btn.connect('leave', self._uncrop_leave)
+            self._preview_overlay.add_overlay(self._uncrop_btn)
+
+    def _uncrop_hover(self, widget, *_):
+        widget.set_opacity(.9)
+
+    def _uncrop_leave(self, widget, *_):
+        widget.set_opacity(.4)
+
+    def connect_signals(self, presenter):
+        self._builder.connect_signals(presenter)
+
+        self._window.connect("check-resize", presenter.on_window_resize)
+        self._window.connect("window-state-event", presenter.window_state_event_handler)
+        self._window.set_icon_from_file(
+            resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
+        )
+
+        if self._uncrop_btn is not None:
+            self._uncrop_btn.connect('clicked', presenter.on_action_uncrop_clicked)
 
     def flash_status_icon(self, stock_name: str="emblem-ok"):
         """
@@ -791,14 +824,7 @@ def main():
     }
     presenter.set_keymappings(keymappings)
 
-    builder.connect_signals(presenter)
-
-    window.connect("check-resize", presenter.on_window_resize)
-    window.connect("window-state-event", presenter.window_state_event_handler)
-    window.set_icon_from_file(
-        resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
-    )
-
+    view.connect_signals(presenter)
     view.run()
 
     GObject.threads_init() # Start background threads.
