@@ -30,10 +30,10 @@ class Grim(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        params = [self.tempfile]
+        params = [self._tempfile]
 
         if capture_cursor:
-            params = ['-c', self.tempfile]
+            params = ['-c', self._tempfile]
 
         self._call_screenshooter('grim', params)
 

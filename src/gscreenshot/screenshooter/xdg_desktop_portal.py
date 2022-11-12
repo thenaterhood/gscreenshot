@@ -123,7 +123,7 @@ class XdgDesktopPortal(Screenshooter):
         if sys.version_info.major < 3:
             py_call = "python2"
 
-        self._call_screenshooter(py_call, [script_path, self.tempfile])
+        self._call_screenshooter(py_call, [script_path, self._tempfile])
 
     @staticmethod
     def can_run() -> bool:

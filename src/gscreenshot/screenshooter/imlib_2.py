@@ -28,7 +28,7 @@ class Imlib2(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        self._call_screenshooter('imlib2_grab', [self.tempfile])
+        self._call_screenshooter('imlib2_grab', [self._tempfile])
 
     @staticmethod
     def can_run() -> bool:
