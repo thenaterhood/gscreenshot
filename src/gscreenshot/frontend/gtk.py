@@ -31,37 +31,138 @@ class View(object):
     '''View class for the GTK frontend'''
 
     def __init__(self, window, builder, capabilities):
+        self._builder = builder
         self._window = window
-        self._window_is_fullscreen = False
-        self._was_maximized = False
+        self._window_is_fullscreen:bool = False
+        self._was_maximized:bool = False
         self._capabilities = capabilities
         self._last_window_dimensions = self._window.get_size()
         self._header_bar = builder.get_object('header_bar')
-        self._preview = builder.get_object('image1')
-        self._control_grid = builder.get_object('control_box')
-        self._cursor_selection_items = builder.get_object('cursor_selection_items')
-        self._cursor_selection_dropdown = builder.get_object('pointer_selection_dropdown')
-        self._cursor_selection_label = builder.get_object('pointer_selection_label')
-        self._actions_menu = builder.get_object('menu_saveas_additional_actions')
-        self._status_icon = builder.get_object('status_icon')
+        self._preview:Gtk.Image = builder.get_object('image1')
+        self._control_grid:Gtk.Box = builder.get_object('control_box')
+        self._cursor_selection_items:Gtk.ListStore = builder.get_object('cursor_selection_items')
+        self._cursor_selection_dropdown:Gtk.ComboBox = builder.get_object('pointer_selection_dropdown')
+        self._cursor_selection_label:Gtk.Label = builder.get_object('pointer_selection_label')
+        self._multishot_count:Gtk.SpinButton = builder.get_object('multishot_count')
+        self._multishot_label:Gtk.Label = builder.get_object('multishot_count_label')
+        self._actions_menu:Gtk.Menu = builder.get_object('menu_saveas_additional_actions')
+        self._status_icon:Gtk.Image = builder.get_object('status_icon')
+        self._preview_overlay:Gtk.Overlay = builder.get_object('image_overlay')
+
+        self._prev_btn:Gtk.Button = Gtk.Button.new_from_stock(Gtk.STOCK_GO_BACK)
+        self._prev_btn.set_size_request(20, 20)
+        self._prev_btn.set_opacity(0)
+
+        self._next_btn:Gtk.Button = Gtk.Button.new_from_stock(Gtk.STOCK_GO_FORWARD)
+        self._next_btn.set_size_request(20, 20)
+        self._next_btn.set_opacity(0)
+
+        self._preview_control:Gtk.ButtonBox = Gtk.ButtonBox()
+        self._preview_control.set_hexpand(False)
+        self._preview_control.set_vexpand(False)
+        self._preview_control.set_halign(Gtk.Align.CENTER)
+        self._preview_control.set_valign(Gtk.Align.END)
+        self._preview_control.add(self._prev_btn)
+        self._preview_control.add(self._next_btn)
+
+        self._preview_overlay.add_overlay(self._preview_control)
+
+        self.update_gallery_controls(False, False)
+
+        self._disable_and_hide(self._multishot_count)
+        self._disable_and_hide(self._multishot_label)
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
 
         if GSCapabilities.WINDOW_SELECTION not in self._capabilities:
             window_select_button = builder.get_object('button_window')
-            window_select_button.set_opacity(0)
-            window_select_button.set_sensitive(0)
+            self._disable_and_hide(window_select_button)
 
         if GSCapabilities.REGION_SELECTION not in self._capabilities:
             region_select_button = builder.get_object('button_selectarea')
-            region_select_button.set_opacity(0)
-            region_select_button.set_sensitive(0)
+            self._disable_and_hide(region_select_button)
 
         if GSCapabilities.CURSOR_CAPTURE not in self._capabilities:
             checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
-            checkbox_capture_cursor.set_opacity(0)
-            checkbox_capture_cursor.set_sensitive(0)
+            self._disable_and_hide(checkbox_capture_cursor)
+
+    def _disable_and_hide(self, widget):
+        '''disables and hides a widget'''
+        widget.set_opacity(0)
+        widget.set_sensitive(0)
+
+    def _enable_and_show(self, widget):
+        '''enables and shows a widget'''
+        widget.set_opacity(1)
+        widget.set_sensitive(1)
+
+    def _hover_effect(self, widget, *_):
+        '''
+        applies a higher opacity to the widget when the cursor hovers
+        '''
+        widget.set_opacity(.9)
+
+    def _unhover_effect(self, widget, *_):
+        '''
+        applies a lighter opacity to the widget when the cursor leaves
+        '''
+        widget.set_opacity(.4)
+
+    def show_multishot_count(self, enable):
+        if not enable:
+            self._disable_and_hide(self._multishot_count)
+            self._disable_and_hide(self._multishot_label)
+            if GSCapabilities.REGION_SELECTION in self._capabilities:
+                self._enable_and_show(self._builder.get_object('button_selectarea'))
+            if GSCapabilities.WINDOW_SELECTION in self._capabilities:
+                self._enable_and_show(self._builder.get_object('button_window'))
+        else:
+            self._enable_and_show(self._multishot_count)
+            self._enable_and_show(self._multishot_label)
+
+    def update_gallery_controls(self, show_next=True, show_previous=True):
+        '''
+        updates the preview controls to match the current state
+        '''
+        while Gtk.events_pending():
+            Gtk.main_iteration()      
+        
+        if show_next and self._next_btn.get_opacity() <= 0:
+            self._next_btn.set_opacity(.5)
+            self._next_btn.connect('enter', self._hover_effect)
+            self._next_btn.connect('leave', self._unhover_effect)
+        elif not show_next and self._next_btn.get_opacity() > 0:
+            self._next_btn.set_opacity(0)
+            self._next_btn.disconnect_by_func(self._hover_effect)
+            self._next_btn.disconnect_by_func(self._unhover_effect)
+
+        if show_previous and self._prev_btn.get_opacity() <= 0:
+            self._prev_btn.set_opacity(.5)
+            self._prev_btn.connect('enter', self._hover_effect)
+            self._prev_btn.connect('leave', self._unhover_effect)
+        elif not show_previous and self._prev_btn.get_opacity() > 0:
+            self._prev_btn.set_opacity(0)
+            self._prev_btn.disconnect_by_func(self._hover_effect)
+            self._prev_btn.disconnect_by_func(self._unhover_effect)
+
+    def connect_signals(self, presenter):
+        '''
+        connects signals
+        '''
+        self._builder.connect_signals(presenter)
+
+        self._window.connect("check-resize", presenter.on_window_resize)
+        self._window.connect("window-state-event", presenter.window_state_event_handler)
+        self._window.set_icon_from_file(
+            resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
+        )
+
+        if self._prev_btn is not None:
+            self._prev_btn.connect('clicked', presenter.on_preview_prev_clicked)
+
+        if self._next_btn is not None:
+            self._next_btn.connect('clicked', presenter.on_preview_next_clicked)
 
     def flash_status_icon(self, stock_name: str="emblem-ok"):
         """
@@ -337,7 +438,7 @@ class Presenter(object):
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
             '_pixbuf', '_view', '_keymappings', '_capture_cursor',
-            '_cursor_selection')
+            '_cursor_selection', '_multishot_mode', '_multishot_count')
 
     _delay: int
     _app: Gscreenshot
@@ -348,6 +449,8 @@ class Presenter(object):
     _keymappings: dict
     _capture_cursor: bool
     _cursor_selection: str
+    _multishot_mode: bool
+    _multishot_count: int
 
     def __init__(self, application: Gscreenshot, view: View):
         self._app = application
@@ -356,6 +459,8 @@ class Presenter(object):
         self._delay = 0
         self._hide = True
         self._capture_cursor = False
+        self._multishot_mode = False
+        self._multishot_count = 1
         self._show_preview()
         self._view.show_cursor_options(self._capture_cursor)
         self._keymappings = {}
@@ -368,13 +473,23 @@ class Presenter(object):
                 )
 
     def _begin_take_screenshot(self, app_method):
-        app_method(self._delay, self._capture_cursor, self._cursor_selection)
+        if self._multishot_mode:
+            count = self._multishot_count
+        else:
+            count = 1
+
+        app_method(self._delay, self._capture_cursor, self._cursor_selection, count)
 
         # Re-enable UI on the UI thread.
         GLib.idle_add(self._end_take_screenshot)
 
     def _end_take_screenshot(self):
         self._show_preview()
+        screenshot_collection = self._app.get_screenshot_collection()
+        self._view.update_gallery_controls(
+            show_next=screenshot_collection.has_next(),
+            show_previous=screenshot_collection.has_previous()
+        )
 
         self._view.unhide()
         self._view.set_ready()
@@ -430,6 +545,15 @@ class Presenter(object):
         '''Handle a change with the screenshot delay input'''
         self._delay = widget.get_value()
 
+    def multishot_value_changed(self, widget):
+        '''Handle a change with the multishot count input'''
+        self._multishot_count = int(widget.get_value())
+
+    def multishot_toggled(self, widget):
+        '''Toggle multishot'''
+        self._multishot_mode = widget.get_active()
+        self._view.show_multishot_count(self._multishot_mode)
+
     def selected_cursor_changed(self, widget):
         '''Handle a change to the selected cursor'''
         self._cursor_selection = widget.get_model()[widget.get_active()][2]
@@ -454,10 +578,45 @@ class Presenter(object):
             self._app.screenshot_selected
             )
 
-    def on_action_uncrop_clicked(self, *_):
-        '''Handle the uncrop button'''
-        self._app.uncrop()
+    def on_preview_prev_clicked(self, *_):
+        screenshot_collection = self._app.get_screenshot_collection()
+        screenshot_collection.cursor_prev()
         self._show_preview()
+        self._view.update_gallery_controls(
+            show_next=screenshot_collection.has_next(),
+            show_previous=screenshot_collection.has_previous()
+        )
+
+    def on_preview_next_clicked(self, *_):
+        screenshot_collection = self._app.get_screenshot_collection()
+        screenshot_collection.cursor_next()
+        self._show_preview()
+        self._view.update_gallery_controls(
+            show_next=screenshot_collection.has_next(),
+            show_previous=screenshot_collection.has_previous()
+        )
+
+    def on_button_saveall_clicked(self, *_):
+        '''Handle the "save all" button'''
+        saved = False
+        cancelled = False
+        save_dialog = FileSaveDialog(
+            self._app.get_time_foldername(),
+            self._app.get_last_save_directory(),
+            self._view.get_window()
+        )
+
+        while not (saved or cancelled):
+            fname = self._view.run_dialog(save_dialog)
+            if fname is not None:
+                self._view.set_busy()
+                saved = self._app.save_screenshot_collection(fname)
+                self._view.set_ready()
+            else:
+                cancelled = True
+
+        if saved:
+            self._view.flash_status_icon("document-save")
 
     def on_button_saveas_clicked(self, *_):
         '''Handle the saveas button'''
@@ -791,14 +950,7 @@ def main():
     }
     presenter.set_keymappings(keymappings)
 
-    builder.connect_signals(presenter)
-
-    window.connect("check-resize", presenter.on_window_resize)
-    window.connect("window-state-event", presenter.window_state_event_handler)
-    window.set_icon_from_file(
-        resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
-    )
-
+    view.connect_signals(presenter)
     view.run()
 
     GObject.threads_init() # Start background threads.

@@ -8,6 +8,7 @@ import typing
 import PIL.Image
 
 from pkg_resources import resource_filename
+from gscreenshot.screenshot import Screenshot
 from gscreenshot.selector import RegionSelector
 from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
@@ -25,11 +26,10 @@ class Screenshooter(object):
     Python interface for a screenshooter
     """
 
-    __slots__ = ('_image', '_cropped_image', '_tempfile', '_selector')
+    __slots__ = ('_tempfile', '_selector', '_screenshot')
     __utilityname__: typing.Optional[str] = None
 
-    _image: typing.Optional[PIL.Image.Image]
-    _cropped_image: typing.Optional[PIL.Image.Image]
+    _screenshot: typing.Optional[Screenshot]
     _tempfile: str
     _selector: typing.Optional[RegionSelector]
 
@@ -45,8 +45,7 @@ class Screenshooter(object):
         else:
             self._selector = selector
 
-        self._image = None
-        self._cropped_image = None
+        self._screenshot = None
         self._tempfile = os.path.join(
                 tempfile.gettempdir(),
                 str(os.getpid()) + ".png"
@@ -55,15 +54,22 @@ class Screenshooter(object):
     @property
     def image(self) -> typing.Optional[PIL.Image.Image]:
         """
-        Returns the last screenshot taken
+        Returns the last screenshot taken - PIL Image
 
         Returns:
             PIL.Image or None
         """
-        return self._cropped_image or self._image
+        if self._screenshot is not None:
+            return self._screenshot.get_image()
 
-    def uncrop(self):
-        self._cropped_image = None
+        return None
+
+    @property
+    def screenshot(self) -> typing.Optional[Screenshot]:
+        """
+        Returns the last screenshot taken - Screenshot object
+        """
+        return self._screenshot
 
     def get_capabilities(self) -> typing.List[str]:
         """
@@ -152,8 +158,8 @@ class Screenshooter(object):
 
         self.grab_fullscreen_(delay, capture_cursor, use_cursor)
 
-        if self._image is not None:
-            self._cropped_image = self._image.crop(crop_box)
+        if self._screenshot is not None:
+            self._screenshot = Screenshot(self._screenshot.get_image().crop(crop_box))
 
     def grab_window_(self, delay: int=0, capture_cursor: bool=False,
                      use_cursor: typing.Optional[PIL.Image.Image]=None):
@@ -217,7 +223,7 @@ class Screenshooter(object):
         This is intended for use with screenshot backends that don't
         capture the cursor (or don't capture the cursor in some scenarios)
         """
-        if self._image is None:
+        if self._screenshot is None:
             return
 
         cursor_pos = self.get_cursor_position()
@@ -232,7 +238,7 @@ class Screenshooter(object):
         if cursor_img is None:
             cursor_img = PIL.Image.open(fname)
 
-        screenshot_img = self._image.copy()
+        screenshot_img = self._screenshot.get_image().copy()
 
         screenshot_width, screenshot_height = screenshot_img.size
 
@@ -261,7 +267,7 @@ class Screenshooter(object):
         # as a mask (PIL uses the alpha channel) so the cursor doesn't have
         # a black box.
         screenshot_img.paste(cursor_img, cursor_pos, cursor_img)
-        self._image = screenshot_img
+        self._screenshot = Screenshot(screenshot_img)
 
     def _grab_selection_fallback(self, delay: int=0, capture_cursor: bool=False):
         """
@@ -283,10 +289,10 @@ class Screenshooter(object):
         params = [screenshooter] + params
         try:
             subprocess.check_output(params)
-            self._image = PIL.Image.open(self._tempfile)
+            self._screenshot = Screenshot(PIL.Image.open(self._tempfile))
             os.unlink(self._tempfile)
         except (subprocess.CalledProcessError, IOError, OSError):
-            self._image = None
+            self._screenshot = None
             return False
 
         return True
