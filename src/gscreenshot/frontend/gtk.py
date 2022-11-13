@@ -128,7 +128,7 @@ class View(object):
         updates the preview controls to match the current state
         '''
         while Gtk.events_pending():
-            Gtk.main_iteration() 
+            Gtk.main_iteration()
 
         if show_next and self._next_btn.get_opacity() <= 0:
             self._next_btn.set_opacity(.5)
