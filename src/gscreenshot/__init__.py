@@ -260,7 +260,8 @@ class Gscreenshot(object):
             array
         """
         supported_formats = [
-            'bmp', 'eps', 'gif', 'jpeg', 'pcx', 'pdf', 'ppm', 'tiff', 'png'
+            'bmp', 'eps', 'gif', 'jpeg', 'pcx',
+            'pdf', 'ppm', 'tiff', 'png', 'webp',
             ]
 
         return supported_formats
