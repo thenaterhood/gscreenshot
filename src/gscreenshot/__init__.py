@@ -177,6 +177,7 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
+        self._screenshots = ScreenshotCollection()
 
         if not capture_cursor:
             use_cursor = None
@@ -211,6 +212,7 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
+        self._screenshots = ScreenshotCollection()
 
         if not capture_cursor:
             use_cursor = None
@@ -245,6 +247,7 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
+        self._screenshots = ScreenshotCollection()
 
         if not capture_cursor:
             use_cursor = None

@@ -78,6 +78,9 @@ class ScreenshotCollection(object):
         '''get the screenshot with the given index'''
         return self._screenshots[idx]
 
+    def __iter__(self):
+        yield from self._screenshots
+
     def append(self, item: Screenshot):
         '''adds a screenshot to the end of the collection'''
         self._screenshots.append(item)
