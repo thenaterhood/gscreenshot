@@ -7,6 +7,7 @@ from PIL import Image
 from PIL import ImageChops
 from gscreenshot.selector import SelectionCancelled, SelectionParseError
 from src.gscreenshot.screenshooter import Screenshooter
+from src.gscreenshot.screenshot import Screenshot
 
 
 class BaseScreenshooter(Screenshooter):
@@ -19,18 +20,24 @@ class BaseScreenshooter(Screenshooter):
         self._image = Mock()
         self._image.size = (20, 30)
         self._image.copy.return_value = self._image
+        self._screenshot = Mock()
+        self._screenshot.get_image.return_value = self._image
         self.called = "fullscreen"
 
     def grab_selection(self, delay=0, capture_cursor=False):
         self._image = Mock()
         self._image.size = (20, 30)
         self._image.copy.return_value = self._image
+        self._screenshot = Mock()
+        self._screenshot.get_image.return_value = self._image
         self.called = "selection"
 
     def grab_window(self, delay=0, capture_cursor=False):
         self._image = Mock()
         self._image.size = (20, 30)
         self._image.copy.return_value = self._image
+        self._screenshot = Mock()
+        self._screenshot.get_image.return_value = self._image
         self.called = "window"
 
     def set_image(self, image):
