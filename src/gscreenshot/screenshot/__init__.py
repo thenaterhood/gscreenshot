@@ -58,7 +58,7 @@ class Screenshot(object):
         '''Whether this screenshot image was saved'''
         return self.get_saved_path() is not None
 
-    
+
 class ScreenshotCollection(object):
     '''
     The collection of screenshots taken by gscreenshot
