@@ -184,7 +184,7 @@ class Gscreenshot(object):
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        for i in range(0, count):
+        for _ in range(0, count):
             self.screenshooter.grab_fullscreen_(
                 delay,
                 capture_cursor,
@@ -219,7 +219,7 @@ class Gscreenshot(object):
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        for i in range(0, count):
+        for _ in range(0, count):
             self.screenshooter.grab_selection_(
                 delay,
                 capture_cursor,
@@ -254,7 +254,7 @@ class Gscreenshot(object):
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        for i in range(0, count):
+        for _ in range(0, count):
             self.screenshooter.grab_window_(
                 delay,
                 capture_cursor,
@@ -286,6 +286,7 @@ class Gscreenshot(object):
         return None
 
     def get_screenshot_collection(self) -> ScreenshotCollection:
+        '''Returns the screenshot collection'''
         return self._screenshots
 
     def get_supported_formats(self) -> typing.List[str]:
@@ -313,7 +314,6 @@ class Gscreenshot(object):
         Returns:
             Image
         """
-        thumbnail = None
         screenshot = self._screenshots.cursor_current()
 
         if screenshot is not None:
@@ -332,6 +332,7 @@ class Gscreenshot(object):
         return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
     def get_time_foldername(self) -> str:
+        '''Generates a time-based folder name'''
         now = datetime.now()
         return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S")
 
@@ -360,8 +361,11 @@ class Gscreenshot(object):
 
         return screenshot_fname
 
-    def _save_image(self, image: Image.Image, filename: typing.Optional[str]=None, overwrite: bool=True) -> bool:
-
+    def _save_image(self, image: Image.Image, filename: typing.Optional[str]=None,
+                    overwrite: bool=True) -> bool:
+        '''
+        Internal method for saving an image to a file
+        '''
         if filename is None:
             filename = self.get_time_filename()
 
@@ -429,6 +433,9 @@ class Gscreenshot(object):
             return False
 
     def save_screenshot_collection(self, foldername: typing.Optional[str]=None) -> bool:
+        '''
+        Saves every image in the current screenshot collection
+        '''
 
         if foldername is None:
             foldername = self.get_time_foldername()
@@ -443,7 +450,7 @@ class Gscreenshot(object):
                 return False
 
             screenshot.set_saved_path(fname)
-    
+
         return True
 
     def save_last_image(self, filename: typing.Optional[str]= None) -> bool:

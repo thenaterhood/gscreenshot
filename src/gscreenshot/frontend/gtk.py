@@ -40,9 +40,12 @@ class View(object):
         self._header_bar = builder.get_object('header_bar')
         self._preview:Gtk.Image = builder.get_object('image1')
         self._control_grid:Gtk.Box = builder.get_object('control_box')
-        self._cursor_selection_items:Gtk.ListStore = builder.get_object('cursor_selection_items')
-        self._cursor_selection_dropdown:Gtk.ComboBox = builder.get_object('pointer_selection_dropdown')
-        self._cursor_selection_label:Gtk.Label = builder.get_object('pointer_selection_label')
+        self._cursor_selection_items:Gtk.ListStore = \
+            builder.get_object('cursor_selection_items')
+        self._cursor_selection_dropdown:Gtk.ComboBox = \
+            builder.get_object('pointer_selection_dropdown')
+        self._cursor_selection_label:Gtk.Label = \
+            builder.get_object('pointer_selection_label')
         self._multishot_count:Gtk.SpinButton = builder.get_object('multishot_count')
         self._multishot_label:Gtk.Label = builder.get_object('multishot_count_label')
         self._actions_menu:Gtk.Menu = builder.get_object('menu_saveas_additional_actions')
@@ -110,13 +113,12 @@ class View(object):
         widget.set_opacity(.4)
 
     def show_multishot_count(self, enable):
+        '''
+        enable and show the multishot controls
+        '''
         if not enable:
             self._disable_and_hide(self._multishot_count)
             self._disable_and_hide(self._multishot_label)
-            if GSCapabilities.REGION_SELECTION in self._capabilities:
-                self._enable_and_show(self._builder.get_object('button_selectarea'))
-            if GSCapabilities.WINDOW_SELECTION in self._capabilities:
-                self._enable_and_show(self._builder.get_object('button_window'))
         else:
             self._enable_and_show(self._multishot_count)
             self._enable_and_show(self._multishot_label)
@@ -126,8 +128,8 @@ class View(object):
         updates the preview controls to match the current state
         '''
         while Gtk.events_pending():
-            Gtk.main_iteration()      
-        
+            Gtk.main_iteration() 
+
         if show_next and self._next_btn.get_opacity() <= 0:
             self._next_btn.set_opacity(.5)
             self._next_btn.connect('enter', self._hover_effect)
@@ -573,12 +575,13 @@ class Presenter(object):
         self._button_select_area_or_window_clicked(args)
 
     def _button_select_area_or_window_clicked(self, *_):
-
+        '''Take a screenshot of an area or window'''
         self.take_screenshot(
             self._app.screenshot_selected
             )
 
     def on_preview_prev_clicked(self, *_):
+        '''Handle a click of the "previous" button on the preview'''
         screenshot_collection = self._app.get_screenshot_collection()
         screenshot_collection.cursor_prev()
         self._show_preview()
@@ -588,6 +591,7 @@ class Presenter(object):
         )
 
     def on_preview_next_clicked(self, *_):
+        '''Handle a click of the "next" button on the preview'''
         screenshot_collection = self._app.get_screenshot_collection()
         screenshot_collection.cursor_next()
         self._show_preview()

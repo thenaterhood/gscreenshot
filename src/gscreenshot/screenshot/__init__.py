@@ -1,3 +1,6 @@
+'''
+Screenshot container classes for gscreenshot
+'''
 import typing
 from PIL import Image
 
@@ -132,4 +135,3 @@ class ScreenshotCollection(object):
     def cursor_to_end(self):
         '''move the cursor to the last (highest) index'''
         self._cursor = len(self._screenshots) - 1
-    
