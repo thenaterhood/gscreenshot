@@ -10,8 +10,11 @@ class GscreenshotTest(unittest.TestCase):
     def setUp(self):
         self.fake_screenshooter = Mock()
         self.fake_image = Mock()
+        self.fake_screenshot = Mock()
+        self.fake_screenshot.get_image.return_value = self.fake_image
 
         self.fake_screenshooter.image = self.fake_image
+        self.fake_screenshooter.screenshot = self.fake_screenshot
         self.gscreenshot = Gscreenshot(self.fake_screenshooter)
 
     def test_screenshot_full_display_defaults(self):
