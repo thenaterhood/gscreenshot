@@ -42,6 +42,8 @@ class BaseScreenshooter(Screenshooter):
 
     def set_image(self, image):
         self._image = image
+        self._screenshot = Mock()
+        self._screenshot.get_image.return_value = self._image
 
     @staticmethod
     def can_run():
