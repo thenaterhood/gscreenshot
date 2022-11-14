@@ -120,10 +120,11 @@ class GscreenshotTest(unittest.TestCase):
         self.assertEqual(self.fake_image, actual)
 
     def test_get_thumbnail(self):
-
         fake_thumbnail = Mock()
         fake_thumbnail.thumbnail.return_falue = fake_thumbnail
-        self.fake_image.copy.return_value = fake_thumbnail
+        self.fake_screenshot.get_thumbnail.return_value = fake_thumbnail
+
+        self.gscreenshot.screenshot_full_display()
 
         actual = self.gscreenshot.get_thumbnail(50, 50)
         self.assertEqual(fake_thumbnail, actual)
@@ -153,6 +154,7 @@ class GscreenshotTest(unittest.TestCase):
         self.assertIsInstance(self.gscreenshot.get_supported_formats(), list)
 
     def test_get_last_image(self):
+        self.gscreenshot.screenshot_full_display()
         self.assertEqual(self.fake_image, self.gscreenshot.get_last_image())
 
     def test_get_screenshooter_name(self):
@@ -166,18 +168,21 @@ class GscreenshotTest(unittest.TestCase):
 
     def test_save_last_image_success(self):
 
+        self.gscreenshot.screenshot_full_display()
         success = self.gscreenshot.save_last_image("potato.png")
         self.fake_image.save.assert_called_with("potato.png", "PNG", exif=unittest.mock.ANY)
         self.assertTrue(success)
 
     def test_save_last_image_bad_extension(self):
 
+        self.gscreenshot.screenshot_full_display()
         success = self.gscreenshot.save_last_image("potato.nopenope")
         self.fake_image.save.assert_not_called()
         self.assertFalse(success)
 
     def test_save_last_image_ioerror(self):
 
+        self.gscreenshot.screenshot_full_display()
         self.fake_image.save.side_effect = IOError("mocked IOError")
         success = self.gscreenshot.save_last_image("potato.png")
         self.assertFalse(success)
@@ -235,6 +240,7 @@ class GscreenshotTest(unittest.TestCase):
     @mock.patch('src.gscreenshot.session_is_wayland')
     @mock.patch('src.gscreenshot.subprocess')
     def test_copy_to_clipboard_x11(self, mock_subprocess, mock_util):
+        self.gscreenshot.screenshot_full_display()
         mock_util.return_value = False
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
         self.fake_image.save.assert_called_once()
@@ -258,6 +264,7 @@ class GscreenshotTest(unittest.TestCase):
     @mock.patch('src.gscreenshot.subprocess')
     def test_copy_to_clipboard_wayland(self, mock_subprocess, mock_util):
         mock_util.return_value = True
+        self.gscreenshot.screenshot_full_display()
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
         self.fake_image.save.assert_called_once()
 
@@ -281,6 +288,7 @@ class GscreenshotTest(unittest.TestCase):
         mock_subprocess.Popen.side_effect = OSError
         # We can't mock the exception itself
         mock_subprocess.CalledProcessError = subprocess.CalledProcessError
+        self.gscreenshot.screenshot_full_display()
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
 
         self.fake_image.save.assert_called_once()
