@@ -164,6 +164,7 @@ class Gscreenshot(object):
 
         return self.screenshooter.__class__.__name__
 
+    #pylint: disable=too-many-arguments
     def screenshot_full_display(self, delay: int=0, capture_cursor: bool=False,
                                 cursor_name: str='theme', multishot: bool=False, count: int=1
                                 ) -> typing.Optional[Image.Image]:
@@ -200,6 +201,7 @@ class Gscreenshot(object):
 
         return self.get_last_image()
 
+    #pylint: disable=too-many-arguments
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
                             cursor_name: str='theme', multishot: bool=False, count: int=1
                             ) -> typing.Optional[Image.Image]:
@@ -236,6 +238,7 @@ class Gscreenshot(object):
 
         return self.get_last_image()
 
+    #pylint: disable=too-many-arguments
     def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
                           cursor_name: str='theme', multishot: bool=False, count: int=1
                           ) -> typing.Optional[Image.Image]:
