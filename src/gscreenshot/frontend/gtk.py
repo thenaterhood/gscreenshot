@@ -2,6 +2,7 @@
 #pylint: disable=wrong-import-order
 #pylint: disable=wrong-import-position
 #pylint: disable=ungrouped-imports
+#pylint: disable=too-many-lines
 '''
 Classes for the GTK gscreenshot frontend
 '''
