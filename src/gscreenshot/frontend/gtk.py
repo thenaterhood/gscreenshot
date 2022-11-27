@@ -742,6 +742,21 @@ class Presenter(object):
             self._view.run_dialog(dialog)
         else:
             self._view.flash_status_icon("document-open")
+            if self._multishot_mode:
+                screenshots = self._app.get_screenshot_collection()
+                current = screenshots.cursor_current()
+                if current is not None:
+                    screenshots.remove(current)
+
+                current = screenshots.cursor_current()
+                if current is not None:
+                    self._view.update_gallery_controls(
+                        show_next=screenshots.has_next(),
+                        show_previous=screenshots.has_previous()
+                    )
+                    self._show_preview()
+
+                    return
             self.quit(None)
 
     def on_button_about_clicked(self, *_):
