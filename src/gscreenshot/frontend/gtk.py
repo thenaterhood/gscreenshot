@@ -684,6 +684,22 @@ class Presenter(object):
 
         if appinfo is not None:
             if appinfo.launch_uris(["file://"+fname], None):
+
+                if self._multishot_mode:
+                    screenshots = self._app.get_screenshot_collection()
+                    current = screenshots.cursor_current()
+                    if current is not None:
+                        screenshots.remove(current)
+
+                    current = screenshots.cursor_current()
+                    if current is not None:
+                        self._view.update_gallery_controls(
+                            show_next=screenshots.has_next(),
+                            show_previous=screenshots.has_previous()
+                        )
+                        self._show_preview()
+
+                        return
                 self.quit(None)
 
     def on_button_copy_clicked(self, *_):
