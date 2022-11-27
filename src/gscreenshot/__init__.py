@@ -165,7 +165,7 @@ class Gscreenshot(object):
         return self.screenshooter.__class__.__name__
 
     def screenshot_full_display(self, delay: int=0, capture_cursor: bool=False,
-                                cursor_name: str='theme', count: int=1
+                                cursor_name: str='theme', multishot: bool=False, count: int=1
                                 ) -> typing.Optional[Image.Image]:
         """
         Takes a screenshot of the full display with a
@@ -177,7 +177,8 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        self._screenshots = ScreenshotCollection()
+        if not multishot:
+            self._screenshots = ScreenshotCollection()
 
         if not capture_cursor:
             use_cursor = None
@@ -200,7 +201,7 @@ class Gscreenshot(object):
         return self.get_last_image()
 
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
-                            cursor_name: str='theme', count: int=1
+                            cursor_name: str='theme', multishot: bool=False, count: int=1
                             ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected area
@@ -212,7 +213,8 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        self._screenshots = ScreenshotCollection()
+        if not multishot:
+            self._screenshots = ScreenshotCollection()
 
         if not capture_cursor:
             use_cursor = None
@@ -235,7 +237,7 @@ class Gscreenshot(object):
         return self.get_last_image()
 
     def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
-                          cursor_name: str='theme', count: int=1
+                          cursor_name: str='theme', multishot: bool=False, count: int=1
                           ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected window
@@ -247,7 +249,8 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        self._screenshots = ScreenshotCollection()
+        if not multishot:
+            self._screenshots = ScreenshotCollection()
 
         if not capture_cursor:
             use_cursor = None

@@ -480,7 +480,11 @@ class Presenter(object):
         else:
             count = 1
 
-        app_method(self._delay, self._capture_cursor, self._cursor_selection, count)
+        app_method(delay=self._delay,
+            capture_cursor=self._capture_cursor,
+            cursor_name=self._cursor_selection,
+            multishot=self._multishot_mode,
+            count=count)
 
         # Re-enable UI on the UI thread.
         GLib.idle_add(self._end_take_screenshot)
@@ -554,7 +558,10 @@ class Presenter(object):
     def multishot_toggled(self, widget):
         '''Toggle multishot'''
         self._multishot_mode = widget.get_active()
-        self._view.show_multishot_count(self._multishot_mode)
+        # This is intended to support an auto-multishot mode, like
+        # a low-framerate screen recording. Disabled for now as I'm
+        # not sure this is a feature gscreenshot needs.
+        #self._view.show_multishot_count(self._multishot_mode)
 
     def selected_cursor_changed(self, widget):
         '''Handle a change to the selected cursor'''
