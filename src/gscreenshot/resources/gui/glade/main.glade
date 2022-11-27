@@ -84,15 +84,6 @@ Version: 3.0.1
         <accelerator key="o" signal="activate" modifiers="GDK_SHIFT_MASK | GDK_CONTROL_MASK"/>
       </object>
     </child>
-    <child>
-      <object class="GtkMenuItem" id="action_save_all">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Save All</property>
-        <property name="use-underline">True</property>
-        <signal name="activate" handler="on_button_saveall_clicked" swapped="no"/>
-      </object>
-    </child>
   </object>
   <object class="GtkAdjustment" id="multishot_adjustment">
     <property name="lower">1</property>

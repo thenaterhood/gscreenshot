@@ -633,18 +633,37 @@ class Presenter(object):
         '''Handle the saveas button'''
         saved = False
         cancelled = False
-        save_dialog = FileSaveDialog(
-                self._app.get_time_filename(),
+
+        if self._multishot_mode:
+
+            save_dialog = FileSaveDialog(
+                self._app.get_time_foldername(),
                 self._app.get_last_save_directory(),
                 self._view.get_window()
-                )
+            )
 
-        while not (saved or cancelled):
-            fname = self._view.run_dialog(save_dialog)
-            if fname is not None:
-                saved = self._app.save_last_image(fname)
-            else:
-                cancelled = True
+            while not (saved or cancelled):
+                fname = self._view.run_dialog(save_dialog)
+                if fname is not None:
+                    self._view.set_busy()
+                    saved = self._app.save_screenshot_collection(fname)
+                    self._view.set_ready()
+                else:
+                    cancelled = True
+
+        else:
+            save_dialog = FileSaveDialog(
+                    self._app.get_time_filename(),
+                    self._app.get_last_save_directory(),
+                    self._view.get_window()
+                    )
+
+            while not (saved or cancelled):
+                fname = self._view.run_dialog(save_dialog)
+                if fname is not None:
+                    saved = self._app.save_last_image(fname)
+                else:
+                    cancelled = True
 
         if saved:
             self._view.flash_status_icon("document-save")
@@ -695,6 +714,22 @@ class Presenter(object):
         close gscreenshot
         """
         if self.on_button_copy_clicked():
+            if self._multishot_mode:
+                screenshots = self._app.get_screenshot_collection()
+                current = screenshots.cursor_current()
+                if current is not None:
+                    screenshots.remove(current)
+
+                current = screenshots.cursor_current()
+                if current is not None:
+                    self._view.update_gallery_controls(
+                        show_next=screenshots.has_next(),
+                        show_previous=screenshots.has_previous()
+                    )
+                    self._show_preview()
+
+                    return
+
             self.quit(None)
 
     def on_button_open_clicked(self, *_):

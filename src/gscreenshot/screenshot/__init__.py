@@ -19,6 +19,7 @@ class Screenshot(object):
     def __init__(self, image: Image.Image):
         '''Constructor'''
         self._image = image
+        self._saved_to = None
 
     def get_image(self) -> Image.Image:
         '''Gets the underlying PIL.Image.Image'''
@@ -88,6 +89,12 @@ class ScreenshotCollection(object):
         '''adds a screenshot to the end of the collection'''
         self._screenshots.append(item)
 
+    def remove(self, item: Screenshot):
+        '''removes a screenshot'''
+        self._screenshots.remove(item)
+        if not self.has_next() or not self.has_previous():
+            self.cursor_to_end()
+
     def has_next(self) -> bool:
         '''
         whether the collection has another screenshot
@@ -126,7 +133,10 @@ class ScreenshotCollection(object):
         '''
         get the screenshot at the current cursor index
         '''
-        return self._screenshots[self._cursor]
+        try:
+            return self._screenshots[self._cursor]
+        except IndexError:
+            return None
 
     def cursor_to_start(self):
         '''move the cursor to index 0'''
