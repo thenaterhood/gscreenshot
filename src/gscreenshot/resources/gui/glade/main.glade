@@ -115,6 +115,8 @@ Version: 3.0.1
                 <property name="name">preview_event_box</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
                 <signal name="button-press-event" handler="handle_preview_click_event" swapped="no"/>
                 <child>
                   <object class="GtkImage" id="image1">
