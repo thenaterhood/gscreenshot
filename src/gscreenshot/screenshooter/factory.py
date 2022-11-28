@@ -31,6 +31,8 @@ class ScreenshooterFactory(object):
                 XdgDesktopPortal,
                 ]
 
+        self.screenshooters:list = []
+
         if session_is_wayland():
             self.screenshooters = self.wayland_screenshooters
         else:

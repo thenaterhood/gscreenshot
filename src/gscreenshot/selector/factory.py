@@ -23,6 +23,8 @@ class SelectorFactory(object):
                 Slurp
                 ]
 
+        self.selectors:list = []
+
         if session_is_wayland():
             self.selectors = self.wayland_selectors
         else:
