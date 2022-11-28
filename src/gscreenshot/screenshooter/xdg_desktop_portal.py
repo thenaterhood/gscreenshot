@@ -42,6 +42,9 @@ class XdgPortalScreenshot:
 
     def __init__(self):
         '''constructor'''
+        if DBusGMainLoop is None or dbus is None:
+            raise Exception('python-dbus is unavailable')
+
         DBusGMainLoop(set_as_default = True)
         self.bus = dbus.SessionBus()
         self.portal = self.bus.get_object(

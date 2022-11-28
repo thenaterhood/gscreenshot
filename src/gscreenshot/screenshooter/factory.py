@@ -2,6 +2,7 @@
 Utilities for selecting a screenshot utility
 '''
 
+import typing
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.grim import Grim
 from gscreenshot.screenshooter.imagemagick import ImageMagick
@@ -15,8 +16,8 @@ from gscreenshot.util import session_is_wayland
 class ScreenshooterFactory(object):
     '''Selects and instantiates a usable screenshot class'''
 
-    def __init__(self, screenshooter=None):
-        self.screenshooter = screenshooter
+    def __init__(self, screenshooter:typing.Optional[Screenshooter]=None):
+        self.screenshooter:typing.Optional[Screenshooter] = screenshooter
         self.xorg_screenshooters = [
                 Scrot,
                 ImageMagick,
