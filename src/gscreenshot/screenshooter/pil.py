@@ -36,10 +36,6 @@ class PILWrapper(Screenshooter):
         sleep(delay)
         self._image = ImageGrab.grab(None)
 
-    def get_capabilities(self):
-        '''List of capabilities'''
-        return []
-
     @staticmethod
     def can_run():
         '''Whether this utility is available'''

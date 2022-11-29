@@ -21,7 +21,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: GitHub Action for pylint
         # You may pin to the exact commit or the version.
@@ -36,7 +36,7 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Install pytest
         run: |
@@ -49,4 +49,19 @@ jobs:
           cd src
           coverage run --source gscreenshot -m pytest ../test
           coverage report -m
+
+  type-check:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install mypy
+        run: |
+          python3 -m pip install "mypy==0.982" "mypy_extensions==0.4.3" types-setuptools
+
+      - name: Run mypy
+        run: |
+          mypy src/
 

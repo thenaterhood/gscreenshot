@@ -42,6 +42,9 @@ class XdgPortalScreenshot:
 
     def __init__(self):
         '''constructor'''
+        if DBusGMainLoop is None or dbus is None:
+            raise Exception('python-dbus is unavailable')
+
         DBusGMainLoop(set_as_default = True)
         self.bus = dbus.SessionBus()
         self.portal = self.bus.get_object(
@@ -67,10 +70,7 @@ class XdgPortalScreenshot:
 
         token_hex = binascii.hexlify(token_bytes).decode('ascii')
 
-        #pylint: disable=fixme
-        # TODO: change to f-strings when dropping python2 support
-        #pylint: disable=consider-using-f-string
-        request_token = 'gscreenshot_%s' % token_hex
+        request_token = f"gscreenshot_{token_hex}"
 
         options = { 'handle_token': request_token }
 
@@ -88,13 +88,10 @@ class XdgPortalScreenshot:
             dbus_interface='org.freedesktop.portal.Screenshot'
         )
 
-    def get_request_handle(self, token):
+    def get_request_handle(self, token) -> str:
         '''get a request handle name'''
         sender_name = re.sub(r'\.', '_', self.bus.get_unique_name()).lstrip(':')
-        #pylint: disable=fixme
-        # TODO: change to f-strings when dropping python2 support
-        #pylint: disable=consider-using-f-string
-        return '/org/freedesktop/portal/desktop/request/%s/%s'%(sender_name, token)
+        return f"/org/freedesktop/portal/desktop/request/{sender_name}/{token}"
 
     @staticmethod
     def callback(response, result):
@@ -132,7 +129,7 @@ class XdgDesktopPortal(Screenshooter):
         self._call_screenshooter(py_call, [script_path, self.tempfile])
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         """Whether dbus is available"""
         if dbus is None:
             return False

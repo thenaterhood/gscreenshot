@@ -2,17 +2,19 @@
 Selector factory module
 '''
 
+import typing
 from gscreenshot.selector.slop import Slop
 from gscreenshot.selector.slurp import Slurp
 from gscreenshot.selector import NoSupportedSelectorError
+from gscreenshot.selector import RegionSelector
 from gscreenshot.util import session_is_wayland
 
 
 class SelectorFactory(object):
     '''Selects and instantiates a usable selector class'''
 
-    def __init__(self, screenselector=None):
-        self.screenselector = screenselector
+    def __init__(self, screenselector:typing.Optional[RegionSelector]=None):
+        self.screenselector:typing.Optional[RegionSelector] = screenselector
         self.xorg_selectors = [
                 Slop
                 ]
@@ -21,12 +23,14 @@ class SelectorFactory(object):
                 Slurp
                 ]
 
+        self.selectors:list = []
+
         if session_is_wayland():
             self.selectors = self.wayland_selectors
         else:
             self.selectors = self.xorg_selectors
 
-    def create(self):
+    def create(self) -> RegionSelector:
         '''Returns a screenselector instance'''
         if self.screenselector is not None:
             return self.screenselector

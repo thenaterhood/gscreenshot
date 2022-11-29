@@ -9,6 +9,7 @@ import gettext
 import io
 import sys
 import threading
+import typing
 from time import sleep
 from pkg_resources import resource_string, resource_filename
 import pygtkcompat
@@ -24,280 +25,6 @@ from gi.repository import GObject
 from gi.repository import GLib
 
 i18n = gettext.gettext
-
-
-class Presenter(object):
-    '''Presenter class for the GTK frontend'''
-
-    __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view', '_keymappings', '_capture_cursor',
-            '_cursor_selection')
-
-    def __init__(self, application, view):
-        self._app = application
-        self._view = view
-        self._can_resize = True
-        self._delay = 0
-        self._hide = True
-        self._capture_cursor = False
-        self._show_preview()
-        self._view.show_cursor_options(self._capture_cursor)
-        self._keymappings = {}
-
-        cursors = self._app.get_available_cursors()
-        self._cursor_selection = 'theme'
-
-        self._view.update_available_cursors(
-                cursors
-                )
-
-    def _begin_take_screenshot(self, app_method):
-        screenshot = app_method(self._delay, self._capture_cursor, self._cursor_selection)
-
-        # Re-enable UI on the UI thread.
-        GLib.idle_add(self._end_take_screenshot, screenshot)
-
-    def _end_take_screenshot(self, screenshot):
-        self._show_preview()
-
-        self._view.unhide()
-        self._view.set_ready()
-
-    def set_keymappings(self, keymappings):
-        '''Set the keymappings'''
-        self._keymappings = keymappings
-
-    def window_state_event_handler(self, widget, event, *_):
-        '''Handle window state events'''
-        self._view.handle_state_event(widget, event)
-
-    def take_screenshot(self, app_method):
-        '''Take a screenshot using the passed app method'''
-        self._view.set_busy()
-
-        if self._hide:
-            self._view.hide()
-
-        # Do work in background thread.
-        # Taken from here: https://wiki.gnome.org/Projects/PyGObject/Threading
-        _thread = threading.Thread(target=self._begin_take_screenshot(app_method))
-        _thread.daemon = True
-        _thread.start()
-
-    def handle_keypress(self, widget, event, *args):
-        """
-        This method handles individual keypresses. These are
-        handled separately from accelerators (which include
-        modifiers).
-        """
-        if event.keyval in self._keymappings:
-            self._keymappings[event.keyval]()
-
-    def handle_preview_click_event(self, widget, event, *args):
-        '''
-        Handle a click on the screenshot preview widget
-        '''
-        # 3 is right click
-        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
-            self._view.show_actions_menu()
-
-    def hide_window_toggled(self, widget):
-        '''Toggle the window to hidden'''
-        self._hide = widget.get_active()
-
-    def capture_cursor_toggled(self, widget):
-        '''Toggle capturing cursor'''
-        self._capture_cursor = widget.get_active()
-        self._view.show_cursor_options(self._capture_cursor)
-
-    def delay_value_changed(self, widget):
-        '''Handle a change with the screenshot delay input'''
-        self._delay = widget.get_value()
-
-    def selected_cursor_changed(self, widget):
-        '''Handle a change to the selected cursor'''
-        self._cursor_selection = widget.get_model()[widget.get_active()][2]
-
-    def on_button_all_clicked(self, *_):
-        '''Take a screenshot of the full screen'''
-        self.take_screenshot(
-            self._app.screenshot_full_display
-            )
-
-    def on_button_window_clicked(self, *args):
-        '''Take a screenshot of a window'''
-        self._button_select_area_or_window_clicked(args)
-
-    def on_button_selectarea_clicked(self, *args):
-        '''Take a screenshot of an area'''
-        self._button_select_area_or_window_clicked(args)
-
-    def _button_select_area_or_window_clicked(self, *_):
-
-        self.take_screenshot(
-            self._app.screenshot_selected
-            )
-
-    def on_button_saveas_clicked(self, *_):
-        '''Handle the saveas button'''
-        saved = False
-        cancelled = False
-        save_dialog = FileSaveDialog(
-                self._app.get_time_filename(),
-                self._app.get_last_save_directory(),
-                self._view.get_window()
-                )
-
-        while not (saved or cancelled):
-            fname = self._view.run_dialog(save_dialog)
-            if fname is not None:
-                saved = self._app.save_last_image(fname)
-            else:
-                cancelled = True
-
-        if saved:
-            self._view.flash_status_icon("document-save")
-
-    def on_button_openwith_clicked(self, *_):
-        '''Handle the "open with" button'''
-        self._view.flash_status_icon(Gtk.STOCK_EXECUTE)
-        fname = self._app.save_and_return_path()
-        appchooser = OpenWithDialog()
-
-        self._view.run_dialog(appchooser)
-
-        appinfo = appchooser.appinfo
-
-        if appinfo is not None:
-            if appinfo.launch_uris(["file://"+fname], None):
-                self.quit(None)
-
-    def on_button_copy_clicked(self, *_):
-        """
-        Copy the current screenshot to the clipboard
-        """
-        img = self._app.get_last_image()
-
-        if img is None:
-            return False
-
-        pixbuf = self._image_to_pixbuf(img)
-
-        if not self._view.copy_to_clipboard(pixbuf):
-            if not self._app.copy_last_screenshot_to_clipboard():
-                warning_dialog = WarningDialog(
-                    i18n("Your clipboard doesn't support persistence and xclip isn't available."),
-                    self._view.get_window())
-                self._view.run_dialog(warning_dialog)
-                return False
-
-        self._view.flash_status_icon("edit-copy")
-        return True
-
-    def on_button_copy_and_close_clicked(self, *_):
-        """
-        Copy the current screenshot to the clipboard and
-        close gscreenshot
-        """
-        if self.on_button_copy_clicked():
-            self.quit(None)
-
-    def on_button_open_clicked(self, *_):
-        '''Handle the open button'''
-        success = self._app.open_last_screenshot()
-        if not success:
-            dialog = WarningDialog(
-                i18n("Please install xdg-open to open files."),
-                self._view.get_window())
-            self._view.run_dialog(dialog)
-        else:
-            self._view.flash_status_icon("document-open")
-            self.quit(None)
-
-    def on_button_about_clicked(self, *_):
-        '''Handle the about button'''
-        about = Gtk.AboutDialog(transient_for=self._view.get_window())
-
-        authors = self._app.get_program_authors()
-        about.set_authors(authors)
-
-        description = i18n(self._app.get_program_description())
-        description += "\n" + i18n("Using {0} screenshot backend").format(
-            self._app.get_screenshooter_name()
-        )
-        description += "\n" + i18n("Available features: {0}").format(
-            ", ".join(self._app.get_capabilities())
-        )
-
-        about.set_comments(i18n(description))
-
-        website = self._app.get_program_website()
-        about.set_website(website)
-        about.set_website_label(website)
-
-        name = self._app.get_program_name()
-        about.set_program_name(name)
-        about.set_title(i18n("About"))
-
-        license_text = self._app.get_program_license_text()
-        about.set_license(license_text)
-
-        version = self._app.get_program_version()
-        about.set_version(version)
-
-        about.set_logo(
-                Gtk.gdk.pixbuf_new_from_file(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
-                        )
-                    )
-                )
-
-        self._view.run_dialog(about)
-
-    def on_fullscreen_toggle(self):
-        '''Handle the window getting toggled to fullscreen'''
-        self._view.toggle_fullscreen()
-
-    def on_button_quit_clicked(self, widget=None):
-        '''Handle the quit button'''
-        self.quit(widget)
-
-    def on_window_main_destroy(self, widget=None):
-        '''Handle the titlebar close button'''
-        self.quit(widget)
-
-    def on_window_resize(self, *_):
-        '''Handle window resizes'''
-        if self._can_resize:
-            self._view.resize()
-            self._show_preview()
-
-    def quit(self, *_):
-        '''Exit the app'''
-        self._app.quit()
-
-    def _image_to_pixbuf(self, image):
-        descriptor = io.BytesIO()
-        image = image.convert("RGB")
-        image.save(descriptor, "ppm")
-        contents = descriptor.getvalue()
-        descriptor.close()
-        loader = Gtk.gdk.PixbufLoader("pnm")
-        loader.write(contents)
-        pixbuf = loader.get_pixbuf()
-        try:
-            loader.close()
-        except GLib.GError:
-            pass
-        return pixbuf
-
-    def _show_preview(self):
-        height, width = self._view.get_preview_dimensions()
-
-        preview_img = self._app.get_thumbnail(width, height)
-
-        self._view.update_preview(self._image_to_pixbuf(preview_img))
 
 
 class View(object):
@@ -336,7 +63,7 @@ class View(object):
             checkbox_capture_cursor.set_opacity(0)
             checkbox_capture_cursor.set_sensitive(0)
 
-    def flash_status_icon(self, stock_name="emblem-ok"):
+    def flash_status_icon(self, stock_name: str="emblem-ok"):
         """
         Shows the status/confirmation icon in the UI after an action
         for a second.
@@ -392,7 +119,7 @@ class View(object):
         combo.pack_start(renderer, True)
         combo.add_attribute(renderer, "text", 1)
 
-    def show_cursor_options(self, show):
+    def show_cursor_options(self, show: bool):
         '''
         Toggle the cursor combobox and label hidden/visible
         '''
@@ -405,7 +132,7 @@ class View(object):
             self._cursor_selection_label.set_opacity(0)
             self._cursor_selection_dropdown.set_sensitive(0)
 
-    def update_available_cursors(self, cursors):
+    def update_available_cursors(self, cursors: dict):
         '''
         Update the available cursor selection in the combolist
         Params: self, {name: PIL.Image}
@@ -603,6 +330,294 @@ class View(object):
             pass
 
         return result
+
+
+class Presenter(object):
+    '''Presenter class for the GTK frontend'''
+
+    __slots__ = ('_delay', '_app', '_hide', '_can_resize',
+            '_pixbuf', '_view', '_keymappings', '_capture_cursor',
+            '_cursor_selection')
+
+    _delay: int
+    _app: Gscreenshot
+    _hide: bool
+    _can_resize: bool
+    _pixbuf: Gdk.PixbufLoader
+    _view: View
+    _keymappings: dict
+    _capture_cursor: bool
+    _cursor_selection: str
+
+    def __init__(self, application: Gscreenshot, view: View):
+        self._app = application
+        self._view = view
+        self._can_resize = True
+        self._delay = 0
+        self._hide = True
+        self._capture_cursor = False
+        self._show_preview()
+        self._view.show_cursor_options(self._capture_cursor)
+        self._keymappings = {}
+
+        cursors = self._app.get_available_cursors()
+        self._cursor_selection = 'theme'
+
+        self._view.update_available_cursors(
+                cursors
+                )
+
+    def _begin_take_screenshot(self, app_method):
+        app_method(self._delay, self._capture_cursor, self._cursor_selection)
+
+        # Re-enable UI on the UI thread.
+        GLib.idle_add(self._end_take_screenshot)
+
+    def _end_take_screenshot(self):
+        self._show_preview()
+
+        self._view.unhide()
+        self._view.set_ready()
+
+    def set_keymappings(self, keymappings: dict):
+        '''Set the keymappings'''
+        self._keymappings = keymappings
+
+    def window_state_event_handler(self, widget, event, *_):
+        '''Handle window state events'''
+        self._view.handle_state_event(widget, event)
+
+    def take_screenshot(self, app_method: typing.Callable):
+        '''Take a screenshot using the passed app method'''
+        self._view.set_busy()
+
+        if self._hide:
+            self._view.hide()
+
+        # Do work in background thread.
+        # Taken from here: https://wiki.gnome.org/Projects/PyGObject/Threading
+        _thread = threading.Thread(target=self._begin_take_screenshot(app_method))
+        _thread.daemon = True
+        _thread.start()
+
+    def handle_keypress(self, widget, event, *args):
+        """
+        This method handles individual keypresses. These are
+        handled separately from accelerators (which include
+        modifiers).
+        """
+        if event.keyval in self._keymappings:
+            self._keymappings[event.keyval]()
+
+    def handle_preview_click_event(self, widget, event, *args):
+        '''
+        Handle a click on the screenshot preview widget
+        '''
+        # 3 is right click
+        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+            self._view.show_actions_menu()
+
+    def hide_window_toggled(self, widget):
+        '''Toggle the window to hidden'''
+        self._hide = widget.get_active()
+
+    def capture_cursor_toggled(self, widget):
+        '''Toggle capturing cursor'''
+        self._capture_cursor = widget.get_active()
+        self._view.show_cursor_options(self._capture_cursor)
+
+    def delay_value_changed(self, widget):
+        '''Handle a change with the screenshot delay input'''
+        self._delay = widget.get_value()
+
+    def selected_cursor_changed(self, widget):
+        '''Handle a change to the selected cursor'''
+        self._cursor_selection = widget.get_model()[widget.get_active()][2]
+
+    def on_button_all_clicked(self, *_):
+        '''Take a screenshot of the full screen'''
+        self.take_screenshot(
+            self._app.screenshot_full_display
+            )
+
+    def on_button_window_clicked(self, *args):
+        '''Take a screenshot of a window'''
+        self._button_select_area_or_window_clicked(args)
+
+    def on_button_selectarea_clicked(self, *args):
+        '''Take a screenshot of an area'''
+        self._button_select_area_or_window_clicked(args)
+
+    def _button_select_area_or_window_clicked(self, *_):
+
+        self.take_screenshot(
+            self._app.screenshot_selected
+            )
+
+    def on_button_saveas_clicked(self, *_):
+        '''Handle the saveas button'''
+        saved = False
+        cancelled = False
+        save_dialog = FileSaveDialog(
+                self._app.get_time_filename(),
+                self._app.get_last_save_directory(),
+                self._view.get_window()
+                )
+
+        while not (saved or cancelled):
+            fname = self._view.run_dialog(save_dialog)
+            if fname is not None:
+                saved = self._app.save_last_image(fname)
+            else:
+                cancelled = True
+
+        if saved:
+            self._view.flash_status_icon("document-save")
+
+    def on_button_openwith_clicked(self, *_):
+        '''Handle the "open with" button'''
+        self._view.flash_status_icon(Gtk.STOCK_EXECUTE)
+        fname = self._app.save_and_return_path()
+
+        if fname is None:
+            return
+
+        appchooser = OpenWithDialog()
+
+        self._view.run_dialog(appchooser)
+
+        appinfo = appchooser.appinfo
+
+        if appinfo is not None:
+            if appinfo.launch_uris(["file://"+fname], None):
+                self.quit(None)
+
+    def on_button_copy_clicked(self, *_):
+        """
+        Copy the current screenshot to the clipboard
+        """
+        img = self._app.get_last_image()
+
+        if img is None:
+            return False
+
+        pixbuf = self._image_to_pixbuf(img)
+
+        if not self._view.copy_to_clipboard(pixbuf):
+            if not self._app.copy_last_screenshot_to_clipboard():
+                warning_dialog = WarningDialog(
+                    i18n("Your clipboard doesn't support persistence and xclip isn't available."),
+                    self._view.get_window())
+                self._view.run_dialog(warning_dialog)
+                return False
+
+        self._view.flash_status_icon("edit-copy")
+        return True
+
+    def on_button_copy_and_close_clicked(self, *_):
+        """
+        Copy the current screenshot to the clipboard and
+        close gscreenshot
+        """
+        if self.on_button_copy_clicked():
+            self.quit(None)
+
+    def on_button_open_clicked(self, *_):
+        '''Handle the open button'''
+        success = self._app.open_last_screenshot()
+        if not success:
+            dialog = WarningDialog(
+                i18n("Please install xdg-open to open files."),
+                self._view.get_window())
+            self._view.run_dialog(dialog)
+        else:
+            self._view.flash_status_icon("document-open")
+            self.quit(None)
+
+    def on_button_about_clicked(self, *_):
+        '''Handle the about button'''
+        about = Gtk.AboutDialog(transient_for=self._view.get_window())
+
+        authors = self._app.get_program_authors()
+        about.set_authors(authors)
+
+        description = i18n(self._app.get_program_description())
+        description += "\n" + i18n("Using {0} screenshot backend").format(
+            self._app.get_screenshooter_name()
+        )
+        description += "\n" + i18n("Available features: {0}").format(
+            ", ".join(self._app.get_capabilities())
+        )
+
+        about.set_comments(i18n(description))
+
+        website = self._app.get_program_website()
+        about.set_website(website)
+        about.set_website_label(website)
+
+        name = self._app.get_program_name()
+        about.set_program_name(name)
+        about.set_title(i18n("About"))
+
+        license_text = self._app.get_program_license_text()
+        about.set_license(license_text)
+
+        version = self._app.get_program_version()
+        about.set_version(version)
+
+        about.set_logo(
+                Gtk.gdk.pixbuf_new_from_file(
+                    resource_filename(
+                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
+                        )
+                    )
+                )
+
+        self._view.run_dialog(about)
+
+    def on_fullscreen_toggle(self):
+        '''Handle the window getting toggled to fullscreen'''
+        self._view.toggle_fullscreen()
+
+    def on_button_quit_clicked(self, widget=None):
+        '''Handle the quit button'''
+        self.quit(widget)
+
+    def on_window_main_destroy(self, widget=None):
+        '''Handle the titlebar close button'''
+        self.quit(widget)
+
+    def on_window_resize(self, *_):
+        '''Handle window resizes'''
+        if self._can_resize:
+            self._view.resize()
+            self._show_preview()
+
+    def quit(self, *_):
+        '''Exit the app'''
+        self._app.quit()
+
+    def _image_to_pixbuf(self, image):
+        descriptor = io.BytesIO()
+        image = image.convert("RGB")
+        image.save(descriptor, "ppm")
+        contents = descriptor.getvalue()
+        descriptor.close()
+        loader = Gtk.gdk.PixbufLoader("pnm")
+        loader.write(contents)
+        pixbuf = loader.get_pixbuf()
+        try:
+            loader.close()
+        except GLib.GError:
+            pass
+        return pixbuf
+
+    def _show_preview(self):
+        height, width = self._view.get_preview_dimensions()
+
+        preview_img = self._app.get_thumbnail(width, height)
+
+        self._view.update_preview(self._image_to_pixbuf(preview_img))
 
 
 class OpenWithDialog(Gtk.AppChooserDialog):

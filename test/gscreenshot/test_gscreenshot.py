@@ -182,16 +182,16 @@ class GscreenshotTest(unittest.TestCase):
     def test_show_screenshot_notification(self, mock_subprocess):
 
         self.gscreenshot.show_screenshot_notification()
-        mock_subprocess.Popen.assert_called_once_with(
-            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot']
+        mock_subprocess.run.assert_called_once_with(
+            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot'], check=True
         )
 
     @mock.patch('src.gscreenshot.subprocess')
     def test_show_screenshot_notification_error(self, mock_subprocess):
-        mock_subprocess.Popen.side_effect = OSError("fake error")
+        mock_subprocess.run.side_effect = OSError("fake error")
         self.gscreenshot.show_screenshot_notification()
-        mock_subprocess.Popen.assert_called_once_with(
-            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot']
+        mock_subprocess.run.assert_called_once_with(
+            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot'], check=True
         )
 
     @mock.patch('src.gscreenshot.os')
@@ -199,14 +199,14 @@ class GscreenshotTest(unittest.TestCase):
     def test_display_mismatch_warning_no_session_id(self, mock_subprocess, mock_os):
         mock_os.environ = {}
         self.gscreenshot.run_display_mismatch_warning()
-        mock_subprocess.Popen.assert_not_called()
+        mock_subprocess.run.assert_not_called()
 
     @mock.patch('src.gscreenshot.os')
     @mock.patch('src.gscreenshot.subprocess')
     def test_display_mismatch_warning_no_session_type(self, mock_subprocess, mock_os):
         mock_os.environ = {'XDG_SESSION_ID': 0}
         self.gscreenshot.run_display_mismatch_warning()
-        mock_subprocess.Popen.assert_called_once()
+        mock_subprocess.run.assert_called_once()
 
     @mock.patch('src.gscreenshot.os')
     @mock.patch('src.gscreenshot.subprocess')
@@ -215,14 +215,14 @@ class GscreenshotTest(unittest.TestCase):
         self.gscreenshot.run_display_mismatch_warning()
         # We have a dedicated test for interactions with notify-send, so don't
         # get into specifics here
-        mock_subprocess.Popen.assert_called_once()
+        mock_subprocess.run.assert_called_once()
 
     @mock.patch('src.gscreenshot.os')
     @mock.patch('src.gscreenshot.subprocess')
     def test_display_mismatch_warning_no_show_notification(self, mock_subprocess, mock_os):
         mock_os.environ = {'XDG_SESSION_ID': 0, 'XDG_SESSION_TYPE': 'X11'}
         self.gscreenshot.run_display_mismatch_warning()
-        mock_subprocess.Popen.assert_not_called()
+        mock_subprocess.run.assert_not_called()
 
     @mock.patch('src.gscreenshot.session_is_wayland')
     @mock.patch('src.gscreenshot.subprocess')

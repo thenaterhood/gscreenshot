@@ -18,10 +18,12 @@ import os
 import sys
 import subprocess
 import tempfile
+import typing
 
 from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
+from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
 from gscreenshot.util import session_is_wayland
 
@@ -34,6 +36,11 @@ class Gscreenshot(object):
     """
 
     __slots__ = ['screenshooter', 'saved_last_image', 'last_save_file', 'cache']
+
+    screenshooter: Screenshooter
+    saved_last_image: bool
+    last_save_file: typing.Optional[str]
+    cache: typing.Dict[str, str]
 
     # generated using piexif
     EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
@@ -58,11 +65,7 @@ class Gscreenshot(object):
         self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, add the encoding='UTF-8'
-            # param
-            #pylint: disable=unspecified-encoding
-            with open(self.get_cache_file(), "r") as cachefile:
+            with open(self.get_cache_file(), "r", encoding="UTF-8") as cachefile:
                 try:
                     self.cache = json.load(cachefile)
                 except json.JSONDecodeError:
@@ -71,13 +74,13 @@ class Gscreenshot(object):
         else:
             self.save_cache()
 
-    def get_capabilities(self):
+    def get_capabilities(self) -> typing.Set[str]:
         '''
         Get the features supported in the current setup
         '''
         return set(self.screenshooter.get_capabilities_())
 
-    def get_available_cursors(self):
+    def get_available_cursors(self) -> typing.Dict[str, typing.Optional[Image.Image]]:
         '''
         Get the alternate pointer pixmaps gscreenshot can use
         Returns {name: PIL.Image}
@@ -108,16 +111,13 @@ class Gscreenshot(object):
         return a status as to whether it succeeded.
         '''
         try:
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, switch to using with here
-            #pylint: disable=consider-using-with
-            subprocess.Popen([
+            subprocess.run([
                 'notify-send',
                 'gscreenshot',
                 _('a screenshot was taken from a script or terminal'),
                 '--icon',
                 'gscreenshot'
-            ])
+            ], check=True)
         except OSError:
             print(_("failed to show screenshot notification - is notify-send working?"))
 
@@ -137,7 +137,7 @@ class Gscreenshot(object):
         if session_type.lower() not in ('x11', 'mir', 'wayland'):
             self.show_screenshot_notification()
 
-    def get_cache_file(self):
+    def get_cache_file(self) -> str:
         """
         Find the gscreenshot cache file and return its path
         """
@@ -149,16 +149,12 @@ class Gscreenshot(object):
     def save_cache(self):
         """Writes the cache to disk"""
         try:
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, add the encoding='UTF-8'
-            # param
-            #pylint: disable=unspecified-encoding
-            with open(self.get_cache_file(), "w") as cachefile:
+            with open(self.get_cache_file(), "w", encoding="UTF-8") as cachefile:
                 json.dump(self.cache, cachefile)
         except FileNotFoundError:
             print(_("unable to save cache file"))
 
-    def get_screenshooter_name(self):
+    def get_screenshooter_name(self) -> str:
         """Gets the name of the current screenshooter"""
         if hasattr(self.screenshooter, '__utilityname__'):
             if self.screenshooter.__utilityname__ is not None:
@@ -166,7 +162,8 @@ class Gscreenshot(object):
 
         return self.screenshooter.__class__.__name__
 
-    def screenshot_full_display(self, delay=0, capture_cursor=False, cursor_name='theme'):
+    def screenshot_full_display(self, delay: int=0, capture_cursor: bool=False,
+                                cursor_name: str='theme') -> typing.Optional[Image.Image]:
         """
         Takes a screenshot of the full display with a
         given delay.
@@ -192,7 +189,8 @@ class Gscreenshot(object):
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_selected(self, delay=0, capture_cursor=False, cursor_name='theme'):
+    def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
+                            cursor_name: str='theme') -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected area
         with a given delay.
@@ -218,7 +216,8 @@ class Gscreenshot(object):
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def screenshot_window(self, delay=0, capture_cursor=False, cursor_name='theme'):
+    def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
+                          cursor_name: str='theme') -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected window
         with a given delay.
@@ -244,7 +243,7 @@ class Gscreenshot(object):
         self.saved_last_image = False
         return self.screenshooter.image
 
-    def get_last_image(self):
+    def get_last_image(self) -> typing.Optional[Image.Image]:
         """
         Returns the last screenshot taken
 
@@ -253,7 +252,7 @@ class Gscreenshot(object):
         """
         return self.screenshooter.image
 
-    def get_supported_formats(self):
+    def get_supported_formats(self) -> typing.List[str]:
         """
         Returns the image formats supported for saving to
 
@@ -261,12 +260,15 @@ class Gscreenshot(object):
             array
         """
         supported_formats = [
-            'bmp', 'eps', 'gif', 'jpeg', 'pcx', 'pdf', 'ppm', 'tiff', 'png'
+            'bmp', 'eps', 'gif', 'jpeg', 'pcx',
+            'pdf', 'ppm', 'tiff', 'png', 'webp',
             ]
 
         return supported_formats
 
-    def get_thumbnail(self, width, height, image=None):
+    def get_thumbnail(self, width: int, height: int,
+                      image: typing.Optional[Image.Image]=None
+                      ) -> typing.Optional[Image.Image]:
         """
         Gets a thumbnail of either the current image, or a passed one
 
@@ -297,7 +299,7 @@ class Gscreenshot(object):
 
         return self.get_app_icon()
 
-    def get_time_filename(self):
+    def get_time_filename(self) -> str:
         """
         Generates a returns a filename based on the current time
 
@@ -307,7 +309,7 @@ class Gscreenshot(object):
         now = datetime.now()
         return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S.png")
 
-    def save_and_return_path(self):
+    def save_and_return_path(self) -> typing.Optional[str]:
         """
         Saves the last screenshot to /tmp if it hasn't been saved
         and returns the path to it.
@@ -323,11 +325,11 @@ class Gscreenshot(object):
         if not self.saved_last_image:
             self.save_last_image(screenshot_fname)
         else:
-            screenshot_fname = self.last_save_file
+            return self.last_save_file
 
         return screenshot_fname
 
-    def save_last_image(self, filename = None):
+    def save_last_image(self, filename: typing.Optional[str]= None) -> bool:
         """
         Saves the last screenshot taken with a given filename.
         Returns a boolean for success or fail. A supported file
@@ -342,6 +344,9 @@ class Gscreenshot(object):
 
         if filename is None:
             filename = self.get_time_filename()
+
+        if self.screenshooter.image is None:
+            return False
 
         image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
@@ -399,7 +404,7 @@ class Gscreenshot(object):
         else:
             return False
 
-    def open_last_screenshot(self):
+    def open_last_screenshot(self) -> bool:
         """
         Calls xdg to open the screenshot in its default application
 
@@ -407,17 +412,16 @@ class Gscreenshot(object):
             bool success
         """
         screenshot_fname = self.save_and_return_path()
+        if screenshot_fname is None:
+            return False
 
         try:
-            #pylint: disable=fixme
-            # TODO: when dropping python2 support, switch to using with here
-            #pylint: disable=consider-using-with
-            subprocess.Popen(['xdg-open', screenshot_fname])
+            subprocess.run(['xdg-open', screenshot_fname], check=True)
             return True
         except (subprocess.CalledProcessError, IOError):
             return False
 
-    def copy_last_screenshot_to_clipboard(self):
+    def copy_last_screenshot_to_clipboard(self) -> bool:
         """
         Copies the last screenshot to the clipboard with
         xclip, if available. Most frontends should try to
@@ -450,25 +454,23 @@ class Gscreenshot(object):
             image.save(png_data, "PNG")
 
             try:
-                #pylint: disable=fixme
-                # TODO: when dropping python2 support, switch to using with here
-                #pylint: disable=consider-using-with
-                clip = subprocess.Popen(
+                with subprocess.Popen(
                     params,
                     close_fds=True,
                     stdin=subprocess.PIPE,
                     stdout=None,
-                    stderr=None)
-                clip.communicate(input=png_data.getvalue())
-                return True
+                    stderr=None) as xclip:
+
+                    xclip.communicate(input=png_data.getvalue())
+                    return True
             except OSError:
                 return False
 
-    def get_last_save_directory(self):
+    def get_last_save_directory(self) -> str:
         """Returns the path of the last save directory"""
         return self.cache["last_save_dir"]
 
-    def get_program_authors(self):
+    def get_program_authors(self) -> typing.List[str]:
         """
         Returns the list of authors
 
@@ -483,33 +485,33 @@ class Gscreenshot(object):
 
         return authors
 
-    def get_app_icon(self):
+    def get_app_icon(self) -> Image.Image:
         """Returns the application icon"""
         return Image.open(
                 resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
                 )
 
-    def get_program_description(self):
+    def get_program_description(self) -> str:
         """Returns the program description"""
         return "A simple screenshot tool supporting multiple backends."
 
-    def get_program_website(self):
+    def get_program_website(self) -> str:
         """Returns the URL of the program website"""
         return "https://github.com/thenaterhood/gscreenshot"
 
-    def get_program_name(self):
+    def get_program_name(self) -> str:
         """Returns the program name"""
         return "gscreenshot"
 
-    def get_program_license_text(self):
+    def get_program_license_text(self) -> str:
         """Returns the license text"""
         return resource_string('gscreenshot.resources', 'LICENSE').decode('UTF-8')
 
-    def get_program_license(self):
+    def get_program_license(self) -> str:
         """Returns the license name"""
         return "GPLv2"
 
-    def get_program_version(self, padded = False):
+    def get_program_version(self, padded: bool=False) -> str:
         """Returns the program version"""
         if not padded:
             return require("gscreenshot")[0].version
@@ -517,6 +519,9 @@ class Gscreenshot(object):
             version = require("gscreenshot")[0].version.split(".")
             padded_version = [v.rjust(2, "0") for v in version]
             return ".".join(padded_version)
+
+    def __repr__(self) -> str:
+        return f'Gscreenshot(screenshooter={self.screenshooter})'
 
     def quit(self):
         """

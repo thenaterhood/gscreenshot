@@ -31,7 +31,17 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_screenshooter('import', ['-window', 'root', self.tempfile])
 
-    def get_capabilities(self):
+    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
+        """
+        Takes a screenshot of the full screen with a given delay
+
+        Parameters:
+            int delay, in seconds
+        """
+        sleep(delay)
+        self._call_screenshooter('import', [self.tempfile])
+
+    def get_capabilities(self) -> list:
         '''List of capabilities'''
         return [
             GSCapabilities.REGION_SELECTION,
@@ -39,13 +49,6 @@ class ImageMagick(Screenshooter):
         ]
 
     @staticmethod
-    def can_run():
+    def can_run() -> bool:
         '''Whether this utility is available'''
         return find_executable('import') is not None
-
-    def _grab_selection_fallback(self, delay=0, capture_cursor=False):
-        sleep(delay)
-        if not self._call_screenshooter('import', [self.tempfile]):
-            #pylint: disable=super-with-arguments
-            #disabling this until we don't support Python 2 anymore
-            super(ImageMagick, self)._grab_selection_fallback(delay=0)
