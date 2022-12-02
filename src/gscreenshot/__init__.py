@@ -104,22 +104,25 @@ class Gscreenshot(object):
                 )
             }
 
-    def show_screenshot_notification(self):
+    def show_screenshot_notification(self) -> bool:
         '''
         Show a notification that a screenshot was taken.
         This method is a "fire-and-forget" and won't
         return a status as to whether it succeeded.
         '''
         try:
+            # This has a timeout in case the notification
+            # daemon is hanging - don't lock up gscreenshot too
             subprocess.run([
                 'notify-send',
                 'gscreenshot',
                 _('a screenshot was taken from a script or terminal'),
                 '--icon',
                 'gscreenshot'
-            ], check=True)
-        except OSError:
-            print(_("failed to show screenshot notification - is notify-send working?"))
+            ], check=True, timeout=2)
+            return True
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+            return False
 
     def run_display_mismatch_warning(self):
         '''
@@ -418,7 +421,7 @@ class Gscreenshot(object):
         try:
             subprocess.run(['xdg-open', screenshot_fname], check=True)
             return True
-        except (subprocess.CalledProcessError, IOError):
+        except (subprocess.CalledProcessError, IOError, OSError):
             return False
 
     def copy_last_screenshot_to_clipboard(self) -> bool:
@@ -463,7 +466,7 @@ class Gscreenshot(object):
 
                     xclip.communicate(input=png_data.getvalue())
                     return True
-            except OSError:
+            except (OSError, subprocess.CalledProcessError):
                 return False
 
     def get_last_save_directory(self) -> str:
