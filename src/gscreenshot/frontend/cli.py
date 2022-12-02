@@ -120,7 +120,9 @@ def run():
         sys.exit(1)
     else:
         if args.notify:
-            gscreenshot.show_screenshot_notification()
+            if not gscreenshot.show_screenshot_notification():
+                print(_("failed to show screenshot notification - is notify-send working?"))
+
         shot_saved = False
         should_save_shot = (args.filename is not False or args.clip is False)
         exit_code = 0

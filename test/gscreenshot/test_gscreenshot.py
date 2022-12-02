@@ -1,8 +1,9 @@
+import mock
+import subprocess
 import unittest
 from unittest.mock import Mock
-
-import mock
 from src.gscreenshot import Gscreenshot
+
 
 class GscreenshotTest(unittest.TestCase):
 
@@ -183,15 +184,19 @@ class GscreenshotTest(unittest.TestCase):
 
         self.gscreenshot.show_screenshot_notification()
         mock_subprocess.run.assert_called_once_with(
-            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot'], check=True
+            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot'],
+            check=True,
+            timeout=2
         )
 
-    @mock.patch('src.gscreenshot.subprocess')
+    @mock.patch('src.gscreenshot.subprocess.run')
     def test_show_screenshot_notification_error(self, mock_subprocess):
         mock_subprocess.run.side_effect = OSError("fake error")
         self.gscreenshot.show_screenshot_notification()
-        mock_subprocess.run.assert_called_once_with(
-            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot'], check=True
+        mock_subprocess.assert_called_once_with(
+            ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot'],
+            check=True,
+            timeout=2
         )
 
     @mock.patch('src.gscreenshot.os')
@@ -271,6 +276,8 @@ class GscreenshotTest(unittest.TestCase):
     def test_copy_to_clipboard_process_error(self, mock_subprocess, mock_util):
         mock_util.return_value = False
         mock_subprocess.Popen.side_effect = OSError
+        # We can't mock the exception itself
+        mock_subprocess.CalledProcessError = subprocess.CalledProcessError
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
 
         self.fake_image.save.assert_called_once()
