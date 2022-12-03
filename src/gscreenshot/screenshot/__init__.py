@@ -92,8 +92,10 @@ class ScreenshotCollection(object):
     def remove(self, item: Screenshot):
         '''removes a screenshot'''
         self._screenshots.remove(item)
-        if not self.has_next() or not self.has_previous():
+        if not self.has_next():
             self.cursor_to_end()
+        elif not self.has_previous():
+            self.cursor_to_start()
 
     def has_next(self) -> bool:
         '''
