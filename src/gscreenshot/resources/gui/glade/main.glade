@@ -119,12 +119,19 @@ Version: 3.0.1
                 <property name="vexpand">True</property>
                 <signal name="button-press-event" handler="handle_preview_click_event" swapped="no"/>
                 <child>
-                  <object class="GtkImage" id="image1">
-                    <property name="width-request">225</property>
-                    <property name="height-request">200</property>
+                  <object class="GtkEventBox" id="preview_event_box">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="icon_size">0</property>
+                    <signal name="button-press-event" handler="handle_preview_click_event" swapped="no"/>
+                    <child>
+                      <object class="GtkImage" id="image1">
+                        <property name="width-request">225</property>
+                        <property name="height-request">200</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="icon_size">0</property>
+                      </object>
+                    </child>
                   </object>
                   <packing>
                     <property name="index">-1</property>
