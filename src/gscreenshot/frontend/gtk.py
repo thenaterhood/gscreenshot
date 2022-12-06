@@ -47,8 +47,6 @@ class View(object):
             builder.get_object('pointer_selection_dropdown')
         self._cursor_selection_label:Gtk.Label = \
             builder.get_object('pointer_selection_label')
-        self._multishot_count:Gtk.SpinButton = builder.get_object('multishot_count')
-        self._multishot_label:Gtk.Label = builder.get_object('multishot_count_label')
         self._actions_menu:Gtk.Menu = builder.get_object('menu_saveas_additional_actions')
         self._status_icon:Gtk.Image = builder.get_object('status_icon')
         self._preview_overlay:Gtk.Overlay = builder.get_object('image_overlay')
@@ -72,9 +70,6 @@ class View(object):
         self._preview_overlay.add_overlay(self._preview_control)
 
         self.update_gallery_controls(False, False)
-
-        self._disable_and_hide(self._multishot_count)
-        self._disable_and_hide(self._multishot_label)
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
@@ -112,17 +107,6 @@ class View(object):
         applies a lighter opacity to the widget when the cursor leaves
         '''
         widget.set_opacity(.4)
-
-    def show_multishot_count(self, enable):
-        '''
-        enable and show the multishot controls
-        '''
-        if not enable:
-            self._disable_and_hide(self._multishot_count)
-            self._disable_and_hide(self._multishot_label)
-        else:
-            self._enable_and_show(self._multishot_count)
-            self._enable_and_show(self._multishot_label)
 
     def update_gallery_controls(self, show_next=True, show_previous=True):
         '''
@@ -441,7 +425,7 @@ class Presenter(object):
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
             '_pixbuf', '_view', '_keymappings', '_capture_cursor',
-            '_cursor_selection', '_multishot_mode', '_multishot_count')
+            '_cursor_selection')
 
     _delay: int
     _app: Gscreenshot
@@ -452,8 +436,6 @@ class Presenter(object):
     _keymappings: dict
     _capture_cursor: bool
     _cursor_selection: str
-    _multishot_mode: bool
-    _multishot_count: int
 
     def __init__(self, application: Gscreenshot, view: View):
         self._app = application
@@ -462,8 +444,6 @@ class Presenter(object):
         self._delay = 0
         self._hide = True
         self._capture_cursor = False
-        self._multishot_mode = False
-        self._multishot_count = 1
         self._show_preview()
         self._view.show_cursor_options(self._capture_cursor)
         self._keymappings = {}
@@ -476,16 +456,10 @@ class Presenter(object):
                 )
 
     def _begin_take_screenshot(self, app_method):
-        if self._multishot_mode:
-            count = self._multishot_count
-        else:
-            count = 1
-
         app_method(delay=self._delay,
             capture_cursor=self._capture_cursor,
             cursor_name=self._cursor_selection,
-            multishot=self._multishot_mode,
-            count=count)
+            multishot=True)
 
         # Re-enable UI on the UI thread.
         GLib.idle_add(self._end_take_screenshot)
@@ -551,18 +525,6 @@ class Presenter(object):
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''
         self._delay = widget.get_value()
-
-    def multishot_value_changed(self, widget):
-        '''Handle a change with the multishot count input'''
-        self._multishot_count = int(widget.get_value())
-
-    def multishot_toggled(self, widget):
-        '''Toggle multishot'''
-        self._multishot_mode = widget.get_active()
-        # This is intended to support an auto-multishot mode, like
-        # a low-framerate screen recording. Disabled for now as I'm
-        # not sure this is a feature gscreenshot needs.
-        #self._view.show_multishot_count(self._multishot_mode)
 
     def selected_cursor_changed(self, widget):
         '''Handle a change to the selected cursor'''
@@ -635,36 +597,40 @@ class Presenter(object):
         saved = False
         cancelled = False
 
-        if self._multishot_mode:
-
-            save_dialog = FileSaveDialog(
-                self._app.get_time_foldername(),
+        save_dialog = FileSaveDialog(
+                self._app.get_time_filename(),
                 self._app.get_last_save_directory(),
                 self._view.get_window()
-            )
+                )
 
-            while not (saved or cancelled):
-                fname = self._view.run_dialog(save_dialog)
-                if fname is not None:
-                    self._view.set_busy()
-                    saved = self._app.save_screenshot_collection(fname)
-                    self._view.set_ready()
-                else:
-                    cancelled = True
+        while not (saved or cancelled):
+            fname = self._view.run_dialog(save_dialog)
+            if fname is not None:
+                saved = self._app.save_last_image(fname)
+            else:
+                cancelled = True
 
-        else:
-            save_dialog = FileSaveDialog(
-                    self._app.get_time_filename(),
-                    self._app.get_last_save_directory(),
-                    self._view.get_window()
-                    )
+        if saved:
+            self._view.flash_status_icon("document-save")
 
-            while not (saved or cancelled):
-                fname = self._view.run_dialog(save_dialog)
-                if fname is not None:
-                    saved = self._app.save_last_image(fname)
-                else:
-                    cancelled = True
+    def on_button_save_all_clicked(self, *_):
+        '''Handle the "save all" button'''
+        saved = False
+        cancelled = False
+        save_dialog = FileSaveDialog(
+            self._app.get_time_foldername(),
+            self._app.get_last_save_directory(),
+            self._view.get_window()
+        )
+
+        while not (saved or cancelled):
+            fname = self._view.run_dialog(save_dialog)
+            if fname is not None:
+                self._view.set_busy()
+                saved = self._app.save_screenshot_collection(fname)
+                self._view.set_ready()
+            else:
+                cancelled = True
 
         if saved:
             self._view.flash_status_icon("document-save")
@@ -686,21 +652,21 @@ class Presenter(object):
         if appinfo is not None:
             if appinfo.launch_uris(["file://"+fname], None):
 
-                if self._multishot_mode:
-                    screenshots = self._app.get_screenshot_collection()
-                    current = screenshots.cursor_current()
-                    if current is not None:
-                        screenshots.remove(current)
+                screenshots = self._app.get_screenshot_collection()
+                current = screenshots.cursor_current()
+                if current is not None:
+                    screenshots.remove(current)
 
-                    current = screenshots.cursor_current()
-                    if current is not None:
-                        self._view.update_gallery_controls(
-                            show_next=screenshots.has_next(),
-                            show_previous=screenshots.has_previous()
-                        )
-                        self._show_preview()
+                current = screenshots.cursor_current()
+                if current is not None:
+                    self._view.update_gallery_controls(
+                        show_next=screenshots.has_next(),
+                        show_previous=screenshots.has_previous()
+                    )
+                    self._show_preview()
 
-                        return
+                    return
+
                 self.quit(None)
 
     def on_button_copy_clicked(self, *_):
@@ -731,21 +697,20 @@ class Presenter(object):
         close gscreenshot
         """
         if self.on_button_copy_clicked():
-            if self._multishot_mode:
-                screenshots = self._app.get_screenshot_collection()
-                current = screenshots.cursor_current()
-                if current is not None:
-                    screenshots.remove(current)
+            screenshots = self._app.get_screenshot_collection()
+            current = screenshots.cursor_current()
+            if current is not None:
+                screenshots.remove(current)
 
-                current = screenshots.cursor_current()
-                if current is not None:
-                    self._view.update_gallery_controls(
-                        show_next=screenshots.has_next(),
-                        show_previous=screenshots.has_previous()
-                    )
-                    self._show_preview()
+            current = screenshots.cursor_current()
+            if current is not None:
+                self._view.update_gallery_controls(
+                    show_next=screenshots.has_next(),
+                    show_previous=screenshots.has_previous()
+                )
+                self._show_preview()
 
-                    return
+                return
 
             self.quit(None)
 
@@ -759,21 +724,20 @@ class Presenter(object):
             self._view.run_dialog(dialog)
         else:
             self._view.flash_status_icon("document-open")
-            if self._multishot_mode:
-                screenshots = self._app.get_screenshot_collection()
-                current = screenshots.cursor_current()
-                if current is not None:
-                    screenshots.remove(current)
+            screenshots = self._app.get_screenshot_collection()
+            current = screenshots.cursor_current()
+            if current is not None:
+                screenshots.remove(current)
 
-                current = screenshots.cursor_current()
-                if current is not None:
-                    self._view.update_gallery_controls(
-                        show_next=screenshots.has_next(),
-                        show_previous=screenshots.has_previous()
-                    )
-                    self._show_preview()
+            current = screenshots.cursor_current()
+            if current is not None:
+                self._view.update_gallery_controls(
+                    show_next=screenshots.has_next(),
+                    show_previous=screenshots.has_previous()
+                )
+                self._show_preview()
 
-                    return
+                return
             self.quit(None)
 
     def on_button_about_clicked(self, *_):
