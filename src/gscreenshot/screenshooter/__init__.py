@@ -56,6 +56,8 @@ class Screenshooter(object):
         """
         Returns the last screenshot taken - PIL Image
 
+        Deprecated. Use Screenshooter.screenshot.get_image().
+
         Returns:
             PIL.Image or None
         """
@@ -96,7 +98,6 @@ class Screenshooter(object):
 
         if self._selector is not None:
             capabilities = capabilities + self._selector.get_capabilities()
-            capabilities.append(GSCapabilities.UNCROP)
 
         return capabilities
 
