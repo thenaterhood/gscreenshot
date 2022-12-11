@@ -197,7 +197,9 @@ class Gscreenshot(object):
                     self._screenshots.append(self.screenshooter.screenshot)
 
         self.run_display_mismatch_warning()
-        self._screenshots.cursor_to_end()
+
+        if not overwrite:
+            self._screenshots.cursor_to_end()
 
         return self.get_last_image()
 
@@ -234,7 +236,9 @@ class Gscreenshot(object):
                     self._screenshots.append(self.screenshooter.screenshot)
 
         self.run_display_mismatch_warning()
-        self._screenshots.cursor_to_end()
+
+        if not overwrite:
+            self._screenshots.cursor_to_end()
 
         return self.get_last_image()
 
@@ -271,7 +275,9 @@ class Gscreenshot(object):
                     self._screenshots.append(self.screenshooter.screenshot)
 
         self.run_display_mismatch_warning()
-        self._screenshots.cursor_to_end()
+
+        if not overwrite:
+            self._screenshots.cursor_to_end()
 
         return self.get_last_image()
 
