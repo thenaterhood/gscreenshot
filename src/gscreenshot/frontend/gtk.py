@@ -425,7 +425,7 @@ class Presenter(object):
 
     __slots__ = ('_delay', '_app', '_hide', '_can_resize',
             '_pixbuf', '_view', '_keymappings', '_capture_cursor',
-            '_cursor_selection')
+            '_cursor_selection', '_overwrite_mode')
 
     _delay: int
     _app: Gscreenshot
@@ -435,6 +435,7 @@ class Presenter(object):
     _view: View
     _keymappings: dict
     _capture_cursor: bool
+    _overwrite_mode: bool
     _cursor_selection: str
 
     def __init__(self, application: Gscreenshot, view: View):
@@ -447,6 +448,7 @@ class Presenter(object):
         self._show_preview()
         self._view.show_cursor_options(self._capture_cursor)
         self._keymappings = {}
+        self._overwrite_mode = True
 
         cursors = self._app.get_available_cursors()
         self._cursor_selection = 'theme'
@@ -459,7 +461,7 @@ class Presenter(object):
         app_method(delay=self._delay,
             capture_cursor=self._capture_cursor,
             cursor_name=self._cursor_selection,
-            multishot=True)
+            overwrite=self._overwrite_mode)
 
         # Re-enable UI on the UI thread.
         GLib.idle_add(self._end_take_screenshot)
@@ -521,6 +523,10 @@ class Presenter(object):
         '''Toggle capturing cursor'''
         self._capture_cursor = widget.get_active()
         self._view.show_cursor_options(self._capture_cursor)
+
+    def overwrite_mode_toggled(self, widget):
+        '''Toggle overwrite or multishot mode'''
+        self._overwrite_mode = widget.get_active()
 
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''

@@ -250,7 +250,7 @@ Version: 3.0.1
                         <property name="can-focus">False</property>
                         <property name="halign">start</property>
                         <property name="margin-top">6</property>
-                        <property name="margin-bottom">5</property>
+                        <property name="margin-bottom">8</property>
                         <property name="label" translatable="yes">Take screenshot of...</property>
                         <attributes>
                           <attribute name="weight" value="heavy"/>
@@ -259,7 +259,7 @@ Version: 3.0.1
                       <packing>
                         <property name="left-attach">0</property>
                         <property name="top-attach">0</property>
-                        <property name="width">3</property>
+                        <property name="width">2</property>
                       </packing>
                     </child>
                     <child>
@@ -484,6 +484,23 @@ Version: 3.0.1
                         <property name="left-attach">0</property>
                         <property name="top-attach">5</property>
                         <property name="width">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="overwrite_mode_checkbox">
+                        <property name="label" translatable="yes">Overwrite</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">False</property>
+                        <property name="halign">end</property>
+                        <property name="margin-bottom">5</property>
+                        <property name="active">True</property>
+                        <property name="draw-indicator">True</property>
+                        <signal name="toggled" handler="overwrite_mode_toggled" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="left-attach">2</property>
+                        <property name="top-attach">0</property>
                       </packing>
                     </child>
                   </object>

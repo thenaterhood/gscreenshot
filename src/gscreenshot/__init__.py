@@ -166,7 +166,7 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_full_display(self, delay: int=0, capture_cursor: bool=False,
-                                cursor_name: str='theme', multishot: bool=False, count: int=1
+                                cursor_name: str='theme', overwrite: bool=False, count: int=1
                                 ) -> typing.Optional[Image.Image]:
         """
         Takes a screenshot of the full display with a
@@ -178,9 +178,6 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        if not multishot:
-            self._screenshots = ScreenshotCollection()
-
         if not capture_cursor:
             use_cursor = None
         else:
@@ -194,7 +191,10 @@ class Gscreenshot(object):
             )
 
             if self.screenshooter.screenshot is not None:
-                self._screenshots.append(self.screenshooter.screenshot)
+                if overwrite:
+                    self._screenshots.replace(self.screenshooter.screenshot)
+                else:
+                    self._screenshots.append(self.screenshooter.screenshot)
 
         self.run_display_mismatch_warning()
         self._screenshots.cursor_to_end()
@@ -203,7 +203,7 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
-                            cursor_name: str='theme', multishot: bool=False, count: int=1
+                            cursor_name: str='theme', overwrite: bool=False, count: int=1
                             ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected area
@@ -215,9 +215,6 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        if not multishot:
-            self._screenshots = ScreenshotCollection()
-
         if not capture_cursor:
             use_cursor = None
         else:
@@ -231,7 +228,10 @@ class Gscreenshot(object):
             )
 
             if self.screenshooter.screenshot is not None:
-                self._screenshots.append(self.screenshooter.screenshot)
+                if overwrite:
+                    self._screenshots.replace(self.screenshooter.screenshot)
+                else:
+                    self._screenshots.append(self.screenshooter.screenshot)
 
         self.run_display_mismatch_warning()
         self._screenshots.cursor_to_end()
@@ -240,7 +240,7 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
-                          cursor_name: str='theme', multishot: bool=False, count: int=1
+                          cursor_name: str='theme', overwrite: bool=False, count: int=1
                           ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected window
@@ -252,9 +252,6 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        if not multishot:
-            self._screenshots = ScreenshotCollection()
-
         if not capture_cursor:
             use_cursor = None
         else:
@@ -268,7 +265,10 @@ class Gscreenshot(object):
             )
 
             if self.screenshooter.screenshot is not None:
-                self._screenshots.append(self.screenshooter.screenshot)
+                if overwrite:
+                    self._screenshots.replace(self.screenshooter.screenshot)
+                else:
+                    self._screenshots.append(self.screenshooter.screenshot)
 
         self.run_display_mismatch_warning()
         self._screenshots.cursor_to_end()

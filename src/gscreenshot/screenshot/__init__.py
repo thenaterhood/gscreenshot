@@ -97,6 +97,13 @@ class ScreenshotCollection(object):
         elif not self.has_previous():
             self.cursor_to_start()
 
+    def replace(self, replacement: Screenshot, idx: int = -2):
+        '''replaces a screenshot at the cursor or provided index'''
+        if idx == -2:
+            idx = self._cursor
+
+        self._screenshots[idx] = replacement
+
     def has_next(self) -> bool:
         '''
         whether the collection has another screenshot
