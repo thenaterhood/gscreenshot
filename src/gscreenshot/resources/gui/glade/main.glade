@@ -497,6 +497,7 @@ Version: 3.0.1
                         <property name="active">True</property>
                         <property name="draw-indicator">True</property>
                         <signal name="toggled" handler="overwrite_mode_toggled" swapped="no"/>
+                        <accelerator key="Insert" signal="activate"/>
                       </object>
                       <packing>
                         <property name="left-attach">2</property>
