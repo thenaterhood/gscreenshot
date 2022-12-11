@@ -163,8 +163,8 @@ class View(object):
         """
 
         self._status_icon.set_from_icon_name(stock_name, Gtk.IconSize.BUTTON)
+        self._enable_and_show(self._status_icon)
 
-        self._status_icon.set_opacity(1)
         while Gtk.events_pending():
             Gtk.main_iteration()
 
@@ -178,7 +178,7 @@ class View(object):
         by setting its opacity to 0.
         """
         sleep(1)
-        self._status_icon.set_opacity(0)
+        self._disable_and_hide(self._status_icon)
 
     def set_busy(self):
         """
@@ -212,13 +212,11 @@ class View(object):
         Toggle the cursor combobox and label hidden/visible
         '''
         if show and GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
-            self._cursor_selection_dropdown.set_opacity(1)
-            self._cursor_selection_label.set_opacity(1)
-            self._cursor_selection_dropdown.set_sensitive(1)
+            self._enable_and_show(self._cursor_selection_dropdown)
+            self._enable_and_show(self._cursor_selection_label)
         else:
-            self._cursor_selection_dropdown.set_opacity(0)
-            self._cursor_selection_label.set_opacity(0)
-            self._cursor_selection_dropdown.set_sensitive(0)
+            self._disable_and_hide(self._cursor_selection_dropdown)
+            self._disable_and_hide(self._cursor_selection_label)
 
     def update_available_cursors(self, cursors: dict):
         '''
