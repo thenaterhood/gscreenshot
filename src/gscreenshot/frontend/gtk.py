@@ -992,7 +992,14 @@ def main():
         Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')):
             presenter.on_button_quit_clicked,
         Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')):
-            presenter.on_fullscreen_toggle
+            presenter.on_fullscreen_toggle,
+        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Right')):
+            presenter.on_preview_next_clicked,
+        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Left')):
+            presenter.on_preview_prev_clicked
+        # here for reference - this is configured in Glade
+        #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('INSERT')):
+        #    presenter.overwrite_mode_toggled
     }
     presenter.set_keymappings(keymappings)
 
