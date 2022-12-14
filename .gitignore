@@ -11,3 +11,4 @@ install.txt
 build/
 generated/
 *.mo
+*.coverage

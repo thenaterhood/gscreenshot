@@ -15,6 +15,8 @@ class GtkPresenterTest(unittest.TestCase):
         self.app.get_thumbnail.return_value = Image.open(
                 resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
             )
+        self.screenshot_collection = Mock()
+        self.app.get_screenshot_collection.return_value = self.screenshot_collection
         self.view = Mock()
         self.view.get_preview_dimensions.return_value = (20, 30)
         self.presenter = Presenter(self.app, self.view)
@@ -36,6 +38,7 @@ class GtkPresenterTest(unittest.TestCase):
 
     def test_on_button_open_clicked(self):
         self.app.open_last_screenshot.return_value = True
+        self.screenshot_collection.cursor_current.return_value = None
         self.presenter.on_button_open_clicked()
         self.app.open_last_screenshot.assert_called_once()
         self.app.quit.assert_called_once()
@@ -55,6 +58,7 @@ class GtkPresenterTest(unittest.TestCase):
         self.assertEqual(self.app.get_thumbnail.call_count, 2)
 
     def test_on_button_copy_and_close_clicked(self):
+        self.screenshot_collection.cursor_current.return_value = None
         self.presenter.on_button_copy_and_close_clicked()
         self.view.copy_to_clipboard.assert_called_once()
         self.app.quit.assert_called_once()

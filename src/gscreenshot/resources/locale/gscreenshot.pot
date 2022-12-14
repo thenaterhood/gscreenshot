@@ -177,3 +177,9 @@ msgstr ""
 
 msgid "Please install one of the following to use gscreenshot:"
 msgstr ""
+
+msgid "Overwrite"
+msgstr ""
+
+msgid "Save All"
+msgstr ""

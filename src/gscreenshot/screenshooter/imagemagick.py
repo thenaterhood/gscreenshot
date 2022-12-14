@@ -29,7 +29,7 @@ class ImageMagick(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        self._call_screenshooter('import', ['-window', 'root', self.tempfile])
+        self._call_screenshooter('import', ['-window', 'root', self._tempfile])
 
     def _grab_selection_fallback(self, delay=0, capture_cursor=False):
         """
@@ -39,7 +39,7 @@ class ImageMagick(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        self._call_screenshooter('import', [self.tempfile])
+        self._call_screenshooter('import', [self._tempfile])
 
     def get_capabilities(self) -> list:
         '''List of capabilities'''

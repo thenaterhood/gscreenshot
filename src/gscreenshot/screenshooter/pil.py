@@ -3,6 +3,7 @@ Integration for the PIL screenshot functionality
 '''
 from time import sleep
 from gscreenshot.screenshooter import Screenshooter
+from gscreenshot.screenshot import Screenshot
 
 SUPPORTED_PLATFORM = False
 
@@ -34,7 +35,7 @@ class PILWrapper(Screenshooter):
             int delay, in seconds
         """
         sleep(delay)
-        self._image = ImageGrab.grab(None)
+        self._screenshot = Screenshot(ImageGrab.grab(None))
 
     @staticmethod
     def can_run():

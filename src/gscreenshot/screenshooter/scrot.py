@@ -28,7 +28,7 @@ class Scrot(Screenshooter):
         Parameters:
             int delay, in seconds
         """
-        params = ['-z', self.tempfile, '-d', str(delay)]
+        params = ['-z', self._tempfile, '-d', str(delay)]
         if capture_cursor and Scrot._supports_native_cursor_capture:
             params.append('-p')
 
@@ -69,7 +69,7 @@ class Scrot(Screenshooter):
         Fallback for selection which uses scrot's builtin
         region selection
         """
-        params =  ['-z', self.tempfile, '-d', str(delay), '-s']
+        params =  ['-z', self._tempfile, '-d', str(delay), '-s']
         if capture_cursor and Scrot._supports_native_cursor_capture:
             params.append('-p')
 

@@ -188,3 +188,9 @@ msgstr "Funciones disponibles: {0}"
 
 msgid "Please install one of the following to use gscreenshot:"
 msgstr "instala uno de los siguientes:"
+
+msgid "Overwrite"
+msgstr "Sobrescribir"
+
+msgid "Save All"
+msgstr "Guardar todos"
