@@ -47,7 +47,11 @@ class Screenshot(object):
         thumbnail.thumbnail((width, height), antialias_algo)
 
         if with_border:
-            shadow = Image.new('RGBA', (int(thumbnail.size[0]+4), int(thumbnail.size[1]+4)), (70, 70, 70, 50))
+            shadow = Image.new(
+                'RGBA',
+                (int(thumbnail.size[0]+4), int(thumbnail.size[1]+4)),
+                (70, 70, 70, 50)
+            )
             shadow.paste(thumbnail, (1, 1))
             return shadow
 
