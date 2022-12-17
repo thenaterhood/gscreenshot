@@ -2,7 +2,7 @@
 Screenshot container classes for gscreenshot
 '''
 import typing
-from PIL import Image
+from PIL import Image, ImageFilter
 
 
 class Screenshot(object):
@@ -25,17 +25,17 @@ class Screenshot(object):
         '''Gets the underlying PIL.Image.Image'''
         return self._image
 
-    def get_thumbnail(self, width: int, height: int,
-                      ) -> Image.Image:
-        """
-        Gets a thumbnail of either the current image, or a passed one
+    def get_preview(self, width: int, height: int, with_border=False) -> Image.Image:
+        '''
+        Gets a preview of the image.
+
         Params:
             width: int
             height: int
-            image: Image|None
+            with_border: bool, whether to add a drop shadow for visibility
         Returns:
             Image
-        """
+        '''
         thumbnail = self._image.copy()
 
         antialias_algo = None
@@ -45,6 +45,16 @@ class Screenshot(object):
             antialias_algo = Image.ANTIALIAS
 
         thumbnail.thumbnail((width, height), antialias_algo)
+
+        if with_border:
+            shadow = Image.new(
+                'RGBA',
+                (int(thumbnail.size[0]+4), int(thumbnail.size[1]+4)),
+                (70, 70, 70, 50)
+            )
+            shadow.paste(thumbnail, (1, 1))
+            return shadow
+
         return thumbnail
 
     def set_saved_path(self, path: typing.Optional[str]):
