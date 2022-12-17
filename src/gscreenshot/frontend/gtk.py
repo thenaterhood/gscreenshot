@@ -825,7 +825,7 @@ class Presenter(object):
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()
 
-        preview_img = self._app.get_thumbnail(width, height)
+        preview_img = self._app.get_thumbnail(width, height, with_border=True)
 
         self._view.update_preview(self._image_to_pixbuf(preview_img))
 

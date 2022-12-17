@@ -122,7 +122,7 @@ class GscreenshotTest(unittest.TestCase):
     def test_get_thumbnail(self):
         fake_thumbnail = Mock()
         fake_thumbnail.thumbnail.return_falue = fake_thumbnail
-        self.fake_screenshot.get_thumbnail.return_value = fake_thumbnail
+        self.fake_screenshot.get_preview.return_value = fake_thumbnail
 
         self.gscreenshot.screenshot_full_display()
 

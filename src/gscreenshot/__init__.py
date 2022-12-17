@@ -315,7 +315,7 @@ class Gscreenshot(object):
 
         return supported_formats
 
-    def get_thumbnail(self, width: int, height: int,
+    def get_thumbnail(self, width: int, height: int, with_border: bool=False
                       ) -> Image.Image:
         """
         Gets a thumbnail of either the current image, or a passed one
@@ -329,7 +329,7 @@ class Gscreenshot(object):
         screenshot = self._screenshots.cursor_current()
 
         if screenshot is not None:
-            return screenshot.get_thumbnail(width, height) or self.get_app_icon()
+            return screenshot.get_preview(width, height, with_border) or self.get_app_icon()
 
         return self.get_app_icon()
 
