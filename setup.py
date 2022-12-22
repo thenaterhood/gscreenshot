@@ -58,6 +58,9 @@ def build_data_files(version):
     for d in data_files:
         generated_path = os.path.join('generated', d[1][0])
         try:
+            if not os.path.exists(d[1][0]):
+                print("WARNING: missing intermediate file " + d[1][0])
+                continue
             with open(d[1][0], 'r') as infile:
                 infile_data = infile.read()
                 updated_data = infile_data.replace('%%VERSION%%', version)
