@@ -124,7 +124,8 @@ class Screenshooter(object):
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
     def grab_selection_(self, delay: int=0, capture_cursor: bool=False,
-                        use_cursor: typing.Optional[PIL.Image.Image]=None):
+                        use_cursor: typing.Optional[PIL.Image.Image]=None,
+                        region: typing.Optional[typing.Tuple[int, int, int, int]]=None):
         """
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
@@ -138,6 +139,12 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
+        if region is not None:
+            self.grab_fullscreen_(delay, capture_cursor, use_cursor)
+            if self._screenshot is not None:
+                self._screenshot.set_region(region)
+            return
+
         if self._selector is None:
             self._grab_selection_fallback(delay, capture_cursor)
             return
@@ -160,7 +167,7 @@ class Screenshooter(object):
         self.grab_fullscreen_(delay, capture_cursor, use_cursor)
 
         if self._screenshot is not None:
-            self._screenshot = Screenshot(self._screenshot.get_image().crop(crop_box))
+            self._screenshot.set_region(crop_box)
 
     def grab_window_(self, delay: int=0, capture_cursor: bool=False,
                      use_cursor: typing.Optional[PIL.Image.Image]=None):

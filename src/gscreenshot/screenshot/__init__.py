@@ -15,15 +15,28 @@ class Screenshot(object):
 
     _image: Image.Image
     _saved_to: typing.Optional[str]
+    _region: typing.Optional[typing.Tuple[int, int, int, int]]
 
     def __init__(self, image: Image.Image):
         '''Constructor'''
         self._image = image
         self._saved_to = None
+        self._region = None
+
+    def set_region(self, region: typing.Optional[typing.Tuple[int, int, int, int]]):
+        '''Sets the region'''
+        self._region = region
+
+    def get_region(self) -> typing.Optional[typing.Tuple[int, int, int, int]]:
+        '''Gets the region, or None'''
+        return self._region
 
     def get_image(self) -> Image.Image:
         '''Gets the underlying PIL.Image.Image'''
-        return self._image
+        if self._region is None:
+            return self._image
+
+        return self._image.crop(self._region)
 
     def get_preview(self, width: int, height: int, with_border=False) -> Image.Image:
         '''
@@ -36,7 +49,7 @@ class Screenshot(object):
         Returns:
             Image
         '''
-        thumbnail = self._image.copy()
+        thumbnail = self.get_image().copy()
 
         antialias_algo = None
         try:

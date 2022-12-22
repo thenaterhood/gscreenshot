@@ -211,7 +211,8 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
-                            cursor_name: str='theme', overwrite: bool=False, count: int=1
+                            cursor_name: str='theme', overwrite: bool=False, count: int=1,
+                            region: typing.Optional[typing.Tuple[int, int, int, int]]=None
                             ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected area
@@ -232,7 +233,8 @@ class Gscreenshot(object):
             self.screenshooter.grab_selection_(
                 delay,
                 capture_cursor,
-                use_cursor=use_cursor
+                use_cursor=use_cursor,
+                region=region
             )
 
             if self.screenshooter.screenshot is not None:
