@@ -50,14 +50,19 @@ class Gscreenshot(object):
         """
         constructor
         """
-        locale_path = resource_filename('gscreenshot.resources', 'locale')
-        locale.setlocale(locale.LC_ALL, '')
-        # I don't know what's going on with this. This call appears to exist,
-        # works fine, and seems required for glade localization to work.
-        #pylint: disable=no-member
-        locale.bindtextdomain('gscreenshot', locale_path)
-        gettext.bindtextdomain('gscreenshot', locale_path)
-        gettext.textdomain('gscreenshot')
+        try:
+            locale_path = resource_filename('gscreenshot.resources', 'locale')
+            locale.setlocale(locale.LC_ALL, '')
+            # I don't know what's going on with this. This call appears to exist,
+            # works fine, and seems required for glade localization to work.
+            #pylint: disable=no-member
+            locale.bindtextdomain('gscreenshot', locale_path)
+            gettext.bindtextdomain('gscreenshot', locale_path)
+            gettext.textdomain('gscreenshot')
+        except locale.Error:
+            # gscreenshot will fall back to english instead
+            # of crashing if there's a locale issue.
+            pass
 
         screenshooter_factory = ScreenshooterFactory(screenshooter)
         self.screenshooter = screenshooter_factory.create()
