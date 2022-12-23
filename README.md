@@ -59,15 +59,20 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 :   A numeric value in seconds to wait before taking the screenshot. Defaults to 0 (no delay).
 
 -f *FILENAME*, \--filename *FILENAME*
-:   A filename to store the screenshot to once taken. Two types of format parameters are accepted:
+:   A filename to store the screenshot to once taken.
+
+    Defaults to gscreenshot_%Y-%m-%d-%H%M%S.png.
+
+    Two types of format parameters are accepted:
 
     * $$: A literal $
+    * $a: The system hostname
     * $h: The height of the screenshot in pixels
-    * $w: The width of the screenshot in pixels
     * $p: The size of the screenshot in pixels
+    * $w: The width of the screenshot in pixels
 
     * %%: A literal %
-    * The full list of strftime format options starting with "%".
+    * The full list of strftime format options in their standard format. See the examples section.
 
 -c, \--clip
 :   Copy the resulting screenshot to the clipboard. Relies on xclip or wl-clipboard.
@@ -94,7 +99,7 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 gscreenshot
 :   Open the gscreenshot GUI.
 
-gscreenshot -f "screenshot_$hx$w_%Y-%m-%d.png" -s -c -d 1
+gscreenshot -f \'screenshot_\$hx\$w_%Y-%m-%d.png\' -s -c -d 1
 :   Take a screenshot of a screen region (interactive) without the GUI, with a 1 second delay. Copy the
     screenshot to the clipboard and save it to a PNG file including the height, width, and day in the filename.
     Note that you can subsitute gscreenshot-cli for gscreenshot in this call, if so desired.
@@ -106,7 +111,7 @@ gscreenshot-cli
 
 Invoke gscreenshot with no parameters to open the graphical user interface.
 
-Buttons and Checkboxes
+## Buttons and Checkboxes
 
 "Selection"
 :   Allows you to drag-select an area to capture.
@@ -140,7 +145,7 @@ Save As dropdown (and right click menu):
 :   Open extended options.
 
 
-Menu Options
+## Menu Options
 
 "Copy"
 :   Copy the displayed screenshot to the clipboard.
@@ -159,7 +164,7 @@ Menu Options
 :   Choose or create a folder to save all the screenshots available in the preview into.
 
 
-Keyboard Shortcuts
+## Keyboard Shortcuts
 
 Control+S
 :   Opens the save dialog
@@ -202,14 +207,14 @@ the following, which should be available (or already installed by) your package 
 At this point, you can install gscreenshot itself by running
 "sudo pip install -e ."
 
-For full functionality on X11, the recommended packages are:
+## For full functionality on X11, the recommended packages are:
 
 * Scrot 1.0 or newer (screenshot backend)
 * Slop (region selection + cursor capture)
 * xdg-open (for opening screenshots in your image viewer)
 * xclip (for command line clipboard functionality)
 
-For alternate X11 configurations, choose from one of the following combinations:
+## For alternate X11 configurations, choose from one of the following combinations:
 
 * Scrot (1.0 or older) + slop + python-xlib
 * ImageMagick + slop + python-xlib
@@ -218,14 +223,14 @@ For alternate X11 configurations, choose from one of the following combinations:
 * PIL/python-pillow + slop + python-xlib
 * Scrot only (any version) (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
 
-For full functionality on Wayland, the recommended packages are:
+## For full functionality on Wayland, the recommended packages are:
 
 * grim (for screenshots)
 * slurp (for region selection)
 * xdg-open (for opening screenshots in your image viewer)
 * wl-clipboard (for copy to clipboard)
 
-For alternate Wayland configurations, choose from one of the following combinations:
+## For alternate Wayland configurations, choose from one of the following combinations:
 
 * xdg-desktop-portal + slurp + python-dbus
 
@@ -234,7 +239,8 @@ session is Wayland or X11.
 
 Note that Wayland support may be limited - your mileage may vary depending on your system's configuration.
 
-If you intend to develop gscreenshot, you will also want to install Glade.
+If you intend to develop gscreenshot, you may also want to install Glade (GTK designer) and pandoc
+(for generating the manpage).
 
 If you install manually, you may also want to install the data files by hand, which includes
 the manpage, .desktop file, and icons. You can find these in the "generated" directory.
@@ -255,13 +261,15 @@ gscreenshot is licensed under the GPLv2.
 
 # CONTRIBUTING
 
-Contributing code
+## Contributing code
+
 Please base pull requests off of and open pull requests against the
 'dev' branch. 'main' is reserved for stable code. You may be asked to
 rebase your code against the latest version of the 'dev' branch if
 there's been a flurry of activity before your contribution.
 
-Localizations
+## Localizations
+
 gscreenshot uses the standard gettext tools. Locale files can be found in
 src/gscreenshot/resources/locale.
 
@@ -269,10 +277,11 @@ If you contribute a localization, do not add the compiled .mo files. They
 are generated on demand as part of the installation.
 
 Current supported languages are:
-English
-Español
 
-Packaging
+* English
+* Español
+
+## Packaging
 
 The following command should be suitable, with minor adjustments, for creating
 a gscreenshot package.
