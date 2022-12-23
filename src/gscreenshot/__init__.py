@@ -15,6 +15,7 @@ import io
 import json
 import locale
 import os
+import platform
 import sys
 import subprocess
 import tempfile
@@ -340,13 +341,47 @@ class Gscreenshot(object):
         Returns:
             str
         """
+        return self.interpolate_filename("gscreenshot_%Y-%m-%d-%H%M%S.png")
+
+    def interpolate_filename(self, filename:str) -> str:
+        '''
+        Does interpolation of a filename, as the following:
+           $$   a literal '$'
+           $a   system hostname
+           $h   image's height in pixels
+           $p   image's size in pixels
+           $w   image's width in pixels
+
+           Format operators starting with "%" are
+           run through strftime.
+        '''
+        if "$" not in filename and "%" not in filename:
+            return filename
+
+        general_replacements:typing.Dict[str, str] = {
+            '$$': '$',
+            '$a': platform.node()
+        }
+
+        image = self.get_last_image()
+        if image is not None:
+            general_replacements.update({
+                '$h': str(image.height),
+                '$p': str(image.height * image.width),
+                '$w': str(image.width)
+            })
+
+        for fmt, replacement in general_replacements.items():
+            filename = filename.replace(fmt, replacement)
+
         now = datetime.now()
-        return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S.png")
+        filename = now.strftime(filename)
+
+        return filename
 
     def get_time_foldername(self) -> str:
         '''Generates a time-based folder name'''
-        now = datetime.now()
-        return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S")
+        return self.interpolate_filename("gscreenshot_%Y-%m-%d-%H%M%S")
 
     def save_and_return_path(self) -> typing.Optional[str]:
         """
@@ -380,6 +415,8 @@ class Gscreenshot(object):
         '''
         if filename is None:
             filename = self.get_time_filename()
+        else:
+            filename = self.interpolate_filename(filename)
 
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 
@@ -451,6 +488,8 @@ class Gscreenshot(object):
 
         if foldername is None:
             foldername = self.get_time_foldername()
+        else:
+            foldername = self.interpolate_filename(foldername)
 
         os.makedirs(foldername)
 
