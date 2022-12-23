@@ -371,8 +371,8 @@ class Gscreenshot(object):
                 '$w': str(image.width)
             })
 
-        for k, v in general_replacements.items():
-            filename = filename.replace(k, v)
+        for fmt, replacement in general_replacements.items():
+            filename = filename.replace(fmt, replacement)
 
         now = datetime.now()
         filename = now.strftime(filename)
