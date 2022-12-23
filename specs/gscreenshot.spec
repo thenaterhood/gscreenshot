@@ -1,6 +1,6 @@
 %define name gscreenshot
-%define version 3.0.1
-%define unmangled_version 3.0.1
+%define version 3.1.0
+%define unmangled_version 3.1.0
 %define release 1
 
 Summary: A simple screenshot tool
@@ -13,7 +13,7 @@ Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 Prefix: %{_prefix}
 BuildArch: noarch
-BuildRequires: python3 python3-setuptools gettext
+BuildRequires: python3 python3-setuptools gettext pandoc
 Requires: scrot python3 python3-pillow python3-gobject python3-setuptools python3-xlib
 Vendor: Nate Levesque <public@thenaterhood.com>
 Url: https://github.com/thenaterhood/gscreenshot

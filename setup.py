@@ -25,7 +25,8 @@ test_requires = [
 data_files = [
     ('share/applications', ['dist/desktop/gscreenshot.desktop']),
     ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
-    ('share/menu', ['dist/menu/gscreenshot'])
+    ('share/menu', ['dist/menu/gscreenshot']),
+    ('share/man/man1', ['generated/gscreenshot.1.gz'])
     ]
 
 def get_version_from_specfile():
@@ -57,6 +58,9 @@ def build_data_files(version):
     for d in data_files:
         generated_path = os.path.join('generated', d[1][0])
         try:
+            if not os.path.exists(d[1][0]):
+                print("WARNING: missing intermediate file " + d[1][0])
+                continue
             with open(d[1][0], 'r') as infile:
                 infile_data = infile.read()
                 updated_data = infile_data.replace('%%VERSION%%', version)
@@ -74,7 +78,9 @@ def build_data_files(version):
             # replace anything in
             files.append((d[0], d[1]))
 
+    print(files)
     return files
+
 
 def compile_locales():
     print('=> Compiling locales...')
@@ -94,9 +100,45 @@ def compile_locales():
             print("===> WARNING ====> Failed to compile " + po)
         os.chdir(original_dir)
 
+
+def compile_manpage():
+    print('=> Compiling manpage...')
+
+    try:
+        subprocess.check_output([
+            'pandoc',
+            '--standalone',
+            '--to',
+            'man',
+            'README.md',
+            '-o',
+            'generated/gscreenshot.1'
+            ])
+    except:
+        print("===> WARNING ====> Failed to compile manpage")
+        return
+
+    try:
+        subprocess.check_output([
+            'gzip',
+            '-f',
+            'generated/gscreenshot.1',
+        ])
+    except:
+        print("===> WARNING ====> Failed to compress manpage")
+        return
+
+
 pkg_version = get_version_from_specfile()
 
+
+try:
+    os.makedirs("generated")
+except (OSError, FileExistsError) as e:
+    if not os.path.isdir("generated"):
+        raise
 compile_locales()
+compile_manpage()
 
 setup(name='gscreenshot',
     version=pkg_version,
@@ -130,7 +172,7 @@ setup(name='gscreenshot',
         ],
     data_files=build_data_files(pkg_version),
     package_data={
-        '': ['*.glade', 'LICENSE', '*.png', '*.mo']
+        '': ['*.glade', 'LICENSE', '*.png', '*.mo', 'gscreenshot.1.gz']
         },
     include_package_data=True
     )

@@ -15,6 +15,7 @@ import io
 import json
 import locale
 import os
+import platform
 import sys
 import subprocess
 import tempfile
@@ -23,6 +24,7 @@ import typing
 from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
+from gscreenshot.screenshot import Screenshot, ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
 from gscreenshot.util import session_is_wayland
@@ -35,12 +37,11 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
-    __slots__ = ['screenshooter', 'saved_last_image', 'last_save_file', 'cache']
+    __slots__ = ['screenshooter', 'cache', '_screenshots']
 
     screenshooter: Screenshooter
-    saved_last_image: bool
-    last_save_file: typing.Optional[str]
     cache: typing.Dict[str, str]
+    _screenshots: ScreenshotCollection
 
     # generated using piexif
     EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
@@ -60,9 +61,8 @@ class Gscreenshot(object):
 
         screenshooter_factory = ScreenshooterFactory(screenshooter)
         self.screenshooter = screenshooter_factory.create()
+        self._screenshots = ScreenshotCollection()
 
-        self.saved_last_image = False
-        self.last_save_file = None
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
             with open(self.get_cache_file(), "r", encoding="UTF-8") as cachefile:
@@ -165,8 +165,10 @@ class Gscreenshot(object):
 
         return self.screenshooter.__class__.__name__
 
+    #pylint: disable=too-many-arguments
     def screenshot_full_display(self, delay: int=0, capture_cursor: bool=False,
-                                cursor_name: str='theme') -> typing.Optional[Image.Image]:
+                                cursor_name: str='theme', overwrite: bool=False, count: int=1
+                                ) -> typing.Optional[Image.Image]:
         """
         Takes a screenshot of the full display with a
         given delay.
@@ -177,23 +179,35 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-
         if not capture_cursor:
             use_cursor = None
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        self.screenshooter.grab_fullscreen_(
-            delay,
-            capture_cursor,
-            use_cursor=use_cursor
-        )
-        self.run_display_mismatch_warning()
-        self.saved_last_image = False
-        return self.screenshooter.image
+        for _ in range(0, count):
+            self.screenshooter.grab_fullscreen_(
+                delay,
+                capture_cursor,
+                use_cursor=use_cursor
+            )
 
+            if self.screenshooter.screenshot is not None:
+                if overwrite:
+                    self._screenshots.replace(self.screenshooter.screenshot)
+                else:
+                    self._screenshots.append(self.screenshooter.screenshot)
+
+        self.run_display_mismatch_warning()
+
+        if not overwrite:
+            self._screenshots.cursor_to_end()
+
+        return self.get_last_image()
+
+    #pylint: disable=too-many-arguments
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
-                            cursor_name: str='theme') -> typing.Optional[Image.Image]:
+                            cursor_name: str='theme', overwrite: bool=False, count: int=1
+                            ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected area
         with a given delay.
@@ -204,23 +218,35 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-
         if not capture_cursor:
             use_cursor = None
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        self.screenshooter.grab_selection_(
-            delay,
-            capture_cursor,
-            use_cursor=use_cursor
-        )
-        self.run_display_mismatch_warning()
-        self.saved_last_image = False
-        return self.screenshooter.image
+        for _ in range(0, count):
+            self.screenshooter.grab_selection_(
+                delay,
+                capture_cursor,
+                use_cursor=use_cursor
+            )
 
+            if self.screenshooter.screenshot is not None:
+                if overwrite:
+                    self._screenshots.replace(self.screenshooter.screenshot)
+                else:
+                    self._screenshots.append(self.screenshooter.screenshot)
+
+        self.run_display_mismatch_warning()
+
+        if not overwrite:
+            self._screenshots.cursor_to_end()
+
+        return self.get_last_image()
+
+    #pylint: disable=too-many-arguments
     def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
-                          cursor_name: str='theme') -> typing.Optional[Image.Image]:
+                          cursor_name: str='theme', overwrite: bool=False, count: int=1
+                          ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected window
         with a given delay.
@@ -231,20 +257,30 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-
         if not capture_cursor:
             use_cursor = None
         else:
             use_cursor = self.get_available_cursors()[cursor_name]
 
-        self.screenshooter.grab_window_(
-            delay,
-            capture_cursor,
-            use_cursor=use_cursor
-        )
+        for _ in range(0, count):
+            self.screenshooter.grab_window_(
+                delay,
+                capture_cursor,
+                use_cursor=use_cursor
+            )
+
+            if self.screenshooter.screenshot is not None:
+                if overwrite:
+                    self._screenshots.replace(self.screenshooter.screenshot)
+                else:
+                    self._screenshots.append(self.screenshooter.screenshot)
+
         self.run_display_mismatch_warning()
-        self.saved_last_image = False
-        return self.screenshooter.image
+
+        if not overwrite:
+            self._screenshots.cursor_to_end()
+
+        return self.get_last_image()
 
     def get_last_image(self) -> typing.Optional[Image.Image]:
         """
@@ -253,7 +289,18 @@ class Gscreenshot(object):
         Returns:
             PIL.Image
         """
-        return self.screenshooter.image
+        try:
+            screenshot = self._screenshots.cursor_current()
+            if screenshot is not None:
+                return screenshot.get_image()
+        except IndexError:
+            pass
+
+        return None
+
+    def get_screenshot_collection(self) -> ScreenshotCollection:
+        '''Returns the screenshot collection'''
+        return self._screenshots
 
     def get_supported_formats(self) -> typing.List[str]:
         """
@@ -269,36 +316,21 @@ class Gscreenshot(object):
 
         return supported_formats
 
-    def get_thumbnail(self, width: int, height: int,
-                      image: typing.Optional[Image.Image]=None
-                      ) -> typing.Optional[Image.Image]:
+    def get_thumbnail(self, width: int, height: int, with_border: bool=False
+                      ) -> Image.Image:
         """
         Gets a thumbnail of either the current image, or a passed one
-
         Params:
             width: int
             height: int
             image: Image|None
-
         Returns:
             Image
         """
-        thumbnail = None
+        screenshot = self._screenshots.cursor_current()
 
-        if image is None and self.screenshooter.image is not None:
-            thumbnail = self.screenshooter.image.copy()
-        elif image is not None:
-            thumbnail = image.copy()
-
-        if thumbnail is not None:
-            antialias_algo = None
-            try:
-                antialias_algo = Image.Resampling.LANCZOS
-            except AttributeError: # PIL < 9.0
-                antialias_algo = Image.ANTIALIAS
-
-            thumbnail.thumbnail((width, height), antialias_algo)
-            return thumbnail
+        if screenshot is not None:
+            return screenshot.get_preview(width, height, with_border) or self.get_app_icon()
 
         return self.get_app_icon()
 
@@ -309,8 +341,47 @@ class Gscreenshot(object):
         Returns:
             str
         """
+        return self.interpolate_filename("gscreenshot_%Y-%m-%d-%H%M%S.png")
+
+    def interpolate_filename(self, filename:str) -> str:
+        '''
+        Does interpolation of a filename, as the following:
+           $$   a literal '$'
+           $a   system hostname
+           $h   image's height in pixels
+           $p   image's size in pixels
+           $w   image's width in pixels
+
+           Format operators starting with "%" are
+           run through strftime.
+        '''
+        if "$" not in filename and "%" not in filename:
+            return filename
+
+        general_replacements:typing.Dict[str, str] = {
+            '$$': '$',
+            '$a': platform.node()
+        }
+
+        image = self.get_last_image()
+        if image is not None:
+            general_replacements.update({
+                '$h': str(image.height),
+                '$p': str(image.height * image.width),
+                '$w': str(image.width)
+            })
+
+        for fmt, replacement in general_replacements.items():
+            filename = filename.replace(fmt, replacement)
+
         now = datetime.now()
-        return datetime.strftime(now, "gscreenshot_%Y-%m-%d-%H%M%S.png")
+        filename = now.strftime(filename)
+
+        return filename
+
+    def get_time_foldername(self) -> str:
+        '''Generates a time-based folder name'''
+        return self.interpolate_filename("gscreenshot_%Y-%m-%d-%H%M%S")
 
     def save_and_return_path(self) -> typing.Optional[str]:
         """
@@ -325,33 +396,28 @@ class Gscreenshot(object):
                 self.get_time_filename()
                 )
 
-        if not self.saved_last_image:
+        screenshot = self._screenshots.cursor_current()
+        if screenshot is None:
+            return None
+
+        if not screenshot.saved():
             self.save_last_image(screenshot_fname)
+            screenshot.set_saved_path(screenshot_fname)
         else:
-            return self.last_save_file
+            return screenshot.get_saved_path()
 
         return screenshot_fname
 
-    def save_last_image(self, filename: typing.Optional[str]= None) -> bool:
-        """
-        Saves the last screenshot taken with a given filename.
-        Returns a boolean for success or fail. A supported file
-        extension must be part of the filename provided.
-
-        Parameters:
-            str filename
-
-        Returns:
-            bool success
-        """
-
+    def _save_image(self, image: Image.Image, filename: typing.Optional[str]=None,
+                    overwrite: bool=True) -> bool:
+        '''
+        Internal method for saving an image to a file
+        '''
         if filename is None:
             filename = self.get_time_filename()
+        else:
+            filename = self.interpolate_filename(filename)
 
-        if self.screenshooter.image is None:
-            return False
-
-        image = self.screenshooter.image
         actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 
         if actual_file_ext == "":
@@ -374,6 +440,9 @@ class Gscreenshot(object):
                     )
             actual_file_ext = 'png'
 
+        if not overwrite and os.path.exists(filename):
+            return False
+
         if actual_file_ext == 'jpg':
             actual_file_ext = 'jpeg'
 
@@ -382,6 +451,9 @@ class Gscreenshot(object):
         if actual_file_ext in supported_formats:
             self.cache["last_save_dir"] = os.path.dirname(filename)
             self.save_cache()
+
+            screenshot = self._screenshots.cursor_current()
+
             try:
                 # add exif data. This is sketchy but we don't need to
                 # dynamically generate it, just find and replace.
@@ -398,14 +470,66 @@ class Gscreenshot(object):
 
                 image.save(filename, actual_file_ext.upper(), exif=exif_data)
 
-                self.saved_last_image = True
-                self.last_save_file = filename
+                if screenshot is not None:
+                    screenshot.set_saved_path(filename)
                 return True
             except IOError:
-                self.saved_last_image = False
+
+                if screenshot is not None:
+                    screenshot.set_saved_path(None)
                 return False
         else:
             return False
+
+    def save_screenshot_collection(self, foldername: typing.Optional[str]=None) -> bool:
+        '''
+        Saves every image in the current screenshot collection
+        '''
+
+        if foldername is None:
+            foldername = self.get_time_foldername()
+        else:
+            foldername = self.interpolate_filename(foldername)
+
+        os.makedirs(foldername)
+
+        i = 0
+        for screenshot in self._screenshots:
+            i += 1
+            fname = os.path.join(foldername, f"gscreenshot-{i}.png")
+            if not self._save_image(screenshot.get_image(), fname, False):
+                return False
+
+            screenshot.set_saved_path(fname)
+
+        return True
+
+    def save_last_image(self, filename: typing.Optional[str]= None) -> bool:
+        """
+        Saves the last screenshot taken with a given filename.
+        Returns a boolean for success or fail. A supported file
+        extension must be part of the filename provided.
+
+        Parameters:
+            str filename
+
+        Returns:
+            bool success
+        """
+
+        image = self.get_last_image()
+
+        if image is None:
+            return False
+
+        if self._save_image(image, filename):
+            screenshot = self._screenshots.cursor_current()
+            if screenshot is not None:
+                screenshot.set_saved_path(filename)
+
+            return True
+
+        return False
 
     def open_last_screenshot(self) -> bool:
         """
@@ -433,7 +557,7 @@ class Gscreenshot(object):
         Returns:
             bool success
         """
-        image = self.screenshooter.image
+        image = self.get_last_image()
 
         if image is None:
             return False
