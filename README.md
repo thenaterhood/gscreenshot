@@ -140,6 +140,8 @@ Invoke gscreenshot with no parameters to open the graphical user interface.
 
 "Save As"
 :   Brings up the file save dialog to save the screenshot shown in the preview to a file.
+    When setting a filename, you can use the same format parameters as supported by the `-f`
+    command line option.
 
 Save As dropdown (and right click menu):
 :   Open extended options.
@@ -162,7 +164,8 @@ Save As dropdown (and right click menu):
 
 "Save All"
 :   Choose or create a folder to save all the screenshots available in the preview into.
-
+    When setting a folder name, you can use the same format parameters as supported by the `-f`
+    command line option.
 
 ## Keyboard Shortcuts
 
