@@ -29,6 +29,11 @@ data_files = [
     ('share/man/man1', ['generated/gscreenshot.1.gz'])
     ]
 
+def print_warning(warning:str):
+    print("\n\n\n\n")
+    print("===> WARNING ====> " + warning)
+    print("\n\n\n\n")
+
 def get_version_from_specfile():
     '''
     Gets the version from the RPM specfile in specs/
@@ -78,7 +83,6 @@ def build_data_files(version):
             # replace anything in
             files.append((d[0], d[1]))
 
-    print(files)
     return files
 
 
@@ -97,15 +101,17 @@ def compile_locales():
         try:
             subprocess.check_output(['msgfmt', basename, '-o', outname])
         except:
-            print("===> WARNING ====> Failed to compile " + po)
+            print_warning("Failed to compile " + po)
         os.chdir(original_dir)
 
 
 def compile_manpage():
     print('=> Compiling manpage...')
 
-    try:
-        subprocess.check_output([
+    success = False
+
+    man_converters = [
+        [
             'pandoc',
             '--standalone',
             '--to',
@@ -113,9 +119,26 @@ def compile_manpage():
             'README.md',
             '-o',
             'generated/gscreenshot.1'
-            ])
-    except:
-        print("===> WARNING ====> Failed to compile manpage")
+        ],
+        [
+            'go-md2man',
+            '--in',
+            'README.md',
+            '--out',
+            'generated/gscreenshot.1'
+        ]
+    ]
+
+    for converter in man_converters:
+        try:
+            subprocess.check_output(converter)
+            success = True
+            break
+        except Exception as e:
+            continue
+
+    if not success:
+        print_warning("Non-fatal. Failed to compile manpage. Install pandoc or md2man (sometimes go-md2man).")
         return
 
     try:
@@ -125,7 +148,7 @@ def compile_manpage():
             'generated/gscreenshot.1',
         ])
     except:
-        print("===> WARNING ====> Failed to compress manpage")
+        print_warning("Failed to compress manpage")
         return
 
 
