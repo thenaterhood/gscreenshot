@@ -194,3 +194,6 @@ msgstr "Sobrescribir"
 
 msgid "Save All"
 msgstr "Guardar todos"
+
+msgid "Use same selection as preview"
+msgstr "Misma selección que la vista previa"

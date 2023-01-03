@@ -86,6 +86,12 @@ class View(object):
             checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
             self._disable_and_hide(checkbox_capture_cursor)
 
+        if GSCapabilities.REUSE_REGION not in self._capabilities:
+            reuse_region_dropdown = builder.get_object('selection_actions_btn')
+            selectarea_gtkbox = builder.get_object('select_area_gtkbox')
+            self._disable_and_hide(reuse_region_dropdown)
+            selectarea_gtkbox.remove(reuse_region_dropdown)
+
     def _disable_and_hide(self, widget):
         '''disables and hides a widget'''
         widget.set_opacity(0)
@@ -455,11 +461,12 @@ class Presenter(object):
                 cursors
                 )
 
-    def _begin_take_screenshot(self, app_method):
+    def _begin_take_screenshot(self, app_method, **args):
         app_method(delay=self._delay,
             capture_cursor=self._capture_cursor,
             cursor_name=self._cursor_selection,
-            overwrite=self._overwrite_mode)
+            overwrite=self._overwrite_mode,
+            **args)
 
         # Re-enable UI on the UI thread.
         GLib.idle_add(self._end_take_screenshot)
@@ -483,7 +490,7 @@ class Presenter(object):
         '''Handle window state events'''
         self._view.handle_state_event(widget, event)
 
-    def take_screenshot(self, app_method: typing.Callable):
+    def take_screenshot(self, app_method: typing.Callable, **args):
         '''Take a screenshot using the passed app method'''
         self._view.set_busy()
 
@@ -492,7 +499,7 @@ class Presenter(object):
 
         # Do work in background thread.
         # Taken from here: https://wiki.gnome.org/Projects/PyGObject/Threading
-        _thread = threading.Thread(target=self._begin_take_screenshot(app_method))
+        _thread = threading.Thread(target=self._begin_take_screenshot(app_method, **args))
         _thread.daemon = True
         _thread.start()
 
@@ -553,6 +560,22 @@ class Presenter(object):
         self.take_screenshot(
             self._app.screenshot_selected
             )
+
+    def on_use_last_region_clicked(self, *_):
+        '''
+        Take a screenshot with the same region as the
+        screenshot under the cursor, if applicable
+        '''
+        last_screenshot = self._app.get_screenshot_collection().cursor_current()
+        region = None
+
+        if last_screenshot is not None:
+            region = last_screenshot.get_region()
+
+        self.take_screenshot(
+            self._app.screenshot_selected,
+            region=region
+        )
 
     def on_preview_prev_clicked(self, *_):
         '''Handle a click of the "previous" button on the preview'''

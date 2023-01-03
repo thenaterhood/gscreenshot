@@ -35,7 +35,8 @@ class RegionSelector():
         """
         return [
             GSCapabilities.WINDOW_SELECTION,
-            GSCapabilities.REGION_SELECTION
+            GSCapabilities.REGION_SELECTION,
+            GSCapabilities.REUSE_REGION
         ]
 
     def region_select(self) -> typing.Tuple[int, int, int, int]:

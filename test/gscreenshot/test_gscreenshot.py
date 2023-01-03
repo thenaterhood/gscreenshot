@@ -58,7 +58,8 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.grab_selection_.assert_called_once_with(
             0,
             False,
-            use_cursor=None
+            use_cursor=None,
+            region=None
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -69,7 +70,8 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.grab_selection_.assert_called_once_with(
             5,
             False,
-            use_cursor=None
+            use_cursor=None,
+            region=None
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -80,7 +82,8 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.grab_selection_.assert_called_once_with(
             0,
             True,
-            use_cursor=None
+            use_cursor=None,
+            region=None
         )
 
         self.assertEqual(self.fake_image, actual)
