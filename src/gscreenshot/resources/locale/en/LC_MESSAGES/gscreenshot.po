@@ -184,3 +184,6 @@ msgstr ""
 
 msgid "Save All"
 msgstr ""
+
+msgid "Use same selection as preview"
+msgstr ""
