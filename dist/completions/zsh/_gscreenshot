@@ -6,7 +6,7 @@ function _gscreenshot {
     for opt in $(gscreenshot --help | grep -- -- | cut -d "," -f 2 | awk '{print $1}'); do
         case "$opt" in
         --filename)
-            opt="$opt:*:file:_directories"
+            opt="$opt:file:_directories"
             ;;
         --delay)
             opt="$opt:number:"
