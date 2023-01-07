@@ -36,6 +36,9 @@ class View(object):
         self._window = window
         self._window_is_fullscreen:bool = False
         self._was_maximized:bool = False
+
+        self.hide()
+
         self._capabilities = capabilities
         self._last_window_dimensions = self._window.get_size()
         self._header_bar = builder.get_object('header_bar')
@@ -964,7 +967,6 @@ def main():
         'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
 
     window = builder.get_object('window_main')
-
 
     capabilities = application.get_capabilities()
     view = View(window, builder, capabilities)
