@@ -125,13 +125,14 @@ class ScreenshotCollection(object):
         if idx == -2:
             idx = self._cursor
 
+        if len(self._screenshots) == 0:
+            self.append(replacement)
+            return
+
         try:
             self._screenshots[idx] = replacement
         except IndexError:
-            try:
-                self._screenshots[self._cursor] = replacement
-            except IndexError:
-                self.append(replacement)
+            self._screenshots[self._cursor] = replacement
 
     def has_next(self) -> bool:
         '''
