@@ -122,7 +122,7 @@ class ScreenshotCollection(object):
 
     def replace(self, replacement: Screenshot, idx: int = -2):
         '''replaces a screenshot at the cursor or provided index'''
-        if idx == -2 or idx:
+        if idx == -2:
             idx = self._cursor
 
         try:
