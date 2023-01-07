@@ -26,7 +26,9 @@ data_files = [
     ('share/applications', ['dist/desktop/gscreenshot.desktop']),
     ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
     ('share/menu', ['dist/menu/gscreenshot']),
-    ('share/man/man1', ['generated/gscreenshot.1.gz'])
+    ('share/man/man1', ['generated/gscreenshot.1.gz']),
+    ('usr/share/zsh/site-functions', ['dist/completions/zsh/_gscreenshot']),
+    ('usr/share/bash-completion/completions', ['dist/completions/bash/gscreenshot'])
     ]
 
 def print_warning(warning:str):
@@ -34,7 +36,7 @@ def print_warning(warning:str):
     print("===> WARNING ====> " + warning)
     print("\n\n\n\n")
 
-def get_version_from_specfile():
+def get_version_from_specfile() -> str:
     '''
     Gets the version from the RPM specfile in specs/
 
@@ -46,6 +48,9 @@ def get_version_from_specfile():
             if '%define version' in line:
                 version = line.split(' ')[2].strip()
                 break
+
+    if version is None:
+        raise Exception("Failed to get version")
 
     return version
 
@@ -196,7 +201,8 @@ setup(name='gscreenshot',
         ],
     data_files=build_data_files(pkg_version),
     package_data={
-        '': ['*.glade', 'LICENSE', '*.png', '*.mo', 'gscreenshot.1.gz']
+        '': ['*.glade', 'LICENSE', '*.png', '*.mo',
+            'gscreenshot.1.gz', '_gscreenshot', 'gscreenshot']
         },
     include_package_data=True
     )
