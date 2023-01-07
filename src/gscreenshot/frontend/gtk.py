@@ -976,6 +976,10 @@ def main():
             view
             )
 
+    # Lucky 13 to give a tiny bit more time for the desktop environment
+    # to settle down and hide the window before we take our initial
+    # screenshot.
+    sleep(0.13)
     presenter.on_button_all_clicked()
 
     accel = Gtk.AccelGroup()
