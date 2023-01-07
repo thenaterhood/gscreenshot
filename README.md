@@ -213,7 +213,8 @@ At this point, you can install gscreenshot itself by running
 ## For full functionality on X11, the recommended packages are:
 
 * Scrot 1.0 or newer (screenshot backend)
-* Slop (region selection + cursor capture)
+* Slop (region selection)
+* python-xlib (cursor capture)
 * xdg-open (for opening screenshots in your image viewer)
 * xclip (for command line clipboard functionality)
 
@@ -267,8 +268,8 @@ gscreenshot is licensed under the GPLv2.
 ## Contributing code
 
 Please base pull requests off of and open pull requests against the
-'dev' branch. 'main' is reserved for stable code. You may be asked to
-rebase your code against the latest version of the 'dev' branch if
+dev branch. main is reserved for stable code. You may be asked to
+rebase your code against the latest version of the dev branch if
 there's been a flurry of activity before your contribution.
 
 ## Localizations
