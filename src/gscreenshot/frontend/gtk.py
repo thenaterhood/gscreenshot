@@ -427,15 +427,13 @@ class View(object):
 class Presenter(object):
     '''Presenter class for the GTK frontend'''
 
-    __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view', '_keymappings', '_capture_cursor',
+    __slots__ = ('_delay', '_app', '_hide',
+            '_view', '_keymappings', '_capture_cursor',
             '_cursor_selection', '_overwrite_mode')
 
     _delay: int
     _app: Gscreenshot
     _hide: bool
-    _can_resize: bool
-    _pixbuf: Gdk.PixbufLoader
     _view: View
     _keymappings: dict
     _capture_cursor: bool
@@ -445,7 +443,6 @@ class Presenter(object):
     def __init__(self, application: Gscreenshot, view: View):
         self._app = application
         self._view = view
-        self._can_resize = True
         self._delay = 0
         self._hide = True
         self._capture_cursor = False
@@ -822,9 +819,8 @@ class Presenter(object):
 
     def on_window_resize(self, *_):
         '''Handle window resizes'''
-        if self._can_resize:
-            self._view.resize()
-            self._show_preview()
+        self._view.resize()
+        self._show_preview()
 
     def quit(self, *_):
         '''Exit the app'''
@@ -962,14 +958,6 @@ def main():
         warning.run()
         sys.exit(1)
 
-    # Improves startup performance by kicking off a screenshot
-    # as early as we can in the background.
-    screenshot_thread = threading.Thread(
-        target=application.screenshot_full_display
-    )
-    screenshot_thread.daemon = True
-    screenshot_thread.start()
-
     builder = Gtk.Builder()
     builder.set_translation_domain('gscreenshot')
     builder.add_from_string(resource_string(
@@ -977,10 +965,6 @@ def main():
 
     window = builder.get_object('window_main')
 
-    waited = 0
-    while application.get_last_image() is None and waited < 8:
-        sleep(.01)
-        waited += .1
 
     capabilities = application.get_capabilities()
     view = View(window, builder, capabilities)
@@ -989,6 +973,8 @@ def main():
             application,
             view
             )
+
+    presenter.on_button_all_clicked()
 
     accel = Gtk.AccelGroup()
     accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK,
