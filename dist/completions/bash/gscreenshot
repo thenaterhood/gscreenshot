@@ -1,0 +1,25 @@
+#!/bin/env bash
+_gscreenshot_completions()
+{
+    local cur prev opts
+    COMPREPLY=()
+    cur="${COMP_WORDS[COMP_CWORD]}"
+    prev="${COMP_WORDS[COMP_CWORD-1]}"
+    if [ -n "$prev" ]; then
+        case "$prev" in
+        --filename)
+            while IFS='' read -r line; do COMPREPLY+=("$line"); done < <(compgen -o plusdirs -- "$cur")
+            return
+            ;;
+        --delay)
+            COMPREPLY=("[seconds]")
+            return
+            ;;
+        esac
+    fi
+    opts=$(gscreenshot --help | grep -- -- | cut -d "," -f 2 | awk '{print $1}')
+    while IFS='' read -r line; do COMPREPLY+=("$line"); done < <(compgen -W "${opts}" -- "$cur")
+}
+
+complete -F _gscreenshot_completions gscreenshot
+complete -F _gscreenshot_completions gscreenshot-cli
