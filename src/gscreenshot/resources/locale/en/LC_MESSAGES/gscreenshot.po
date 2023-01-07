@@ -187,3 +187,21 @@ msgstr ""
 
 msgid "Use same selection as preview"
 msgstr ""
+
+msgid "region_selection"
+msgstr "Region Selection"
+
+msgid "reuse_region"
+msgstr "Reuse Region"
+
+msgid "window_selection"
+msgstr "Window Selection"
+
+msgid "cursor_capture"
+msgstr "Cursor Capture"
+
+msgid "alternate_cursor"
+msgstr "Alternate Cursor"
+
+msgid "capture_full_screen"
+msgstr "Full Screen Capture"

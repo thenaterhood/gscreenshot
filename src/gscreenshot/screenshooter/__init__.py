@@ -27,7 +27,7 @@ class Screenshooter(object):
     """
 
     __slots__ = ('_tempfile', '_selector', '_screenshot')
-    __utilityname__: typing.Optional[str] = None
+    __utilityname__: str = "default"
 
     _screenshot: typing.Optional[Screenshot]
     _tempfile: str
@@ -73,7 +73,7 @@ class Screenshooter(object):
         """
         return self._screenshot
 
-    def get_capabilities(self) -> typing.List[str]:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         """
         Get supported features. Note that under-the-hood the capabilities
         of the selector (if applicable) will be added to this.
@@ -81,23 +81,23 @@ class Screenshooter(object):
         Returns:
             [GSCapabilities]
         """
-        return []
+        return {}
 
-    def get_capabilities_(self) -> typing.List[str]:
+    def get_capabilities_(self) -> typing.Dict[str, str]:
         """
         Get supported features. This should not be overridden by extending
         classes. Implement get_capabilities instead.
         """
         capabilities = self.get_capabilities()
         # If we're running, this is the bare minimum
-        capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
+        capabilities[GSCapabilities.CAPTURE_FULLSCREEN] = self.__utilityname__
 
         if display is not None and not session_is_wayland():
-            capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
-            capabilities.append(GSCapabilities.CURSOR_CAPTURE)
+            capabilities[GSCapabilities.ALTERNATE_CURSOR] = "python-xlib"
+            capabilities[GSCapabilities.CURSOR_CAPTURE] = "python-xlib"
 
         if self._selector is not None:
-            capabilities = capabilities + self._selector.get_capabilities()
+            capabilities.update(self._selector.get_capabilities())
 
         return capabilities
 

@@ -778,8 +778,12 @@ class Presenter(object):
         description += "\n" + i18n("Using {0} screenshot backend").format(
             self._app.get_screenshooter_name()
         )
+
+        capabilities_formatted = []
+        for capability, provider in self._app.get_capabilities().items():
+            capabilities_formatted.append(f"{i18n(capability)} ({provider})")
         description += "\n" + i18n("Available features: {0}").format(
-            ", ".join(self._app.get_capabilities())
+            "\n ".join(capabilities_formatted)
         )
 
         about.set_comments(i18n(description))

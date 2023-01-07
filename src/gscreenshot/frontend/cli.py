@@ -100,8 +100,12 @@ def run():
         version = gscreenshot.get_program_version()
 
         print(_("Using {0} screenshot backend").format(gscreenshot.get_screenshooter_name()))
-        print(_("Available features: {0}").format(", ".join(gscreenshot.get_capabilities())))
+        capabilities_formatted = []
+        for capability, provider in gscreenshot.get_capabilities().items():
+            capabilities_formatted.append(f"{_(capability)} ({provider})")
+ 
         print(f"{name} {version}; {description}")
+        print(_("Available features: {0}").format(", ".join(capabilities_formatted)))
         print(website)
         print("")
         print(_("Author(s)"))

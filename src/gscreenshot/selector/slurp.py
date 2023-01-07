@@ -15,19 +15,13 @@ class Slurp(RegionSelector):
     of both corners of the selection.
     """
 
+    __utilityname__: str = "slurp"
+
     def __init__(self):
         """
         constructor
         """
         RegionSelector.__init__(self)
-
-    def get_capabilities(self) -> list:
-        """
-        Get the features this selector supports
-        """
-        return [
-            GSCapabilities.REGION_SELECTION
-        ]
 
     def region_select(self) -> typing.Tuple[int, int, int, int]:
         """

@@ -79,11 +79,11 @@ class Gscreenshot(object):
         else:
             self.save_cache()
 
-    def get_capabilities(self) -> typing.Set[str]:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         '''
         Get the features supported in the current setup
         '''
-        return set(self.screenshooter.get_capabilities_())
+        return self.screenshooter.get_capabilities_()
 
     def get_available_cursors(self) -> typing.Dict[str, typing.Optional[Image.Image]]:
         '''
