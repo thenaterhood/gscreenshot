@@ -2,6 +2,7 @@
 ImageMagick screenshot class
 '''
 from time import sleep
+import typing
 
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import find_executable
@@ -41,12 +42,12 @@ class ImageMagick(Screenshooter):
         sleep(delay)
         self._call_screenshooter('import', [self._tempfile])
 
-    def get_capabilities(self) -> list:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         '''List of capabilities'''
-        return [
-            GSCapabilities.REGION_SELECTION,
-            GSCapabilities.WINDOW_SELECTION
-        ]
+        return {
+            GSCapabilities.REGION_SELECTION: self.__utilityname__,
+            GSCapabilities.WINDOW_SELECTION: self.__utilityname__
+        }
 
     @staticmethod
     def can_run() -> bool:

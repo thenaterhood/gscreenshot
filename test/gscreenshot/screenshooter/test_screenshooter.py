@@ -55,7 +55,7 @@ class ScreenshooterTest(unittest.TestCase):
     def setUp(self):
         self.screenshooter = BaseScreenshooter()
         self.screenshooter._selector = Mock()
-        self.screenshooter._selector.get_capabilities.return_value = []
+        self.screenshooter._selector.get_capabilities.return_value = {}
 
     def test_grab_fullscreen(self):
         self.assertIsNone(self.screenshooter.image)
@@ -176,7 +176,7 @@ class ScreenshooterTest(unittest.TestCase):
             "original and actual image should not differ")
 
     def test_get_capabilities(self):
-        self.assertIsInstance(self.screenshooter.get_capabilities_(), list)
+        self.assertIsInstance(self.screenshooter.get_capabilities_(), dict)
 
     @mock.patch('src.gscreenshot.screenshooter.subprocess.check_output')
     @mock.patch('src.gscreenshot.screenshooter.PIL')

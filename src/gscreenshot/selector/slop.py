@@ -15,6 +15,8 @@ class Slop(RegionSelector):
     of both corners of the selection.
     """
 
+    __utilityname__: str = "slop"
+
     def __init__(self):
         """
         constructor

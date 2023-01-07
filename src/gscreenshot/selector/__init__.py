@@ -24,20 +24,22 @@ class NoSupportedSelectorError(BaseException):
 class RegionSelector():
     '''Region selection interface'''
 
+    __utilityname__: str = "default"
+
     def __init__(self):
         """
         constructor
         """
 
-    def get_capabilities(self) -> typing.List[str]:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         """
         Get the features this selector supports
         """
-        return [
-            GSCapabilities.WINDOW_SELECTION,
-            GSCapabilities.REGION_SELECTION,
-            GSCapabilities.REUSE_REGION
-        ]
+        return {
+            GSCapabilities.WINDOW_SELECTION: self.__utilityname__,
+            GSCapabilities.REGION_SELECTION: self.__utilityname__,
+            GSCapabilities.REUSE_REGION: self.__utilityname__
+        }
 
     def region_select(self) -> typing.Tuple[int, int, int, int]:
         """
