@@ -27,8 +27,8 @@ data_files = [
     ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
     ('share/menu', ['dist/menu/gscreenshot']),
     ('share/man/man1', ['generated/gscreenshot.1.gz']),
-    ('usr/share/zsh/site-functions', ['dist/completions/zsh/_gscreenshot']),
-    ('usr/share/bash-completion/completions', ['dist/completions/bash/gscreenshot'])
+    ('share/zsh/site-functions', ['dist/completions/zsh/_gscreenshot']),
+    ('share/bash-completion/completions', ['dist/completions/bash/gscreenshot'])
     ]
 
 def print_warning(warning:str):
