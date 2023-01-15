@@ -7,7 +7,6 @@ import tempfile
 import typing
 import PIL.Image
 
-from pkg_resources import resource_filename
 from gscreenshot.screenshot import Screenshot
 from gscreenshot.screenshot.effects.crop import CropEffect
 from gscreenshot.screenshot.effects.stamp import StampEffect
