@@ -498,7 +498,8 @@ class Gscreenshot(object):
         else:
             foldername = self.interpolate_filename(foldername)
 
-        os.makedirs(foldername)
+        if not os.path.exists(foldername):
+            os.makedirs(foldername)
 
         i = 0
         for screenshot in self._screenshots:
