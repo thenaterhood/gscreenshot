@@ -73,5 +73,3 @@ class Scrot(Screenshooter):
             params.append('-p')
 
         self._call_screenshooter('scrot', params)
-        if capture_cursor and not Scrot._supports_native_cursor_capture:
-            self.add_fake_cursor()

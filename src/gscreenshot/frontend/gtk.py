@@ -17,6 +17,7 @@ import pygtkcompat
 from gscreenshot import Gscreenshot
 from gscreenshot.util import GSCapabilities
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+from gscreenshot.screenshot.effects.crop import CropEffect
 
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
@@ -570,7 +571,10 @@ class Presenter(object):
         region = None
 
         if last_screenshot is not None:
-            region = last_screenshot.get_region()
+            effects = last_screenshot.get_effects()
+            crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
+            if crop_effect and "region" in crop_effect.meta:
+                region = crop_effect.meta["region"]
 
         self.take_screenshot(
             self._app.screenshot_selected,

@@ -3,6 +3,7 @@ Screenshot container classes for gscreenshot
 '''
 import typing
 from PIL import Image, ImageFilter
+from gscreenshot.screenshot.effects import ScreenshotEffect
 
 
 class Screenshot(object):
@@ -15,28 +16,43 @@ class Screenshot(object):
 
     _image: Image.Image
     _saved_to: typing.Optional[str]
-    _region: typing.Optional[typing.Tuple[int, int, int, int]]
+    _effects: typing.List[ScreenshotEffect]
 
     def __init__(self, image: Image.Image):
         '''Constructor'''
         self._image = image
         self._saved_to = None
-        self._region = None
+        self._effects = []
 
-    def set_region(self, region: typing.Optional[typing.Tuple[int, int, int, int]]):
-        '''Sets the region'''
-        self._region = region
+    def add_effect(self, effect: ScreenshotEffect):
+        '''
+        Add another overlay effect to this screenshot
+        '''
+        self._effects.append(effect)
 
-    def get_region(self) -> typing.Optional[typing.Tuple[int, int, int, int]]:
-        '''Gets the region, or None'''
-        return self._region
+    def remove_effect(self, effect: ScreenshotEffect):
+        '''
+        Remove an overlay effect from this screenshot.
+        Note that effects can also be disabled without
+        being removed.
+        '''
+        self._effects.remove(effect)
+
+    def get_effects(self) -> typing.List[ScreenshotEffect]:
+        '''
+        Provides the list of effects
+        '''
+        return self._effects
 
     def get_image(self) -> Image.Image:
         '''Gets the underlying PIL.Image.Image'''
-        if self._region is None:
-            return self._image
+        image = self._image.copy()
 
-        return self._image.crop(self._region)
+        for effect in self._effects:
+            if effect.enabled:
+                image = effect.apply_to(image)
+
+        return image
 
     def get_preview(self, width: int, height: int, with_border=False) -> Image.Image:
         '''
@@ -81,6 +97,10 @@ class Screenshot(object):
     def saved(self) -> bool:
         '''Whether this screenshot image was saved'''
         return self.get_saved_path() is not None
+
+    def __repr__(self) -> str:
+        return f'''{self.__class__.__name__}(image={self._image})
+        '''
 
 
 class ScreenshotCollection(object):
