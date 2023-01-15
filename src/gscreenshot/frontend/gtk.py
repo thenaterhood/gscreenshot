@@ -597,28 +597,6 @@ class Presenter(object):
             show_previous=screenshot_collection.has_previous()
         )
 
-    def on_button_saveall_clicked(self, *_):
-        '''Handle the "save all" button'''
-        saved = False
-        cancelled = False
-        save_dialog = FileSaveDialog(
-            self._app.get_time_foldername(),
-            self._app.get_last_save_directory(),
-            self._view.get_window()
-        )
-
-        while not (saved or cancelled):
-            fname = self._view.run_dialog(save_dialog)
-            if fname is not None:
-                self._view.set_busy()
-                saved = self._app.save_screenshot_collection(fname)
-                self._view.set_ready()
-            else:
-                cancelled = True
-
-        if saved:
-            self._view.flash_status_icon("document-save")
-
     def on_button_saveas_clicked(self, *_):
         '''Handle the saveas button'''
         saved = False
@@ -647,7 +625,8 @@ class Presenter(object):
         save_dialog = FileSaveDialog(
             self._app.get_time_foldername(),
             self._app.get_last_save_directory(),
-            self._view.get_window()
+            self._view.get_window(),
+            choose_directory=True
         )
 
         while not (saved or cancelled):
@@ -875,10 +854,13 @@ class OpenWithDialog(Gtk.AppChooserDialog):
 
 class FileSaveDialog(object):
     '''The 'save as' dialog'''
-    def __init__(self, default_filename=None, default_folder=None, parent=None):
+    def __init__(self, default_filename=None, default_folder=None,
+        parent=None, choose_directory=False
+    ):
         self.default_filename = default_filename
         self.default_folder = default_folder
         self.parent = parent
+        self._choose_directory = choose_directory
 
     def run(self):
         ''' Run the dialog'''
@@ -888,10 +870,14 @@ class FileSaveDialog(object):
 
     def request_file(self):
         '''Run the file selection dialog'''
+        action = Gtk.FILE_CHOOSER_ACTION_SAVE
+        if self._choose_directory:
+            action = Gtk.FILE_CHOOSER_ACTION_CREATE_FOLDER
+
         chooser = Gtk.FileChooserDialog(
                 transient_for=self.parent,
                 title=None,
-                action=Gtk.FILE_CHOOSER_ACTION_SAVE,
+                action=action,
                 buttons=(
                     Gtk.STOCK_CANCEL,
                     Gtk.RESPONSE_CANCEL,
