@@ -189,6 +189,7 @@ setup(name='gscreenshot',
     packages=[
         'gscreenshot',
         'gscreenshot.frontend',
+        'gscreenshot.frontend.gtk',
         'gscreenshot.screenshooter',
         'gscreenshot.screenshot',
         'gscreenshot.screenshot.effects',
