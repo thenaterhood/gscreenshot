@@ -19,6 +19,7 @@ class GSCapabilities(object):
     '''
 
     REGION_SELECTION = "region_selection"
+    REUSE_REGION = "reuse_region"
     WINDOW_SELECTION = "window_selection"
     CURSOR_CAPTURE = "cursor_capture"
     ALTERNATE_CURSOR = "alternate_cursor"

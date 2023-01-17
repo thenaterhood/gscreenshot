@@ -2,6 +2,7 @@
 Integration for the Scrot screenshot utility
 '''
 import subprocess
+import typing
 
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import GSCapabilities
@@ -28,23 +29,21 @@ class Scrot(Screenshooter):
         Parameters:
             int delay, in seconds
         """
-        params = ['-z', self._tempfile, '-d', str(delay)]
+        params = ['-z', self._tempfile, '-d', str(int(delay))]
         if capture_cursor and Scrot._supports_native_cursor_capture:
             params.append('-p')
 
         self._call_screenshooter('scrot', params)
-        if capture_cursor and not Scrot._supports_native_cursor_capture:
-            self.add_fake_cursor()
 
-    def get_capabilities(self) -> list:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         '''List of capabilities'''
-        capabilities = [
-            GSCapabilities.REGION_SELECTION,
-            GSCapabilities.WINDOW_SELECTION
-        ]
+        capabilities = {
+            GSCapabilities.REGION_SELECTION: self.__utilityname__,
+            GSCapabilities.WINDOW_SELECTION: self.__utilityname__
+        }
 
         if self._supports_native_cursor_capture:
-            capabilities.append(GSCapabilities.CURSOR_CAPTURE)
+            capabilities[GSCapabilities.CURSOR_CAPTURE] = self.__utilityname__
 
         return capabilities
 
@@ -69,10 +68,8 @@ class Scrot(Screenshooter):
         Fallback for selection which uses scrot's builtin
         region selection
         """
-        params =  ['-z', self._tempfile, '-d', str(delay), '-s']
+        params =  ['-z', self._tempfile, '-d', str(int(delay)), '-s']
         if capture_cursor and Scrot._supports_native_cursor_capture:
             params.append('-p')
 
         self._call_screenshooter('scrot', params)
-        if capture_cursor and not Scrot._supports_native_cursor_capture:
-            self.add_fake_cursor()

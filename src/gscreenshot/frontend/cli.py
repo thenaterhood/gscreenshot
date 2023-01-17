@@ -92,22 +92,23 @@ def run():
 
 
     if args.version is not False:
-        authors = gscreenshot.get_program_authors()
-        website = gscreenshot.get_program_website()
         description = gscreenshot.get_program_description()
-        license_name = gscreenshot.get_program_license()
         name = gscreenshot.get_program_name()
         version = gscreenshot.get_program_version()
 
         print(_("Using {0} screenshot backend").format(gscreenshot.get_screenshooter_name()))
-        print(_("Available features: {0}").format(", ".join(gscreenshot.get_capabilities())))
+        capabilities_formatted = []
+        for capability, provider in gscreenshot.get_capabilities().items():
+            capabilities_formatted.append(f"{_(capability)} ({provider})")
+
         print(f"{name} {version}; {description}")
-        print(website)
+        print(_("Available features: {0}").format(", ".join(capabilities_formatted)))
+        print(gscreenshot.get_program_website())
         print("")
         print(_("Author(s)"))
-        print("\n".join(authors))
+        print("\n".join(gscreenshot.get_program_authors()))
         print("")
-        print(_("Licensed as {0}").format(license_name))
+        print(_("Licensed as {0}").format(gscreenshot.get_program_license()))
         sys.exit(0)
 
     if args.selection is not False:

@@ -52,10 +52,10 @@ class Grim(Screenshooter):
 
         return True
 
-    def get_capabilities(self) -> typing.List[str]:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         """
         Get supported features
         """
-        return [
-            GSCapabilities.CURSOR_CAPTURE
-        ]
+        return {
+            GSCapabilities.CURSOR_CAPTURE: self.__utilityname__
+        }

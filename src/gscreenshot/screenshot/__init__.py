@@ -3,6 +3,7 @@ Screenshot container classes for gscreenshot
 '''
 import typing
 from PIL import Image, ImageFilter
+from gscreenshot.screenshot.effects import ScreenshotEffect
 
 
 class Screenshot(object):
@@ -15,15 +16,43 @@ class Screenshot(object):
 
     _image: Image.Image
     _saved_to: typing.Optional[str]
+    _effects: typing.List[ScreenshotEffect]
 
     def __init__(self, image: Image.Image):
         '''Constructor'''
         self._image = image
         self._saved_to = None
+        self._effects = []
+
+    def add_effect(self, effect: ScreenshotEffect):
+        '''
+        Add another overlay effect to this screenshot
+        '''
+        self._effects.append(effect)
+
+    def remove_effect(self, effect: ScreenshotEffect):
+        '''
+        Remove an overlay effect from this screenshot.
+        Note that effects can also be disabled without
+        being removed.
+        '''
+        self._effects.remove(effect)
+
+    def get_effects(self) -> typing.List[ScreenshotEffect]:
+        '''
+        Provides the list of effects
+        '''
+        return self._effects
 
     def get_image(self) -> Image.Image:
         '''Gets the underlying PIL.Image.Image'''
-        return self._image
+        image = self._image.copy()
+
+        for effect in self._effects:
+            if effect.enabled:
+                image = effect.apply_to(image)
+
+        return image
 
     def get_preview(self, width: int, height: int, with_border=False) -> Image.Image:
         '''
@@ -36,7 +65,7 @@ class Screenshot(object):
         Returns:
             Image
         '''
-        thumbnail = self._image.copy()
+        thumbnail = self.get_image().copy()
 
         antialias_algo = None
         try:
@@ -68,6 +97,10 @@ class Screenshot(object):
     def saved(self) -> bool:
         '''Whether this screenshot image was saved'''
         return self.get_saved_path() is not None
+
+    def __repr__(self) -> str:
+        return f'''{self.__class__.__name__}(image={self._image})
+        '''
 
 
 class ScreenshotCollection(object):
@@ -112,7 +145,14 @@ class ScreenshotCollection(object):
         if idx == -2:
             idx = self._cursor
 
-        self._screenshots[idx] = replacement
+        if len(self._screenshots) == 0:
+            self.append(replacement)
+            return
+
+        try:
+            self._screenshots[idx] = replacement
+        except IndexError:
+            self._screenshots[self._cursor] = replacement
 
     def has_next(self) -> bool:
         '''

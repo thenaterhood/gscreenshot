@@ -79,11 +79,11 @@ class Gscreenshot(object):
         else:
             self.save_cache()
 
-    def get_capabilities(self) -> typing.Set[str]:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         '''
         Get the features supported in the current setup
         '''
-        return set(self.screenshooter.get_capabilities_())
+        return self.screenshooter.get_capabilities_()
 
     def get_available_cursors(self) -> typing.Dict[str, typing.Optional[Image.Image]]:
         '''
@@ -211,7 +211,8 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
-                            cursor_name: str='theme', overwrite: bool=False, count: int=1
+                            cursor_name: str='theme', overwrite: bool=False, count: int=1,
+                            region: typing.Optional[typing.Tuple[int, int, int, int]]=None
                             ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected area
@@ -232,7 +233,8 @@ class Gscreenshot(object):
             self.screenshooter.grab_selection_(
                 delay,
                 capture_cursor,
-                use_cursor=use_cursor
+                use_cursor=use_cursor,
+                region=region
             )
 
             if self.screenshooter.screenshot is not None:
@@ -496,7 +498,8 @@ class Gscreenshot(object):
         else:
             foldername = self.interpolate_filename(foldername)
 
-        os.makedirs(foldername)
+        if not os.path.exists(foldername):
+            os.makedirs(foldername)
 
         i = 0
         for screenshot in self._screenshots:

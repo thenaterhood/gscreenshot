@@ -7,8 +7,9 @@ import tempfile
 import typing
 import PIL.Image
 
-from pkg_resources import resource_filename
 from gscreenshot.screenshot import Screenshot
+from gscreenshot.screenshot.effects.crop import CropEffect
+from gscreenshot.screenshot.effects.stamp import StampEffect
 from gscreenshot.selector import RegionSelector
 from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
@@ -27,7 +28,7 @@ class Screenshooter(object):
     """
 
     __slots__ = ('_tempfile', '_selector', '_screenshot')
-    __utilityname__: typing.Optional[str] = None
+    __utilityname__: str = "default"
 
     _screenshot: typing.Optional[Screenshot]
     _tempfile: str
@@ -73,7 +74,7 @@ class Screenshooter(object):
         """
         return self._screenshot
 
-    def get_capabilities(self) -> typing.List[str]:
+    def get_capabilities(self) -> typing.Dict[str, str]:
         """
         Get supported features. Note that under-the-hood the capabilities
         of the selector (if applicable) will be added to this.
@@ -81,23 +82,23 @@ class Screenshooter(object):
         Returns:
             [GSCapabilities]
         """
-        return []
+        return {}
 
-    def get_capabilities_(self) -> typing.List[str]:
+    def get_capabilities_(self) -> typing.Dict[str, str]:
         """
         Get supported features. This should not be overridden by extending
         classes. Implement get_capabilities instead.
         """
         capabilities = self.get_capabilities()
         # If we're running, this is the bare minimum
-        capabilities.append(GSCapabilities.CAPTURE_FULLSCREEN)
+        capabilities[GSCapabilities.CAPTURE_FULLSCREEN] = self.__utilityname__
 
         if display is not None and not session_is_wayland():
-            capabilities.append(GSCapabilities.ALTERNATE_CURSOR)
-            capabilities.append(GSCapabilities.CURSOR_CAPTURE)
+            capabilities[GSCapabilities.ALTERNATE_CURSOR] = "python-xlib"
+            capabilities[GSCapabilities.CURSOR_CAPTURE] = "python-xlib"
 
         if self._selector is not None:
-            capabilities = capabilities + self._selector.get_capabilities()
+            capabilities.update(self._selector.get_capabilities())
 
         return capabilities
 
@@ -111,8 +112,11 @@ class Screenshooter(object):
             self.grab_fullscreen(delay, capture_cursor)
         else:
             self.grab_fullscreen(delay, capture_cursor=False)
-            if capture_cursor:
-                self.add_fake_cursor(use_cursor)
+            cursor_position = self.get_cursor_position()
+            if capture_cursor and self._screenshot is not None and cursor_position:
+                stamp = StampEffect(use_cursor, cursor_position)
+                stamp.set_alias("cursor")
+                self._screenshot.add_effect(stamp)
 
     def grab_fullscreen(self, delay: int=0, capture_cursor: bool=False):
         """
@@ -124,7 +128,8 @@ class Screenshooter(object):
         raise Exception("Not implemented. Fullscreen grab called with delay " + str(delay))
 
     def grab_selection_(self, delay: int=0, capture_cursor: bool=False,
-                        use_cursor: typing.Optional[PIL.Image.Image]=None):
+                        use_cursor: typing.Optional[PIL.Image.Image]=None,
+                        region: typing.Optional[typing.Tuple[int, int, int, int]]=None):
         """
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
@@ -138,6 +143,14 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
+        if region is not None:
+            self.grab_fullscreen_(delay, capture_cursor, use_cursor)
+            if self._screenshot is not None:
+                crop = CropEffect(region)
+                crop.set_alias("region")
+                self._screenshot.add_effect(crop)
+            return
+
         if self._selector is None:
             self._grab_selection_fallback(delay, capture_cursor)
             return
@@ -160,7 +173,9 @@ class Screenshooter(object):
         self.grab_fullscreen_(delay, capture_cursor, use_cursor)
 
         if self._screenshot is not None:
-            self._screenshot = Screenshot(self._screenshot.get_image().crop(crop_box))
+            crop = CropEffect(crop_box)
+            crop.set_alias("region")
+            self._screenshot.add_effect(crop)
 
     def grab_window_(self, delay: int=0, capture_cursor: bool=False,
                      use_cursor: typing.Optional[PIL.Image.Image]=None):
@@ -169,12 +184,7 @@ class Screenshooter(object):
         be overridden by extending classes. Implement grab_window instead.
 
         '''
-        if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
-            self.grab_window(delay, capture_cursor)
-        else:
-            self.grab_window(delay, capture_cursor=False)
-            if capture_cursor:
-                self.add_fake_cursor(use_cursor)
+        self.grab_selection_(delay, capture_cursor, use_cursor)
 
     def grab_window(self, delay: int=0, capture_cursor: bool=False):
         """
@@ -217,58 +227,6 @@ class Screenshooter(object):
             return None
 
         return (mouse_data["root_x"], mouse_data["root_y"])
-
-    def add_fake_cursor(self, cursor_img: typing.Optional[PIL.Image.Image]=None):
-        """
-        Stamps a fake cursor onto the screenshot.
-        This is intended for use with screenshot backends that don't
-        capture the cursor (or don't capture the cursor in some scenarios)
-        """
-        if self._screenshot is None:
-            return
-
-        cursor_pos = self.get_cursor_position()
-        if cursor_pos is None:
-            print("Unable to get cursor position - is xlib available?")
-            return
-
-        fname = resource_filename(
-                  'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
-                )
-
-        if cursor_img is None:
-            cursor_img = PIL.Image.open(fname)
-
-        screenshot_img = self._screenshot.get_image().copy()
-
-        screenshot_width, screenshot_height = screenshot_img.size
-
-        # scale the cursor stamp to a reasonable size
-        cursor_size_ratio = min(max(screenshot_width / 2000, .3), max(screenshot_height / 2000, .3))
-        cursor_height = cursor_img.size[0] * cursor_size_ratio
-        cursor_width = cursor_img.size[1] * cursor_size_ratio
-
-        antialias_algo = None
-        try:
-            antialias_algo = PIL.Image.Resampling.LANCZOS
-        except AttributeError: # PIL < 9.0
-            antialias_algo = PIL.Image.ANTIALIAS
-
-        cursor_img.thumbnail((int(cursor_width), int(cursor_height)), antialias_algo)
-
-        # If the cursor glyph is square, adjust its position slightly so it
-        # shows up where expected.
-        if cursor_img.size[0] == cursor_img.size[1]:
-            cursor_pos = (
-                cursor_pos[0] - 20 if cursor_pos[0] - 20 > 0 else cursor_pos[0],
-                cursor_pos[1] - 20 if cursor_pos[1] - 20 > 0 else cursor_pos[1]
-            )
-
-        # Passing cursor_img twice is intentional. The second time it's used
-        # as a mask (PIL uses the alpha channel) so the cursor doesn't have
-        # a black box.
-        screenshot_img.paste(cursor_img, cursor_pos, cursor_img)
-        self._screenshot = Screenshot(screenshot_img)
 
     def _grab_selection_fallback(self, delay: int=0, capture_cursor: bool=False):
         """

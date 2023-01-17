@@ -17,6 +17,7 @@ import pygtkcompat
 from gscreenshot import Gscreenshot
 from gscreenshot.util import GSCapabilities
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+from gscreenshot.screenshot.effects.crop import CropEffect
 
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
@@ -36,6 +37,9 @@ class View(object):
         self._window = window
         self._window_is_fullscreen:bool = False
         self._was_maximized:bool = False
+
+        self.hide()
+
         self._capabilities = capabilities
         self._last_window_dimensions = self._window.get_size()
         self._header_bar = builder.get_object('header_bar')
@@ -85,6 +89,12 @@ class View(object):
         if GSCapabilities.CURSOR_CAPTURE not in self._capabilities:
             checkbox_capture_cursor = builder.get_object('checkbox_capture_cursor')
             self._disable_and_hide(checkbox_capture_cursor)
+
+        if GSCapabilities.REUSE_REGION not in self._capabilities:
+            reuse_region_dropdown = builder.get_object('selection_actions_btn')
+            selectarea_gtkbox = builder.get_object('select_area_gtkbox')
+            self._disable_and_hide(reuse_region_dropdown)
+            selectarea_gtkbox.remove(reuse_region_dropdown)
 
     def _disable_and_hide(self, widget):
         '''disables and hides a widget'''
@@ -421,15 +431,13 @@ class View(object):
 class Presenter(object):
     '''Presenter class for the GTK frontend'''
 
-    __slots__ = ('_delay', '_app', '_hide', '_can_resize',
-            '_pixbuf', '_view', '_keymappings', '_capture_cursor',
+    __slots__ = ('_delay', '_app', '_hide',
+            '_view', '_keymappings', '_capture_cursor',
             '_cursor_selection', '_overwrite_mode')
 
     _delay: int
     _app: Gscreenshot
     _hide: bool
-    _can_resize: bool
-    _pixbuf: Gdk.PixbufLoader
     _view: View
     _keymappings: dict
     _capture_cursor: bool
@@ -439,7 +447,6 @@ class Presenter(object):
     def __init__(self, application: Gscreenshot, view: View):
         self._app = application
         self._view = view
-        self._can_resize = True
         self._delay = 0
         self._hide = True
         self._capture_cursor = False
@@ -455,11 +462,12 @@ class Presenter(object):
                 cursors
                 )
 
-    def _begin_take_screenshot(self, app_method):
+    def _begin_take_screenshot(self, app_method, **args):
         app_method(delay=self._delay,
             capture_cursor=self._capture_cursor,
             cursor_name=self._cursor_selection,
-            overwrite=self._overwrite_mode)
+            overwrite=self._overwrite_mode,
+            **args)
 
         # Re-enable UI on the UI thread.
         GLib.idle_add(self._end_take_screenshot)
@@ -483,7 +491,7 @@ class Presenter(object):
         '''Handle window state events'''
         self._view.handle_state_event(widget, event)
 
-    def take_screenshot(self, app_method: typing.Callable):
+    def take_screenshot(self, app_method: typing.Callable, **args):
         '''Take a screenshot using the passed app method'''
         self._view.set_busy()
 
@@ -492,7 +500,7 @@ class Presenter(object):
 
         # Do work in background thread.
         # Taken from here: https://wiki.gnome.org/Projects/PyGObject/Threading
-        _thread = threading.Thread(target=self._begin_take_screenshot(app_method))
+        _thread = threading.Thread(target=self._begin_take_screenshot(app_method, **args))
         _thread.daemon = True
         _thread.start()
 
@@ -554,6 +562,25 @@ class Presenter(object):
             self._app.screenshot_selected
             )
 
+    def on_use_last_region_clicked(self, *_):
+        '''
+        Take a screenshot with the same region as the
+        screenshot under the cursor, if applicable
+        '''
+        last_screenshot = self._app.get_screenshot_collection().cursor_current()
+        region = None
+
+        if last_screenshot is not None:
+            effects = last_screenshot.get_effects()
+            crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
+            if crop_effect and "region" in crop_effect.meta:
+                region = crop_effect.meta["region"]
+
+        self.take_screenshot(
+            self._app.screenshot_selected,
+            region=region
+        )
+
     def on_preview_prev_clicked(self, *_):
         '''Handle a click of the "previous" button on the preview'''
         screenshot_collection = self._app.get_screenshot_collection()
@@ -573,28 +600,6 @@ class Presenter(object):
             show_next=screenshot_collection.has_next(),
             show_previous=screenshot_collection.has_previous()
         )
-
-    def on_button_saveall_clicked(self, *_):
-        '''Handle the "save all" button'''
-        saved = False
-        cancelled = False
-        save_dialog = FileSaveDialog(
-            self._app.get_time_foldername(),
-            self._app.get_last_save_directory(),
-            self._view.get_window()
-        )
-
-        while not (saved or cancelled):
-            fname = self._view.run_dialog(save_dialog)
-            if fname is not None:
-                self._view.set_busy()
-                saved = self._app.save_screenshot_collection(fname)
-                self._view.set_ready()
-            else:
-                cancelled = True
-
-        if saved:
-            self._view.flash_status_icon("document-save")
 
     def on_button_saveas_clicked(self, *_):
         '''Handle the saveas button'''
@@ -624,7 +629,8 @@ class Presenter(object):
         save_dialog = FileSaveDialog(
             self._app.get_time_foldername(),
             self._app.get_last_save_directory(),
-            self._view.get_window()
+            self._view.get_window(),
+            choose_directory=True
         )
 
         while not (saved or cancelled):
@@ -755,8 +761,12 @@ class Presenter(object):
         description += "\n" + i18n("Using {0} screenshot backend").format(
             self._app.get_screenshooter_name()
         )
+
+        capabilities_formatted = []
+        for capability, provider in self._app.get_capabilities().items():
+            capabilities_formatted.append(f"{i18n(capability)} ({provider})")
         description += "\n" + i18n("Available features: {0}").format(
-            ", ".join(self._app.get_capabilities())
+            "\n ".join(capabilities_formatted)
         )
 
         about.set_comments(i18n(description))
@@ -799,9 +809,8 @@ class Presenter(object):
 
     def on_window_resize(self, *_):
         '''Handle window resizes'''
-        if self._can_resize:
-            self._view.resize()
-            self._show_preview()
+        self._view.resize()
+        self._show_preview()
 
     def quit(self, *_):
         '''Exit the app'''
@@ -849,10 +858,13 @@ class OpenWithDialog(Gtk.AppChooserDialog):
 
 class FileSaveDialog(object):
     '''The 'save as' dialog'''
-    def __init__(self, default_filename=None, default_folder=None, parent=None):
+    def __init__(self, default_filename=None, default_folder=None,
+        parent=None, choose_directory=False
+    ):
         self.default_filename = default_filename
         self.default_folder = default_folder
         self.parent = parent
+        self._choose_directory = choose_directory
 
     def run(self):
         ''' Run the dialog'''
@@ -862,10 +874,14 @@ class FileSaveDialog(object):
 
     def request_file(self):
         '''Run the file selection dialog'''
+        action = Gtk.FILE_CHOOSER_ACTION_SAVE
+        if self._choose_directory:
+            action = Gtk.FILE_CHOOSER_ACTION_CREATE_FOLDER
+
         chooser = Gtk.FileChooserDialog(
                 transient_for=self.parent,
                 title=None,
-                action=Gtk.FILE_CHOOSER_ACTION_SAVE,
+                action=action,
                 buttons=(
                     Gtk.STOCK_CANCEL,
                     Gtk.RESPONSE_CANCEL,
@@ -939,25 +955,12 @@ def main():
         warning.run()
         sys.exit(1)
 
-    # Improves startup performance by kicking off a screenshot
-    # as early as we can in the background.
-    screenshot_thread = threading.Thread(
-        target=application.screenshot_full_display
-    )
-    screenshot_thread.daemon = True
-    screenshot_thread.start()
-
     builder = Gtk.Builder()
     builder.set_translation_domain('gscreenshot')
     builder.add_from_string(resource_string(
         'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
 
     window = builder.get_object('window_main')
-
-    waited = 0
-    while application.get_last_image() is None and waited < 8:
-        sleep(.01)
-        waited += .1
 
     capabilities = application.get_capabilities()
     view = View(window, builder, capabilities)
@@ -966,6 +969,12 @@ def main():
             application,
             view
             )
+
+    # Lucky 13 to give a tiny bit more time for the desktop environment
+    # to settle down and hide the window before we take our initial
+    # screenshot.
+    sleep(0.13)
+    presenter.on_button_all_clicked()
 
     accel = Gtk.AccelGroup()
     accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK,

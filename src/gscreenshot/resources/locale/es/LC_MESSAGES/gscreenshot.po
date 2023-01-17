@@ -194,3 +194,25 @@ msgstr "Sobrescribir"
 
 msgid "Save All"
 msgstr "Guardar todos"
+
+msgid "Use same selection as preview"
+msgstr "Misma selección que la vista previa"
+
+msgid "region_selection"
+msgstr "Selección de Región"
+
+msgid "reuse_region"
+msgstr "Reutilizar la Región"
+
+msgid "window_selection"
+msgstr "Selección de Ventana"
+
+msgid "cursor_capture"
+msgstr "Cursor Capture"
+
+msgid "alternate_cursor"
+msgstr "Cursor Alternativo"
+
+msgid "capture_full_screen"
+msgstr "Captura Todos"
+
