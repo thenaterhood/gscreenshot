@@ -5,13 +5,13 @@ import mock
 from pkg_resources import resource_filename
 
 from src.gscreenshot.frontend.gtk import Presenter
-from src.gscreenshot.screenshooter import Screenshooter
 
 
 class GtkPresenterTest(unittest.TestCase):
 
     def setUp(self):
         self.app = Mock()
+        self.app.get_available_cursors.return_value = {}
         self.app.get_thumbnail.return_value = Image.open(
                 resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
             )
