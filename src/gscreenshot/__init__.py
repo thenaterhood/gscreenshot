@@ -88,7 +88,9 @@ class Gscreenshot(object):
         '''
         return self.screenshooter.get_capabilities_()
 
-    def register_stamp_image(self, fname: str, name: typing.Optional[str]=None) -> typing.Optional[str]:
+    def register_stamp_image(self, fname: str,
+        name: typing.Optional[str]=None
+    ) -> typing.Optional[str]:
         '''
         Adds a new stamp image from a file path
         '''

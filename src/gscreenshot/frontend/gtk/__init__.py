@@ -15,7 +15,8 @@ from time import sleep
 from pkg_resources import resource_string, resource_filename
 import pygtkcompat
 from gscreenshot import Gscreenshot
-from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog, FileSaveDialog, FileOpenDialog
+from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
+from gscreenshot.frontend.gtk.dialogs import FileSaveDialog, FileOpenDialog
 from gscreenshot.frontend.gtk.view import View
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from gscreenshot.screenshot.effects.crop import CropEffect
@@ -151,15 +152,15 @@ class Presenter(object):
 
         if cursor_selection == "custom":
 
-            filter:Gtk.FileFilter = Gtk.FileFilter()
+            file_filter:Gtk.FileFilter = Gtk.FileFilter()
             supported_formats = self._app.get_supported_formats()
-            [filter.add_mime_type(
+            _ = [file_filter.add_mime_type(
                 f"image/{format}") for format in supported_formats
                 if format not in ["pdf"]
             ]
 
             chooser = FileOpenDialog(
-                filter=filter
+                file_filter=file_filter
             )
             chosen = None
             cancelled = False
@@ -171,7 +172,8 @@ class Presenter(object):
             if chosen:
                 try:
                     cursor_name = self._app.register_stamp_image(chosen)
-                except Exception as e:
+                #pylint: disable=broad-except
+                except Exception:
                     warning = WarningDialog(f"Unable to open {chosen}")
                     self._view.run_dialog(warning)
                     return

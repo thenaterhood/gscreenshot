@@ -33,14 +33,15 @@ class OpenWithDialog(Gtk.AppChooserDialog):
 
 class FileOpenDialog(object):
     '''The 'save as' dialog'''
+    #pylint: disable=too-many-arguments
     def __init__(self, default_filename=None, default_folder=None,
-        parent=None, choose_directory=False, filter=None,
+        parent=None, choose_directory=False, file_filter=None,
     ):
         self.default_filename = default_filename
         self.default_folder = default_folder
         self.parent = parent
         self._choose_directory = choose_directory
-        self._filter = filter
+        self._filter = file_filter
 
     def run(self):
         ''' Run the dialog'''
