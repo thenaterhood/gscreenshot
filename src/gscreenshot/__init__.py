@@ -37,11 +37,12 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
-    __slots__ = ['screenshooter', 'cache', '_screenshots']
+    __slots__ = ['screenshooter', 'cache', '_screenshots', '_stamps']
 
     screenshooter: Screenshooter
     cache: typing.Dict[str, str]
     _screenshots: ScreenshotCollection
+    _stamps: typing.Dict[str, Image.Image]
 
     # generated using piexif
     EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
@@ -68,6 +69,8 @@ class Gscreenshot(object):
         self.screenshooter = screenshooter_factory.create()
         self._screenshots = ScreenshotCollection()
 
+        self._stamps = {}
+
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
             with open(self.get_cache_file(), "r", encoding="UTF-8") as cachefile:
@@ -85,12 +88,30 @@ class Gscreenshot(object):
         '''
         return self.screenshooter.get_capabilities_()
 
+    def register_stamp_image(self, fname: str, name: typing.Optional[str]=None) -> typing.Optional[str]:
+        '''
+        Adds a new stamp image from a file path
+        '''
+        if not os.path.exists(fname):
+            return None
+
+        glyph = Image.open(fname).convert("RGBA")
+        if name is None:
+            name = os.path.basename(fname)
+
+        if len(name) > 9:
+            name = f"{name[0:8]}..."
+
+        self._stamps[name] = glyph
+
+        return name
+
     def get_available_cursors(self) -> typing.Dict[str, typing.Optional[Image.Image]]:
         '''
         Get the alternate pointer pixmaps gscreenshot can use
         Returns {name: PIL.Image}
         '''
-        return {
+        available = {
                 'theme': None,
                 'adwaita': Image.open(
                     resource_filename(
@@ -108,6 +129,9 @@ class Gscreenshot(object):
                     )
                 )
             }
+
+        available.update(self._stamps)
+        return available
 
     def show_screenshot_notification(self) -> bool:
         '''

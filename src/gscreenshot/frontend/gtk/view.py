@@ -10,6 +10,7 @@ import gettext
 import io
 import threading
 from time import sleep
+import typing
 from pkg_resources import resource_filename
 import pygtkcompat
 from gscreenshot.util import GSCapabilities
@@ -226,16 +227,19 @@ class View(object):
             self._disable_and_hide(self._cursor_selection_dropdown)
             self._disable_and_hide(self._cursor_selection_label)
 
-    def update_available_cursors(self, cursors: dict):
+    def update_available_cursors(self, cursors: dict, selected: typing.Optional[str] = None):
         '''
         Update the available cursor selection in the combolist
         Params: self, {name: PIL.Image}
         '''
         self._cursor_selection_items.clear()
+        selected_idx = 0
+        current_idx = 0
         for cursor_name in cursors:
             if cursors[cursor_name] is not None:
+                current_idx += 1
                 descriptor = io.BytesIO()
-                image = cursors[cursor_name]
+                image = cursors[cursor_name].copy()
                 image.thumbnail((
                     self._cursor_selection_dropdown.get_allocation().height*.42,
                     self._cursor_selection_dropdown.get_allocation().width*.42
@@ -248,15 +252,25 @@ class View(object):
                 pixbuf = loader.get_pixbuf()
                 loader.close()
 
+                i18n_name = i18n(f"cursor-{cursor_name}")
+                if i18n_name == f"cursor-{cursor_name}":
+                    i18n_name = cursor_name
+
                 self._cursor_selection_items.append(
-                    [pixbuf, i18n('cursor-' + cursor_name), cursor_name]
+                    [pixbuf, i18n_name, cursor_name]
                 )
+                if cursor_name == selected:
+                    selected_idx = current_idx
             else:
                 self._cursor_selection_items.append(
-                    [None, i18n('cursor-' + cursor_name), cursor_name]
+                    [None, i18n(f"cursor-{cursor_name}"), cursor_name]
                 )
 
-            if cursor_name == "theme":
+            if selected is not None and selected in cursors:
+                self._cursor_selection_dropdown.set_active(
+                    selected_idx
+                )
+            elif cursor_name == "theme":
                 self._cursor_selection_dropdown.set_active(
                     len(self._cursor_selection_items)-1
                 )

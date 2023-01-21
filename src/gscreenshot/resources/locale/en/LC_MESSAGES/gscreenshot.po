@@ -145,6 +145,9 @@ msgstr "Prohibit"
 msgid "cursor-allow"
 msgstr "Allow"
 
+msgid "cursor-custom"
+msgstr "Custom"
+
 msgid "Author(s)"
 msgstr ""
 

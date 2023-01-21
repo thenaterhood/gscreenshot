@@ -141,6 +141,9 @@ msgstr ""
 msgid "cursor-allow"
 msgstr ""
 
+msgid "cursor-custom"
+msgstr ""
+
 msgid "A simple screenshot tool supporting multiple backends."
 msgstr ""
 

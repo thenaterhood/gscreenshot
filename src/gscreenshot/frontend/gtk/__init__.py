@@ -15,7 +15,7 @@ from time import sleep
 from pkg_resources import resource_string, resource_filename
 import pygtkcompat
 from gscreenshot import Gscreenshot
-from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog, FileSaveDialog
+from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog, FileSaveDialog, FileOpenDialog
 from gscreenshot.frontend.gtk.view import View
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from gscreenshot.screenshot.effects.crop import CropEffect
@@ -58,6 +58,8 @@ class Presenter(object):
         self._overwrite_mode = True
 
         cursors = self._app.get_available_cursors()
+        cursors[i18n("custom")] = None
+
         self._cursor_selection = 'theme'
 
         self._view.update_available_cursors(
@@ -142,7 +144,49 @@ class Presenter(object):
 
     def selected_cursor_changed(self, widget):
         '''Handle a change to the selected cursor'''
-        self._cursor_selection = widget.get_model()[widget.get_active()][2]
+        try:
+            cursor_selection = widget.get_model()[widget.get_active()][2]
+        except IndexError:
+            return
+
+        if cursor_selection == "custom":
+
+            filter:Gtk.FileFilter = Gtk.FileFilter()
+            supported_formats = self._app.get_supported_formats()
+            [filter.add_mime_type(
+                f"image/{format}") for format in supported_formats
+                if format not in ["pdf"]
+            ]
+
+            chooser = FileOpenDialog(
+                filter=filter
+            )
+            chosen = None
+            cancelled = False
+            while not (chosen or cancelled):
+                chosen = self._view.run_dialog(chooser)
+                if chosen is None:
+                    cancelled = True
+
+            if chosen:
+                try:
+                    cursor_name = self._app.register_stamp_image(chosen)
+                except Exception as e:
+                    warning = WarningDialog(f"Unable to open {chosen}")
+                    self._view.run_dialog(warning)
+                    return
+
+                cursors = self._app.get_available_cursors()
+                cursors[i18n("custom")] = None
+
+                self._view.update_available_cursors(
+                    cursors,
+                    cursor_name
+                )
+                if cursor_name:
+                    cursor_selection = cursor_name
+
+        self._cursor_selection = cursor_selection
 
     def on_button_all_clicked(self, *_):
         '''Take a screenshot of the full screen'''
