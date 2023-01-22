@@ -53,9 +53,8 @@ class Scrot(Screenshooter):
         try:
             scrot_version_output = subprocess.check_output(['scrot', '--version'])
             scrot_version_str = scrot_version_output.decode().strip().rsplit('.', maxsplit=1)[-1]
-            scrot_major_version = scrot_version_str.split('.')[0]
 
-            if float(scrot_major_version) >= 1:
+            if float(scrot_version_str) >= 1:
                 Scrot._supports_native_cursor_capture = True
             else:
                 Scrot._supports_native_cursor_capture = False
