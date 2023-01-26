@@ -150,6 +150,9 @@ class Presenter(object):
         except IndexError:
             return
 
+        if cursor_selection is None:
+            return
+
         if cursor_selection == "custom":
 
             file_filter:Gtk.FileFilter = Gtk.FileFilter()
@@ -171,30 +174,22 @@ class Presenter(object):
 
             if chosen:
                 try:
-                    cursor_name = self._app.register_stamp_image(chosen)
+                    cursor_selection = self._app.register_stamp_image(chosen)
                 #pylint: disable=broad-except
                 except Exception:
                     warning = WarningDialog(f"Unable to open {chosen}")
                     self._view.run_dialog(warning)
                     cancelled = True
-                    return
 
-                cursors = self._app.get_available_cursors()
-                cursors[i18n("custom")] = None
-
-                self._view.update_available_cursors(
-                    cursors,
-                    cursor_name
-                )
-                if cursor_name:
-                    cursor_selection = cursor_name
-
-            if cancelled:
+            if cancelled or cursor_selection is None:
                 cursor_selection = self._cursor_selection
-                self._view.update_available_cursors(
-                    self._app.get_available_cursors(),
-                    cursor_selection
-                )
+
+            cursors = self._app.get_available_cursors()
+            cursors[i18n("custom")] = None
+            self._view.update_available_cursors(
+                cursors,
+                cursor_selection
+            )
 
         self._cursor_selection = cursor_selection
 
