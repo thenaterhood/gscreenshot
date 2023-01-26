@@ -176,6 +176,7 @@ class Presenter(object):
                 except Exception:
                     warning = WarningDialog(f"Unable to open {chosen}")
                     self._view.run_dialog(warning)
+                    cancelled = True
                     return
 
                 cursors = self._app.get_available_cursors()
@@ -187,6 +188,13 @@ class Presenter(object):
                 )
                 if cursor_name:
                     cursor_selection = cursor_name
+
+            if cancelled:
+                cursor_selection = self._cursor_selection
+                self._view.update_available_cursors(
+                    self._app.get_available_cursors(),
+                    cursor_selection
+                )
 
         self._cursor_selection = cursor_selection
 
