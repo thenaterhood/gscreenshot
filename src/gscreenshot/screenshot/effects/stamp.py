@@ -53,3 +53,7 @@ class StampEffect(ScreenshotEffect):
         # a black box.
         screenshot.paste(cursor_img, cursor_pos, cursor_img)
         return screenshot
+
+    def __repr__(self):
+        return f"StampEffect({self._glyph}, {self._position})"
+
