@@ -14,9 +14,14 @@ class ScreenshotEffect():
     '''
     A simple manipulation for a screenshot
     '''
-    _enabled: bool = True
-    _alias: typing.Optional[str] = None
-    _meta: dict = {}
+    _enabled: bool
+    _alias: typing.Optional[str]
+    _meta: dict
+
+    def __init__(self):
+        self._meta = {}
+        self._alias = None
+        self._enabled = True
 
     def set_alias(self, alias: typing.Optional[str]):
         '''
