@@ -13,6 +13,7 @@ class StampEffect(ScreenshotEffect):
 
     def __init__(self, glyph: Image.Image, position: typing.Tuple[int, int]):
         '''constructor'''
+        super(StampEffect, self).__init__()
         self._glyph = glyph
         self._position = position
 
