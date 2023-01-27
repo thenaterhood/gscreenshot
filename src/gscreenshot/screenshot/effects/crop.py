@@ -13,7 +13,7 @@ class CropEffect(ScreenshotEffect):
 
     def __init__(self, region=None):
         '''constructor'''
-        super(CropEffect, self).__init__()
+        super().__init__()
         self._meta["region"] = region
 
     def apply_to(self, screenshot: Image.Image) -> Image.Image:
