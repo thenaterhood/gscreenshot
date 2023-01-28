@@ -50,7 +50,11 @@ class View(object):
         self._status_icon:Gtk.Image = builder.get_object('status_icon')
         self._preview_overlay:Gtk.Overlay = builder.get_object('image_overlay')
 
-        self._preview_event_box.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, [], Gdk.DragAction.COPY | Gdk.DragAction.LINK)
+        self._preview_event_box.drag_source_set(
+            Gdk.ModifierType.BUTTON1_MASK,
+            [],
+            Gdk.DragAction.COPY | Gdk.DragAction.LINK
+        )
         self._preview_event_box.drag_source_add_uri_targets()
         self._preview_event_box.drag_source_add_image_targets()
 
