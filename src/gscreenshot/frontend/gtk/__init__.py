@@ -213,6 +213,17 @@ class Presenter(object):
             self._app.screenshot_selected
             )
 
+    def on_preview_drag(self, _widget, _drag_context, data, _info, _time):
+        '''
+        Handle dragging and dropping the image preview
+        '''
+        fname = self._app.save_and_return_path()
+
+        if fname is None:
+            return
+
+        data.set_uris([f"file://{fname}"])
+
     def on_use_last_region_clicked(self, *_):
         '''
         Take a screenshot with the same region as the

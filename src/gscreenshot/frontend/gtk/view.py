@@ -38,6 +38,7 @@ class View(object):
         self._last_window_dimensions = self._window.get_size()
         self._header_bar = builder.get_object('header_bar')
         self._preview:Gtk.Image = builder.get_object('image1')
+        self._preview_event_box:Gtk.EventBox = builder.get_object('preview_event_box')
         self._control_grid:Gtk.Box = builder.get_object('control_box')
         self._cursor_selection_items:Gtk.ListStore = \
             builder.get_object('cursor_selection_items')
@@ -48,6 +49,10 @@ class View(object):
         self._actions_menu:Gtk.Menu = builder.get_object('menu_saveas_additional_actions')
         self._status_icon:Gtk.Image = builder.get_object('status_icon')
         self._preview_overlay:Gtk.Overlay = builder.get_object('image_overlay')
+
+        self._preview_event_box.drag_source_set(Gdk.ModifierType.BUTTON1_MASK, [], Gdk.DragAction.COPY | Gdk.DragAction.LINK)
+        self._preview_event_box.drag_source_add_uri_targets()
+        self._preview_event_box.drag_source_add_image_targets()
 
         self._prev_btn:Gtk.Button = Gtk.Button.new_from_stock(Gtk.STOCK_GO_BACK)
         self._prev_btn.set_size_request(20, 20)

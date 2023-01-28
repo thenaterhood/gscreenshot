@@ -1,6 +1,7 @@
 '''
 Screenshot container classes for gscreenshot
 '''
+import os
 import typing
 from PIL import Image, ImageFilter
 from gscreenshot.screenshot.effects import ScreenshotEffect
@@ -96,7 +97,12 @@ class Screenshot(object):
 
     def saved(self) -> bool:
         '''Whether this screenshot image was saved'''
-        return self.get_saved_path() is not None
+        saved_path = self.get_saved_path()
+
+        if saved_path is None:
+            return False
+
+        return os.path.exists(saved_path)
 
     def __repr__(self) -> str:
         return f'''{self.__class__.__name__}(image={self._image})
