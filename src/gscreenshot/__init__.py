@@ -451,14 +451,13 @@ class Gscreenshot(object):
         else:
             filename = self.interpolate_filename(filename)
 
+        file_type = "png"
 
-        if "/dev" in filename and filename.index("/dev") == 0:
-            file_type = "png"
+        if "/dev" not in filename or filename.index("/dev") != 0:
 
-        else:
-            file_type = os.path.splitext(filename)[1][1:].lower()
+            file_extension = os.path.splitext(filename)[1][1:].lower()
 
-            if file_type == "":
+            if file_extension == "":
                 # If we don't have any file extension, assume
                 # we were given a directory; create the tree
                 # if it doesn't exist, then store the screenshot
@@ -478,47 +477,46 @@ class Gscreenshot(object):
                         )
                 file_type = 'png'
 
+            else:
+                file_type = file_extension
+
             if not overwrite and os.path.exists(filename):
                 return False
+
+            self.cache["last_save_dir"] = os.path.dirname(filename)
+            self.save_cache()
 
         if file_type == 'jpg':
             file_type = 'jpeg'
 
-        supported_formats = self.get_supported_formats()
-
-        if file_type in supported_formats:
-            self.cache["last_save_dir"] = os.path.dirname(filename)
-            self.save_cache()
-
-            screenshot = self._screenshots.cursor_current()
-
-            try:
-                # add exif data. This is sketchy but we don't need to
-                # dynamically generate it, just find and replace.
-                # This avoids needing an external library for such a simple
-                # thing.
-                exif_data = self.EXIF_TEMPLATE.replace(
-                    '[[VERSION]]'.encode(),
-                    self.get_program_version(True).encode()
-                )
-                exif_data = exif_data.replace(
-                    '[[CREATE_DATE]]'.encode(),
-                    datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
-                )
-
-                with open(filename, "wb") as file_pointer:
-                    image.save(file_pointer, file_type.upper(), exif=exif_data)
-
-                if screenshot is not None:
-                    screenshot.set_saved_path(filename)
-                return True
-            except IOError:
-
-                if screenshot is not None:
-                    screenshot.set_saved_path(None)
-                return False
-        else:
+        if file_type not in self.get_supported_formats():
             return False
+
+        try:
+            # add exif data. This is sketchy but we don't need to
+            # dynamically generate it, just find and replace.
+            # This avoids needing an external library for such a simple
+            # thing.
+            exif_data = self.EXIF_TEMPLATE.replace(
+                '[[VERSION]]'.encode(),
+                self.get_program_version(True).encode()
+            )
+            exif_data = exif_data.replace(
+                '[[CREATE_DATE]]'.encode(),
+                datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
+            )
+
+            with open(filename, "wb") as file_pointer:
+                image.save(file_pointer, file_type.upper(), exif=exif_data)
+
+        except IOError:
+            filename = None
+
+        screenshot = self._screenshots.cursor_current()
+        if screenshot is not None:
+            screenshot.set_saved_path(filename)
+
+        return filename is not None
 
     def save_screenshot_collection(self, foldername: typing.Optional[str]=None) -> bool:
         '''
