@@ -85,6 +85,12 @@ def run():
             action='store_true',
             help=_("Capture the cursor.")
     )
+    parser.add_argument(
+            '--raw',
+            required=False,
+            action='store_true',
+            help=_("Output the screenshot data to stdout for piping into other applications")
+    )
 
     args = parser.parse_args()
 
@@ -150,4 +156,13 @@ def run():
                 if tmp_file is not None:
                     print(_("Your screenshot was saved to {0}").format(tmp_file))
                 exit_code = 1
+
+        if args.raw is not False:
+            img = gscreenshot.get_last_image()
+            if img is None:
+                print(_("Failed to save screenshot!"))
+                sys.exit(1)
+
+            img.save(sys.stdout.buffer, 'PNG')
+
         sys.exit(exit_code)
