@@ -451,68 +451,72 @@ class Gscreenshot(object):
         else:
             filename = self.interpolate_filename(filename)
 
-        actual_file_ext = os.path.splitext(filename)[1][1:].lower()
+        file_type = "png"
 
-        if actual_file_ext == "":
-            # If we don't have any file extension, assume
-            # we were given a directory; create the tree
-            # if it doesn't exist, then store the screenshot
-            # there with a time-based filename.
-            try:
-                os.makedirs(filename)
-            except (IOError, OSError):
-                # Likely the directory already exists, so
-                # we'll throw the exception away.
-                # If we fail to save, we'll return a status
-                # saying so, so we'll be okay.
-                pass
+        if "/dev" not in filename or filename.index("/dev") != 0:
 
-            filename = os.path.join(
-                    filename,
-                    self.get_time_filename()
-                    )
-            actual_file_ext = 'png'
+            file_extension = os.path.splitext(filename)[1][1:].lower()
 
-        if not overwrite and os.path.exists(filename):
-            return False
+            if file_extension == "":
+                # If we don't have any file extension, assume
+                # we were given a directory; create the tree
+                # if it doesn't exist, then store the screenshot
+                # there with a time-based filename.
+                try:
+                    os.makedirs(filename)
+                except (IOError, OSError):
+                    # Likely the directory already exists, so
+                    # we'll throw the exception away.
+                    # If we fail to save, we'll return a status
+                    # saying so, so we'll be okay.
+                    pass
 
-        if actual_file_ext == 'jpg':
-            actual_file_ext = 'jpeg'
+                filename = os.path.join(
+                        filename,
+                        self.get_time_filename()
+                        )
+                file_type = 'png'
 
-        supported_formats = self.get_supported_formats()
+            else:
+                file_type = file_extension
 
-        if actual_file_ext in supported_formats:
+            if not overwrite and os.path.exists(filename):
+                return False
+
             self.cache["last_save_dir"] = os.path.dirname(filename)
             self.save_cache()
 
-            screenshot = self._screenshots.cursor_current()
+        if file_type == 'jpg':
+            file_type = 'jpeg'
 
-            try:
-                # add exif data. This is sketchy but we don't need to
-                # dynamically generate it, just find and replace.
-                # This avoids needing an external library for such a simple
-                # thing.
-                exif_data = self.EXIF_TEMPLATE.replace(
-                    '[[VERSION]]'.encode(),
-                    self.get_program_version(True).encode()
-                )
-                exif_data = exif_data.replace(
-                    '[[CREATE_DATE]]'.encode(),
-                    datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
-                )
-
-                image.save(filename, actual_file_ext.upper(), exif=exif_data)
-
-                if screenshot is not None:
-                    screenshot.set_saved_path(filename)
-                return True
-            except IOError:
-
-                if screenshot is not None:
-                    screenshot.set_saved_path(None)
-                return False
-        else:
+        if file_type not in self.get_supported_formats():
             return False
+
+        try:
+            # add exif data. This is sketchy but we don't need to
+            # dynamically generate it, just find and replace.
+            # This avoids needing an external library for such a simple
+            # thing.
+            exif_data = self.EXIF_TEMPLATE.replace(
+                '[[VERSION]]'.encode(),
+                self.get_program_version(True).encode()
+            )
+            exif_data = exif_data.replace(
+                '[[CREATE_DATE]]'.encode(),
+                datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
+            )
+
+            with open(filename, "wb") as file_pointer:
+                image.save(file_pointer, file_type.upper(), exif=exif_data)
+
+        except IOError:
+            filename = None
+
+        screenshot = self._screenshots.cursor_current()
+        if screenshot is not None:
+            screenshot.set_saved_path(filename)
+
+        return filename is not None
 
     def save_screenshot_collection(self, foldername: typing.Optional[str]=None) -> bool:
         '''
