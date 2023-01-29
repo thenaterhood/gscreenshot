@@ -1,7 +1,7 @@
 import mock
 import subprocess
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, mock_open, ANY
 from src.gscreenshot import Gscreenshot
 
 
@@ -169,11 +169,12 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.__utilityname__ = "fake"
         self.assertEqual("fake", self.gscreenshot.get_screenshooter_name())
 
-    def test_save_last_image_success(self):
+    @mock.patch("builtins.open", new_callable=mock_open, create=True)
+    def test_save_last_image_success(self, mock_open):
 
         self.gscreenshot.screenshot_full_display()
         success = self.gscreenshot.save_last_image("potato.png")
-        self.fake_image.save.assert_called_with("potato.png", "PNG", exif=unittest.mock.ANY)
+        self.fake_image.save.assert_called_with(mock_open(), "PNG", exif=ANY)
         self.assertTrue(success)
 
     def test_save_last_image_bad_extension(self):
