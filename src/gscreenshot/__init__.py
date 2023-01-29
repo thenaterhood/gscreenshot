@@ -451,37 +451,42 @@ class Gscreenshot(object):
         else:
             filename = self.interpolate_filename(filename)
 
-        actual_file_ext = os.path.splitext(filename)[1][1:].lower()
 
-        if actual_file_ext == "":
-            # If we don't have any file extension, assume
-            # we were given a directory; create the tree
-            # if it doesn't exist, then store the screenshot
-            # there with a time-based filename.
-            try:
-                os.makedirs(filename)
-            except (IOError, OSError):
-                # Likely the directory already exists, so
-                # we'll throw the exception away.
-                # If we fail to save, we'll return a status
-                # saying so, so we'll be okay.
-                pass
+        if "/dev" in filename and filename.index("/dev") == 0:
+            file_type = "png"
 
-            filename = os.path.join(
-                    filename,
-                    self.get_time_filename()
-                    )
-            actual_file_ext = 'png'
+        else:
+            file_type = os.path.splitext(filename)[1][1:].lower()
 
-        if not overwrite and os.path.exists(filename):
-            return False
+            if file_type == "":
+                # If we don't have any file extension, assume
+                # we were given a directory; create the tree
+                # if it doesn't exist, then store the screenshot
+                # there with a time-based filename.
+                try:
+                    os.makedirs(filename)
+                except (IOError, OSError):
+                    # Likely the directory already exists, so
+                    # we'll throw the exception away.
+                    # If we fail to save, we'll return a status
+                    # saying so, so we'll be okay.
+                    pass
 
-        if actual_file_ext == 'jpg':
-            actual_file_ext = 'jpeg'
+                filename = os.path.join(
+                        filename,
+                        self.get_time_filename()
+                        )
+                file_type = 'png'
+
+            if not overwrite and os.path.exists(filename):
+                return False
+
+        if file_type == 'jpg':
+            file_type = 'jpeg'
 
         supported_formats = self.get_supported_formats()
 
-        if actual_file_ext in supported_formats:
+        if file_type in supported_formats:
             self.cache["last_save_dir"] = os.path.dirname(filename)
             self.save_cache()
 
@@ -501,7 +506,8 @@ class Gscreenshot(object):
                     datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
                 )
 
-                image.save(filename, actual_file_ext.upper(), exif=exif_data)
+                with open(filename, "wb") as file_pointer:
+                    image.save(file_pointer, file_type.upper(), exif=exif_data)
 
                 if screenshot is not None:
                     screenshot.set_saved_path(filename)

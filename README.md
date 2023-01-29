@@ -59,7 +59,8 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 :   A numeric value in seconds to wait before taking the screenshot. Defaults to 0 (no delay).
 
 -f *FILENAME*, \--filename *FILENAME*
-:   A filename to store the screenshot to once taken.
+:   A filename to store the screenshot to once taken. Paths such as /dev/stdout are also
+    acceptable.
 
     Defaults to gscreenshot_%Y-%m-%d-%H%M%S.png.
 
@@ -103,6 +104,9 @@ gscreenshot -f \'screenshot_\$hx\$w_%Y-%m-%d.png\' -s -c -d 1
 :   Take a screenshot of a screen region (interactive) without the GUI, with a 1 second delay. Copy the
     screenshot to the clipboard and save it to a PNG file including the height, width, and day in the filename.
     Note that you can subsitute gscreenshot-cli for gscreenshot in this call, if so desired.
+
+gscreenshot -f /dev/stdout -p | display
+:   Take a screenshot and capture the cursor, then write it to stdout and pipe it to ImageMagick for display.
 
 gscreenshot-cli
 :   Take and save a screenshot to the current directory with default parameters, without starting the GUI.
