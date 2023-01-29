@@ -13,6 +13,7 @@ class StampEffect(ScreenshotEffect):
 
     def __init__(self, glyph: Image.Image, position: typing.Tuple[int, int]):
         '''constructor'''
+        super().__init__()
         self._glyph = glyph
         self._position = position
 
@@ -53,3 +54,6 @@ class StampEffect(ScreenshotEffect):
         # a black box.
         screenshot.paste(cursor_img, cursor_pos, cursor_img)
         return screenshot
+
+    def __repr__(self):
+        return f"StampEffect({self._glyph}, {self._position})"

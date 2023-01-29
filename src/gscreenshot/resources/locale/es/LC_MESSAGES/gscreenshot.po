@@ -150,6 +150,9 @@ msgstr "Prohibir"
 msgid "cursor-allow"
 msgstr "Permitir"
 
+msgid "cursor-custom"
+msgstr "Abrir"
+
 msgid "A simple screenshot tool supporting multiple backends."
 msgstr ""
 "Una herramienta de captura de pantalla simple que admite múltiples "
