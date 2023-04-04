@@ -11,6 +11,10 @@ _gscreenshot_completions()
             while IFS='' read -r line; do COMPREPLY+=("$line"); done < <(compgen -o plusdirs -- "$cur")
             return
             ;;
+        --pointer-glyph)
+            while IFS='' read -r line; do COMPREPLY+=("$line"); done < <(compgen -o plusdirs -- "$cur")
+            return
+            ;;
         --delay)
             COMPREPLY=("[seconds]")
             return

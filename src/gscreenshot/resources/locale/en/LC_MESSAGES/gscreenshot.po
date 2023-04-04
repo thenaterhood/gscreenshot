@@ -208,3 +208,9 @@ msgstr "Alternate Cursor"
 
 msgid "capture_full_screen"
 msgstr "Full Screen Capture"
+
+msgid "The name of a custom cursor glyph ('adwaita', 'prohibit', 'allow') or path to an image."
+msgstr ""
+
+msgid "Unable to open pointer"
+msgstr ""

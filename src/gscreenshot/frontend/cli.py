@@ -85,6 +85,12 @@ def run():
             action='store_true',
             help=_("Capture the cursor.")
     )
+    parser.add_argument(
+            '-g',
+            '--pointer-glyph',
+            required=False,
+            help=_("The name of a custom cursor glyph ('adwaita', 'prohibit', 'allow') or path to an image.")
+    )
 
     args = parser.parse_args()
 
@@ -111,10 +117,19 @@ def run():
         print(_("Licensed as {0}").format(gscreenshot.get_program_license()))
         sys.exit(0)
 
+    if args.pointer_glyph:
+        if args.pointer_glyph not in gscreenshot.get_available_cursors():
+            pointer_name = gscreenshot.register_stamp_image(args.pointer_glyph)
+            if pointer_name:
+                args.pointer_glyph = pointer_name
+            else:
+                print(_("Unable to open pointer"))
+                args.pointer_glyph = 'theme'
+
     if args.selection is not False:
-        gscreenshot.screenshot_selected(args.delay, args.pointer)
+        gscreenshot.screenshot_selected(delay=args.delay, capture_cursor=args.pointer, cursor_name=args.pointer_glyph)
     else:
-        gscreenshot.screenshot_full_display(args.delay, args.pointer)
+        gscreenshot.screenshot_full_display(delay=args.delay, capture_cursor=args.pointer, cursor_name=args.pointer_glyph)
 
     if gscreenshot.get_last_image() is None:
         print(_("No screenshot taken."))
