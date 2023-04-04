@@ -125,7 +125,9 @@ class Screenshooter(object):
         Parameters:
             int delay, in seconds
         """
-        raise NotImplementedError("Not implemented. Fullscreen grab called with delay " + str(delay))
+        raise NotImplementedError(
+            "Not implemented. Fullscreen grab called with delay " + str(delay)
+            )
 
     def grab_selection_(self, delay: int=0, capture_cursor: bool=False,
                         use_cursor: typing.Optional[PIL.Image.Image]=None,

@@ -26,14 +26,13 @@ from random import SystemRandom
 from time import sleep
 from gi.repository import GLib
 
-from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
-
 try:
     from dbus.mainloop.glib import DBusGMainLoop
 except ImportError:
     DBusGMainLoop = None
 
 from gscreenshot.screenshooter import Screenshooter
+from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 
 class XdgPortalScreenshot:
