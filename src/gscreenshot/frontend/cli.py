@@ -127,9 +127,17 @@ def run():
                 args.pointer_glyph = 'theme'
 
     if args.selection is not False:
-        gscreenshot.screenshot_selected(delay=args.delay, capture_cursor=args.pointer, cursor_name=args.pointer_glyph)
+        gscreenshot.screenshot_selected(
+            delay=args.delay,
+            capture_cursor=args.pointer,
+            cursor_name=args.pointer_glyph
+        )
     else:
-        gscreenshot.screenshot_full_display(delay=args.delay, capture_cursor=args.pointer, cursor_name=args.pointer_glyph)
+        gscreenshot.screenshot_full_display(
+            delay=args.delay,
+            capture_cursor=args.pointer,
+            cursor_name=args.pointer_glyph
+        )
 
     if gscreenshot.get_last_image() is None:
         print(_("No screenshot taken."))
