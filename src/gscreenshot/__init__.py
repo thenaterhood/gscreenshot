@@ -506,6 +506,9 @@ class Gscreenshot(object):
                 datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
             )
 
+            # open(... , 'w*') truncates the file, so this is not vulnerable
+            # to the 2023 android and windows 11 problem of leaking data from
+            # cropped screenshots.
             with open(filename, "wb") as file_pointer:
                 image.save(file_pointer, file_type.upper(), exif=exif_data)
 

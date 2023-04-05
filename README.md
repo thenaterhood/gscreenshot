@@ -6,9 +6,9 @@ gscreenshot - screenshot frontend (CLI and GUI) for a variety of screenshot back
 
 # SYNOPSIS
 
-gscreenshot [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version]
+gscreenshot [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH]
 
-gscreenshot-cli [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version]
+gscreenshot-cli [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH]
 
 # DESCRIPTION
 
@@ -94,6 +94,10 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 
 -p, \--pointer
 :   Capture the cursor, if supported.
+
+-g, \--pointer-glyph
+:   Use an alternate image when capturing the cursor. "adwaita", "prohibit", "allow" are built in, or pass
+    a file path to use a custom image.
 
 # EXAMPLES
 
