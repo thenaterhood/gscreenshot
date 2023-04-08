@@ -101,6 +101,12 @@ class Gscreenshot(object):
         if name is None:
             name = os.path.basename(fname)
 
+        existing = self.get_available_cursors()
+        i = 0
+        while name in existing:
+            name = f"Custom{i}"
+            i += 1
+
         if len(name) > 9:
             name = f"{name[0:8]}..."
 
