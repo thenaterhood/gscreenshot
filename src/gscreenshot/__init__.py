@@ -24,7 +24,7 @@ import typing
 from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
-from gscreenshot.screenshot import Screenshot, ScreenshotCollection
+from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
 from gscreenshot.util import session_is_wayland
@@ -100,6 +100,12 @@ class Gscreenshot(object):
         glyph = Image.open(fname).convert("RGBA")
         if name is None:
             name = os.path.basename(fname)
+
+        existing = self.get_available_cursors()
+        i = 0
+        while name in existing:
+            name = f"Custom{i}"
+            i += 1
 
         if len(name) > 9:
             name = f"{name[0:8]}..."
