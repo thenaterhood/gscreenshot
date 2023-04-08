@@ -24,7 +24,7 @@ import typing
 from datetime import datetime
 from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
-from gscreenshot.screenshot import Screenshot, ScreenshotCollection
+from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
 from gscreenshot.util import session_is_wayland
