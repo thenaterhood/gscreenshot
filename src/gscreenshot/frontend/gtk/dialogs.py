@@ -53,17 +53,11 @@ class FileOpenDialog(object):
         '''Run the file selection dialog'''
         action = Gtk.FILE_CHOOSER_ACTION_OPEN
 
-        chooser = Gtk.FileChooserDialog(
+        chooser = Gtk.FileChooserNative(
                 transient_for=self.parent,
                 title=None,
                 action=action,
                 filter=self._filter,
-                buttons=(
-                    Gtk.STOCK_CANCEL,
-                    Gtk.RESPONSE_CANCEL,
-                    Gtk.STOCK_OPEN,
-                    Gtk.RESPONSE_OK
-                    )
                 )
 
         if self.default_filename is not None:
@@ -76,7 +70,7 @@ class FileOpenDialog(object):
 
         response = chooser.run()
 
-        if response == Gtk.RESPONSE_OK:
+        if response in [Gtk.RESPONSE_OK, Gtk.ResponseType.ACCEPT]:
             return_value = chooser.get_filename()
         else:
             return_value = None

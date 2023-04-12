@@ -8,6 +8,9 @@ function _gscreenshot {
         --filename)
             opt="$opt:file:_directories"
             ;;
+        --pointer-glyph)
+            opt="$opt:file:_directories"
+            ;;
         --delay)
             opt="$opt:number:"
             ;;
