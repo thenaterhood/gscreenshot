@@ -120,6 +120,8 @@ class Presenter(object):
             # further handling of the keypress
             return self._keymappings[event.keyval](widget)
 
+        return False
+
     def handle_preview_click_event(self, widget, event, *args):
         '''
         Handle a click on the screenshot preview widget
