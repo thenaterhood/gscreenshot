@@ -116,7 +116,11 @@ class Presenter(object):
         modifiers).
         """
         if event.keyval in self._keymappings:
-            self._keymappings[event.keyval]()
+            # The called function should return True to prevent
+            # further handling of the keypress
+            return self._keymappings[event.keyval](widget)
+
+        return False
 
     def handle_preview_click_event(self, widget, event, *args):
         '''
@@ -252,6 +256,7 @@ class Presenter(object):
             show_next=screenshot_collection.has_next(),
             show_previous=screenshot_collection.has_previous()
         )
+        return True
 
     def on_preview_next_clicked(self, *_):
         '''Handle a click of the "next" button on the preview'''
@@ -262,6 +267,7 @@ class Presenter(object):
             show_next=screenshot_collection.has_next(),
             show_previous=screenshot_collection.has_previous()
         )
+        return True
 
     def effect_checkbox_handler(self, widget, effect):
         '''
@@ -472,7 +478,7 @@ class Presenter(object):
 
         self._view.run_dialog(about)
 
-    def on_fullscreen_toggle(self):
+    def on_fullscreen_toggle(self, *_):
         '''Handle the window getting toggled to fullscreen'''
         self._view.toggle_fullscreen()
 
@@ -587,9 +593,9 @@ def main():
         Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Right')):
             presenter.on_preview_next_clicked,
         Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Left')):
-            presenter.on_preview_prev_clicked
-        # here for reference - this is configured in Glade
-        #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('INSERT')):
+            presenter.on_preview_prev_clicked,
+        # Handled in Glade - just here for reference
+        #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Insert')):
         #    presenter.overwrite_mode_toggled
     }
     presenter.set_keymappings(keymappings)
