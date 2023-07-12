@@ -44,10 +44,11 @@ class StampEffect(ScreenshotEffect):
         # If the cursor glyph is square, adjust its position slightly so it
         # shows up where expected.
         if cursor_img.size[0] == cursor_img.size[1]:
-            cursor_pos = (
-                cursor_pos[0] - 20 if cursor_pos[0] - 20 > 0 else cursor_pos[0],
-                cursor_pos[1] - 20 if cursor_pos[1] - 20 > 0 else cursor_pos[1]
+            adjusted_pos = (
+                cursor_pos[0] - round(.5*cursor_img.size[0]),
+                cursor_pos[1] - round(.5*cursor_img.size[1])
             )
+            cursor_pos = adjusted_pos if all(x >= 0 for x in adjusted_pos) else cursor_pos
 
         # Passing cursor_img twice is intentional. The second time it's used
         # as a mask (PIL uses the alpha channel) so the cursor doesn't have
