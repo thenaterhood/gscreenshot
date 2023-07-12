@@ -41,14 +41,15 @@ class StampEffect(ScreenshotEffect):
 
         cursor_img.thumbnail((int(cursor_width), int(cursor_height)), antialias_algo)
 
-        # If the cursor glyph is square, adjust its position slightly so it
-        # shows up where expected.
+        # If the cursor glyph is square, center it
         if cursor_img.size[0] == cursor_img.size[1]:
+            x_pos = cursor_pos[0] - round(.5*cursor_img.size[0])
+            y_pos = cursor_pos[1] - round(.5*cursor_img.size[1])
             adjusted_pos = (
-                cursor_pos[0] - round(.5*cursor_img.size[0]),
-                cursor_pos[1] - round(.5*cursor_img.size[1])
+                x_pos if x_pos >= 0 else 0,
+                y_pos if y_pos >= 0 else 0
             )
-            cursor_pos = adjusted_pos if all(x >= 0 for x in adjusted_pos) else cursor_pos
+            cursor_pos = adjusted_pos
 
         # Passing cursor_img twice is intentional. The second time it's used
         # as a mask (PIL uses the alpha channel) so the cursor doesn't have
