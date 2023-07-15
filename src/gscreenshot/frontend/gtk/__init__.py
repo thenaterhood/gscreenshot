@@ -80,10 +80,7 @@ class Presenter(object):
     def _end_take_screenshot(self):
         self._show_preview()
         screenshot_collection = self._app.get_screenshot_collection()
-        self._view.update_gallery_controls(
-            show_next=screenshot_collection.has_next(),
-            show_previous=screenshot_collection.has_previous()
-        )
+        self._view.update_gallery_controls(screenshot_collection)
 
         self._view.unhide()
         self._view.set_ready()
@@ -252,10 +249,7 @@ class Presenter(object):
         screenshot_collection = self._app.get_screenshot_collection()
         screenshot_collection.cursor_prev()
         self._show_preview()
-        self._view.update_gallery_controls(
-            show_next=screenshot_collection.has_next(),
-            show_previous=screenshot_collection.has_previous()
-        )
+        self._view.update_gallery_controls(screenshot_collection)
         return True
 
     def on_preview_next_clicked(self, *_):
@@ -263,10 +257,7 @@ class Presenter(object):
         screenshot_collection = self._app.get_screenshot_collection()
         screenshot_collection.cursor_next()
         self._show_preview()
-        self._view.update_gallery_controls(
-            show_next=screenshot_collection.has_next(),
-            show_previous=screenshot_collection.has_previous()
-        )
+        self._view.update_gallery_controls(screenshot_collection)
         return True
 
     def effect_checkbox_handler(self, widget, effect):
@@ -303,6 +294,7 @@ class Presenter(object):
                 cancelled = True
 
         if saved:
+            self._view.update_gallery_controls(self._app.get_screenshot_collection())
             self._view.flash_status_icon("document-save")
 
     def on_button_save_all_clicked(self, *_):
@@ -326,6 +318,7 @@ class Presenter(object):
                 cancelled = True
 
         if saved:
+            self._view.update_gallery_controls(self._app.get_screenshot_collection())
             self._view.flash_status_icon("document-save")
 
     def on_button_openwith_clicked(self, *_):
@@ -352,10 +345,7 @@ class Presenter(object):
 
                 current = screenshots.cursor_current()
                 if current is not None:
-                    self._view.update_gallery_controls(
-                        show_next=screenshots.has_next(),
-                        show_previous=screenshots.has_previous()
-                    )
+                    self._view.update_gallery_controls(screenshots)
                     self._show_preview()
 
                     return
@@ -397,10 +387,7 @@ class Presenter(object):
 
             current = screenshots.cursor_current()
             if current is not None:
-                self._view.update_gallery_controls(
-                    show_next=screenshots.has_next(),
-                    show_previous=screenshots.has_previous()
-                )
+                self._view.update_gallery_controls(screenshots)
                 self._show_preview()
 
                 return
@@ -424,10 +411,7 @@ class Presenter(object):
 
             current = screenshots.cursor_current()
             if current is not None:
-                self._view.update_gallery_controls(
-                    show_next=screenshots.has_next(),
-                    show_previous=screenshots.has_previous()
-                )
+                self._view.update_gallery_controls(screenshots)
                 self._show_preview()
 
                 return

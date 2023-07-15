@@ -13,6 +13,7 @@ from time import sleep
 import typing
 from pkg_resources import resource_filename
 import pygtkcompat
+from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.util import GSCapabilities
 
 pygtkcompat.enable()
@@ -66,20 +67,24 @@ class View(object):
         self._next_btn.set_size_request(20, 20)
         self._next_btn.set_opacity(0)
 
+        self._gallery_position:Gtk.Label = Gtk.Label()
+        self._gallery_position.set_size_request(1, 20)
+        self._gallery_position.set_opacity(0)
+        self._gallery_position.modify_bg(Gtk.STATE_NORMAL, Gdk.color_parse('#ffff00'))
+
         self._preview_control:Gtk.ButtonBox = Gtk.ButtonBox()
         self._preview_control.set_hexpand(False)
         self._preview_control.set_vexpand(False)
         self._preview_control.set_halign(Gtk.Align.CENTER)
         self._preview_control.set_valign(Gtk.Align.END)
         self._preview_control.add(self._prev_btn)
+        self._preview_control.add(self._gallery_position)
         self._preview_control.add(self._next_btn)
 
         self._preview_overlay.add_overlay(self._preview_control)
 
         self._edit_popover:Gtk.Menu= Gtk.Menu()
         self._edit_popover.append(Gtk.CheckMenuItem("potato"))
-
-        self.update_gallery_controls(False, False)
 
         if GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._init_cursor_combobox()
@@ -126,27 +131,47 @@ class View(object):
         '''
         widget.set_opacity(.4)
 
-    def update_gallery_controls(self, show_next=True, show_previous=True):
+    def update_gallery_controls(self, screenshots:ScreenshotCollection):
         '''
         updates the preview controls to match the current state
         '''
         while Gtk.events_pending():
             Gtk.main_iteration()
 
-        if show_next and self._next_btn.get_opacity() <= 0:
+        if len(screenshots) > 1:
+            current = screenshots.cursor_current()
+            unsaved_marker = ""
+
+            if current is not None and not current.saved():
+                unsaved_marker = "*"
+
+            self._gallery_position.set_text(
+                f"{screenshots.cursor()+1}{unsaved_marker}/{len(screenshots)}")
+            self._gallery_position.modify_bg(
+                Gtk.STATE_NORMAL,
+                self._window.get_style_context()
+                    .get_background_color(Gtk.STATE_NORMAL)
+                    .to_color())
+            self._gallery_position.set_opacity(.5)
+
+        else:
+            self._gallery_position.set_text("")
+            self._gallery_position.set_opacity(0)
+
+        if screenshots.has_next() and self._next_btn.get_opacity() <= 0:
             self._next_btn.set_opacity(.5)
             self._next_btn.connect('enter', self._hover_effect)
             self._next_btn.connect('leave', self._unhover_effect)
-        elif not show_next and self._next_btn.get_opacity() > 0:
+        elif not screenshots.has_next() and self._next_btn.get_opacity() > 0:
             self._next_btn.set_opacity(0)
             self._next_btn.disconnect_by_func(self._hover_effect)
             self._next_btn.disconnect_by_func(self._unhover_effect)
 
-        if show_previous and self._prev_btn.get_opacity() <= 0:
+        if screenshots.has_previous() and self._prev_btn.get_opacity() <= 0:
             self._prev_btn.set_opacity(.5)
             self._prev_btn.connect('enter', self._hover_effect)
             self._prev_btn.connect('leave', self._unhover_effect)
-        elif not show_previous and self._prev_btn.get_opacity() > 0:
+        elif not screenshots.has_previous() and self._prev_btn.get_opacity() > 0:
             self._prev_btn.set_opacity(0)
             self._prev_btn.disconnect_by_func(self._hover_effect)
             self._prev_btn.disconnect_by_func(self._unhover_effect)
