@@ -134,6 +134,10 @@ class ScreenshotCollection(object):
     def __iter__(self):
         yield from self._screenshots
 
+    def cursor(self) -> int:
+        '''get the current cursor index'''
+        return self._cursor
+
     def append(self, item: Screenshot):
         '''adds a screenshot to the end of the collection'''
         self._screenshots.append(item)
