@@ -160,6 +160,24 @@ class ScreenshotCollection(object):
         except IndexError:
             self._screenshots[self._cursor] = replacement
 
+    def insert(self, screenshot: Screenshot):
+        '''
+        Inserts a screenshot at the cursor
+        '''
+        if len(self._screenshots) < 1:
+            self.append(screenshot)
+            return
+
+        try:
+            self._screenshots = self._screenshots[:self._cursor + 1] + \
+                [screenshot] + self._screenshots[self._cursor + 1:]
+
+            self._cursor = self._cursor + 1
+
+        except IndexError:
+            self.append(screenshot)
+            self.cursor_to_end()
+
     def has_next(self) -> bool:
         '''
         whether the collection has another screenshot
