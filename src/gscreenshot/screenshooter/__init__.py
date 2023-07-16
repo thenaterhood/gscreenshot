@@ -113,7 +113,7 @@ class Screenshooter(object):
         else:
             self.grab_fullscreen(delay, capture_cursor=False)
             cursor_position = self.get_cursor_position()
-            if capture_cursor and self._screenshot is not None and cursor_position:
+            if capture_cursor and use_cursor and self._screenshot and cursor_position:
                 stamp = StampEffect(use_cursor, cursor_position)
                 stamp.set_alias("cursor")
                 self._screenshot.add_effect(stamp)
