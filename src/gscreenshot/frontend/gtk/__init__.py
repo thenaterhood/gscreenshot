@@ -80,10 +80,7 @@ class Presenter(object):
     def _end_take_screenshot(self):
         self._show_preview()
         screenshot_collection = self._app.get_screenshot_collection()
-        self._view.update_gallery_controls(
-            show_next=screenshot_collection.has_next(),
-            show_previous=screenshot_collection.has_previous()
-        )
+        self._view.update_gallery_controls(screenshot_collection)
 
         self._view.unhide()
         self._view.set_ready()
@@ -116,7 +113,11 @@ class Presenter(object):
         modifiers).
         """
         if event.keyval in self._keymappings:
-            self._keymappings[event.keyval]()
+            # The called function should return True to prevent
+            # further handling of the keypress
+            return self._keymappings[event.keyval](widget)
+
+        return False
 
     def handle_preview_click_event(self, widget, event, *args):
         '''
@@ -248,20 +249,16 @@ class Presenter(object):
         screenshot_collection = self._app.get_screenshot_collection()
         screenshot_collection.cursor_prev()
         self._show_preview()
-        self._view.update_gallery_controls(
-            show_next=screenshot_collection.has_next(),
-            show_previous=screenshot_collection.has_previous()
-        )
+        self._view.update_gallery_controls(screenshot_collection)
+        return True
 
     def on_preview_next_clicked(self, *_):
         '''Handle a click of the "next" button on the preview'''
         screenshot_collection = self._app.get_screenshot_collection()
         screenshot_collection.cursor_next()
         self._show_preview()
-        self._view.update_gallery_controls(
-            show_next=screenshot_collection.has_next(),
-            show_previous=screenshot_collection.has_previous()
-        )
+        self._view.update_gallery_controls(screenshot_collection)
+        return True
 
     def effect_checkbox_handler(self, widget, effect):
         '''
@@ -297,6 +294,7 @@ class Presenter(object):
                 cancelled = True
 
         if saved:
+            self._view.update_gallery_controls(self._app.get_screenshot_collection())
             self._view.flash_status_icon("document-save")
 
     def on_button_save_all_clicked(self, *_):
@@ -320,6 +318,7 @@ class Presenter(object):
                 cancelled = True
 
         if saved:
+            self._view.update_gallery_controls(self._app.get_screenshot_collection())
             self._view.flash_status_icon("document-save")
 
     def on_button_openwith_clicked(self, *_):
@@ -346,10 +345,7 @@ class Presenter(object):
 
                 current = screenshots.cursor_current()
                 if current is not None:
-                    self._view.update_gallery_controls(
-                        show_next=screenshots.has_next(),
-                        show_previous=screenshots.has_previous()
-                    )
+                    self._view.update_gallery_controls(screenshots)
                     self._show_preview()
 
                     return
@@ -391,10 +387,7 @@ class Presenter(object):
 
             current = screenshots.cursor_current()
             if current is not None:
-                self._view.update_gallery_controls(
-                    show_next=screenshots.has_next(),
-                    show_previous=screenshots.has_previous()
-                )
+                self._view.update_gallery_controls(screenshots)
                 self._show_preview()
 
                 return
@@ -418,10 +411,7 @@ class Presenter(object):
 
             current = screenshots.cursor_current()
             if current is not None:
-                self._view.update_gallery_controls(
-                    show_next=screenshots.has_next(),
-                    show_previous=screenshots.has_previous()
-                )
+                self._view.update_gallery_controls(screenshots)
                 self._show_preview()
 
                 return
@@ -472,7 +462,7 @@ class Presenter(object):
 
         self._view.run_dialog(about)
 
-    def on_fullscreen_toggle(self):
+    def on_fullscreen_toggle(self, *_):
         '''Handle the window getting toggled to fullscreen'''
         self._view.toggle_fullscreen()
 
@@ -587,9 +577,9 @@ def main():
         Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Right')):
             presenter.on_preview_next_clicked,
         Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Left')):
-            presenter.on_preview_prev_clicked
-        # here for reference - this is configured in Glade
-        #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('INSERT')):
+            presenter.on_preview_prev_clicked,
+        # Handled in Glade - just here for reference
+        #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Insert')):
         #    presenter.overwrite_mode_toggled
     }
     presenter.set_keymappings(keymappings)

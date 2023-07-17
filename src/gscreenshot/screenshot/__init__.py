@@ -134,6 +134,10 @@ class ScreenshotCollection(object):
     def __iter__(self):
         yield from self._screenshots
 
+    def cursor(self) -> int:
+        '''get the current cursor index'''
+        return self._cursor
+
     def append(self, item: Screenshot):
         '''adds a screenshot to the end of the collection'''
         self._screenshots.append(item)
@@ -159,6 +163,24 @@ class ScreenshotCollection(object):
             self._screenshots[idx] = replacement
         except IndexError:
             self._screenshots[self._cursor] = replacement
+
+    def insert(self, screenshot: Screenshot):
+        '''
+        Inserts a screenshot at the cursor
+        '''
+        if len(self._screenshots) < 1:
+            self.append(screenshot)
+            return
+
+        try:
+            self._screenshots = self._screenshots[:self._cursor + 1] + \
+                [screenshot] + self._screenshots[self._cursor + 1:]
+
+            self._cursor = self._cursor + 1
+
+        except IndexError:
+            self.append(screenshot)
+            self.cursor_to_end()
 
     def has_next(self) -> bool:
         '''
