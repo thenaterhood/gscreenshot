@@ -75,10 +75,11 @@ class RegionSelector():
         """
         try:
             with subprocess.Popen(
-                params,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-                ) as selector_process:
+                    params,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE
+            ) as selector_process:
 
                 try:
                     stdout, stderr = selector_process.communicate(timeout=60)
