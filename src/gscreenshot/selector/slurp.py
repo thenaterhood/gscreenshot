@@ -4,6 +4,7 @@ Wrapper for the slurp screen selector utility
 import typing
 from gscreenshot.selector import RegionSelector
 from gscreenshot.util import find_executable, GSCapabilities
+from time import sleep
 
 
 class Slurp(RegionSelector):
@@ -39,7 +40,12 @@ class Slurp(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive(['slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h'])
+        ret = self._get_boundary_interactive([
+            'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
+            '-b', '#00000011', '-s', '#00000011'])
+        # Sleep so we hopefully don't catch the edge of slurp closing
+        sleep(0.1)
+        return ret
 
     def window_select(self) -> typing.Tuple[int, int, int, int]:
         """
@@ -48,7 +54,12 @@ class Slurp(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive(['slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h'])
+        ret = self._get_boundary_interactive([
+            'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
+            '-b', '#00000011', '-s', '#00000011'])
+        # Sleep so we hopefully don't catch the edge of slurp closing
+        sleep(0.1)
+        return ret
 
     @staticmethod
     def can_run() -> bool:

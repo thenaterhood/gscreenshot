@@ -114,7 +114,7 @@ msgid "Using {0} screenshot backend"
 msgstr ""
 
 #: src/gscreenshot/frontend/gtk.py:152
-msgid "Your clipboard doesn't support persistence and xclip isn't available."
+msgid "Your clipboard doesn't support persistence and {0} isn't available."
 msgstr ""
 
 #: src/gscreenshot/frontend/gtk.py:161
@@ -161,7 +161,7 @@ msgstr ""
 msgid "Failed to save screenshot!"
 msgstr ""
 
-msgid "Could not clip image! Xclip failed to run."
+msgid "Could not clip image! {0} failed to run."
 msgstr ""
 
 msgid "Your screenshot was saved to {0}"

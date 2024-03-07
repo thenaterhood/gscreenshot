@@ -164,9 +164,11 @@ def run():
             gscreenshot.open_last_screenshot()
 
         if args.clip is not False:
-            if not gscreenshot.copy_last_screenshot_to_clipboard():
+            try:
+                gscreenshot.copy_last_screenshot_to_clipboard()
+            except Exception as e:
                 tmp_file = gscreenshot.save_and_return_path()
-                print(_("Could not clip image! Xclip failed to run."))
+                print(_("Could not clip image! {0} failed to run.").format(e))
 
                 if tmp_file is not None:
                     print(_("Your screenshot was saved to {0}").format(tmp_file))

@@ -364,9 +364,11 @@ class Presenter(object):
         pixbuf = self._image_to_pixbuf(img)
 
         if not self._view.copy_to_clipboard(pixbuf):
-            if not self._app.copy_last_screenshot_to_clipboard():
+            try:
+                self._app.copy_last_screenshot_to_clipboard()
+            except Exception as e:
                 warning_dialog = WarningDialog(
-                    i18n("Your clipboard doesn't support persistence and xclip isn't available."),
+                    i18n("Your clipboard doesn't support persistence and {0} isn't available.").format(e),
                     self._view.get_window())
                 self._view.run_dialog(warning_dialog)
                 return False
