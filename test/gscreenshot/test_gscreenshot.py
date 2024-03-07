@@ -2,7 +2,7 @@ import mock
 import subprocess
 import unittest
 from unittest.mock import Mock, mock_open, ANY
-from src.gscreenshot import Gscreenshot
+from src.gscreenshot import Gscreenshot, GscreenshotClipboardException
 
 
 class GscreenshotTest(unittest.TestCase):
@@ -293,7 +293,12 @@ class GscreenshotTest(unittest.TestCase):
         # We can't mock the exception itself
         mock_subprocess.CalledProcessError = subprocess.CalledProcessError
         self.gscreenshot.screenshot_full_display()
-        success = self.gscreenshot.copy_last_screenshot_to_clipboard()
+
+        try:
+            self.gscreenshot.copy_last_screenshot_to_clipboard()
+            self.assertFalse(True, "expected exception but it didn't happen")
+        except GscreenshotClipboardException as error:
+            self.assertEqual(str(error), "xclip")
 
         self.fake_image.save.assert_called_once()
 
@@ -309,5 +314,3 @@ class GscreenshotTest(unittest.TestCase):
             stdout=None,
             stderr=None
         )
-
-        self.assertFalse(success)
