@@ -7,7 +7,7 @@ import argparse
 import sys
 import gettext
 
-from gscreenshot import Gscreenshot
+from gscreenshot import Gscreenshot, GscreenshotClipboardException
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 _ = gettext.gettext
@@ -148,7 +148,6 @@ def run():
                 print(_("failed to show screenshot notification - is notify-send working?"))
 
         shot_saved = False
-        should_save_shot = (args.filename is not False or args.clip is False)
         exit_code = 0
 
         if args.filename is not False:
@@ -156,7 +155,7 @@ def run():
         elif args.clip is False:
             shot_saved = gscreenshot.save_last_image()
 
-        if should_save_shot and not shot_saved:
+        if (args.filename is not False or args.clip is False) and not shot_saved:
             exit_code = 1
             print(_("Failed to save screenshot!"))
 
@@ -164,9 +163,11 @@ def run():
             gscreenshot.open_last_screenshot()
 
         if args.clip is not False:
-            if not gscreenshot.copy_last_screenshot_to_clipboard():
+            try:
+                gscreenshot.copy_last_screenshot_to_clipboard()
+            except GscreenshotClipboardException as error:
                 tmp_file = gscreenshot.save_and_return_path()
-                print(_("Could not clip image! Xclip failed to run."))
+                print(_("Could not clip image! {0} failed to run.").format(error))
 
                 if tmp_file is not None:
                     print(_("Your screenshot was saved to {0}").format(tmp_file))

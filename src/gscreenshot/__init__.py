@@ -32,6 +32,11 @@ from gscreenshot.util import session_is_wayland
 _ = gettext.gettext
 
 
+#pylint: disable=missing-class-docstring
+class GscreenshotClipboardException(Exception):
+    pass
+
+
 class Gscreenshot(object):
     """
     Gscreenshot application
@@ -607,6 +612,7 @@ class Gscreenshot(object):
             '-t',
             'image/png'
             ]
+        clipper_name = "xclip"
 
         if session_is_wayland():
             params = [
@@ -614,6 +620,7 @@ class Gscreenshot(object):
                     '-t',
                     'image/png'
                 ]
+            clipper_name = "wl-copy"
 
         with io.BytesIO() as png_data:
             image.save(png_data, "PNG")
@@ -629,7 +636,8 @@ class Gscreenshot(object):
                     xclip.communicate(input=png_data.getvalue())
                     return True
             except (OSError, subprocess.CalledProcessError):
-                return False
+                #pylint: disable=raise-missing-from
+                raise GscreenshotClipboardException(clipper_name)
 
     def get_last_save_directory(self) -> str:
         """Returns the path of the last save directory"""
