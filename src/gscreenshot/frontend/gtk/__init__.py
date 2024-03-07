@@ -14,7 +14,7 @@ import typing
 from time import sleep
 from pkg_resources import resource_string, resource_filename
 import pygtkcompat
-from gscreenshot import Gscreenshot
+from gscreenshot import Gscreenshot, GscreenshotClipboardException
 from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
 from gscreenshot.frontend.gtk.dialogs import FileSaveDialog, FileOpenDialog
 from gscreenshot.frontend.gtk.view import View
@@ -366,9 +366,11 @@ class Presenter(object):
         if not self._view.copy_to_clipboard(pixbuf):
             try:
                 self._app.copy_last_screenshot_to_clipboard()
-            except Exception as e:
+            except GscreenshotClipboardException as error:
                 warning_dialog = WarningDialog(
-                    i18n("Your clipboard doesn't support persistence and {0} isn't available.").format(e),
+                    i18n(
+                        "Your clipboard doesn't support persistence and {0} isn't available."
+                    ).format(error),
                     self._view.get_window())
                 self._view.run_dialog(warning_dialog)
                 return False

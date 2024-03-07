@@ -32,6 +32,10 @@ from gscreenshot.util import session_is_wayland
 _ = gettext.gettext
 
 
+class GscreenshotClipboardException(Exception):
+    pass
+
+
 class Gscreenshot(object):
     """
     Gscreenshot application
@@ -631,7 +635,7 @@ class Gscreenshot(object):
                     xclip.communicate(input=png_data.getvalue())
                     return True
             except (OSError, subprocess.CalledProcessError):
-                raise Exception(clipper_name)
+                raise GscreenshotClipboardException(clipper_name)
 
     def get_last_save_directory(self) -> str:
         """Returns the path of the last save directory"""
