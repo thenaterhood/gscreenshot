@@ -32,6 +32,7 @@ from gscreenshot.util import session_is_wayland
 _ = gettext.gettext
 
 
+#pylint: disable=missing-class-docstring
 class GscreenshotClipboardException(Exception):
     pass
 
@@ -635,6 +636,7 @@ class Gscreenshot(object):
                     xclip.communicate(input=png_data.getvalue())
                     return True
             except (OSError, subprocess.CalledProcessError):
+                #pylint: disable=raise-missing-from
                 raise GscreenshotClipboardException(clipper_name)
 
     def get_last_save_directory(self) -> str:
