@@ -257,6 +257,8 @@ class View(object):
         if show and GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._enable_and_show(self._cursor_selection_dropdown)
             self._enable_and_show(self._cursor_selection_label)
+            if self._cursor_selection_dropdown.get_active() < 0:
+                self._cursor_selection_dropdown.set_active(0)
         else:
             self._disable_and_hide(self._cursor_selection_dropdown)
             self._disable_and_hide(self._cursor_selection_label)

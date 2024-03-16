@@ -40,7 +40,9 @@ class GscreenshotTest(unittest.TestCase):
 
         self.assertEqual(self.fake_image, actual)
 
-    def test_screenshot_full_display_cursor(self):
+    @mock.patch('src.gscreenshot.session_is_wayland')
+    def test_screenshot_full_display_cursor(self, is_wayland):
+        is_wayland.return_value = False
         actual = self.gscreenshot.screenshot_full_display(capture_cursor=True)
 
         self.fake_screenshooter.grab_fullscreen_.assert_called_once_with(
@@ -76,7 +78,9 @@ class GscreenshotTest(unittest.TestCase):
 
         self.assertEqual(self.fake_image, actual)
 
-    def test_screenshot_selection_cursor(self):
+    @mock.patch('src.gscreenshot.session_is_wayland')
+    def test_screenshot_selection_cursor(self, is_wayland):
+        is_wayland.return_value = False
         actual = self.gscreenshot.screenshot_selected(capture_cursor=True)
 
         self.fake_screenshooter.grab_selection_.assert_called_once_with(
@@ -111,7 +115,9 @@ class GscreenshotTest(unittest.TestCase):
 
         self.assertEqual(self.fake_image, actual)
 
-    def test_screenshot_window_cursor(self):
+    @mock.patch('src.gscreenshot.session_is_wayland')
+    def test_screenshot_window_cursor(self, is_wayland):
+        is_wayland.return_value = False
         actual = self.gscreenshot.screenshot_window(capture_cursor=True)
 
         self.fake_screenshooter.grab_window_.assert_called_once_with(

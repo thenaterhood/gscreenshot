@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import typing
 import PIL.Image
+from gscreenshot.cursor_locator.factory import CursorLocatorFactory
 
 from gscreenshot.screenshot import Screenshot
 from gscreenshot.screenshot.effects.crop import CropEffect
@@ -15,11 +16,6 @@ from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.selector.factory import SelectorFactory
 from gscreenshot.util import session_is_wayland, GSCapabilities
-
-try:
-    from Xlib import display
-except ImportError:
-    display = None
 
 
 class Screenshooter(object):
@@ -93,9 +89,15 @@ class Screenshooter(object):
         # If we're running, this is the bare minimum
         capabilities[GSCapabilities.CAPTURE_FULLSCREEN] = self.__utilityname__
 
-        if display is not None and not session_is_wayland():
-            capabilities[GSCapabilities.ALTERNATE_CURSOR] = "python-xlib"
-            capabilities[GSCapabilities.CURSOR_CAPTURE] = "python-xlib"
+        try:
+            cursor_locator = CursorLocatorFactory().create()
+        # pylint: disable=bare-except
+        except:
+            cursor_locator = None
+
+        if cursor_locator is not None:
+            capabilities[GSCapabilities.ALTERNATE_CURSOR] = cursor_locator.__utilityname__
+            capabilities[GSCapabilities.CURSOR_CAPTURE] = cursor_locator.__utilityname__
 
         if self._selector is not None:
             capabilities.update(self._selector.get_capabilities())
@@ -112,11 +114,12 @@ class Screenshooter(object):
             self.grab_fullscreen(delay, capture_cursor)
         else:
             self.grab_fullscreen(delay, capture_cursor=False)
-            cursor_position = self.get_cursor_position()
-            if capture_cursor and use_cursor and self._screenshot and cursor_position:
-                stamp = StampEffect(use_cursor, cursor_position)
-                stamp.set_alias("cursor")
-                self._screenshot.add_effect(stamp)
+            if capture_cursor and use_cursor and self._screenshot:
+                cursor_position = self.get_cursor_position()
+                if cursor_position is not None:
+                    stamp = StampEffect(use_cursor, cursor_position)
+                    stamp.set_alias("cursor")
+                    self._screenshot.add_effect(stamp)
 
     def grab_fullscreen(self, delay: int=0, capture_cursor: bool=False):
         """
@@ -213,22 +216,15 @@ class Screenshooter(object):
         Gets the current position of the mouse cursor, if able.
         Returns (x, y) or None.
         """
-        if display is None:
-            return None
 
         try:
-            # This is a ctype
-            # pylint: disable=protected-access
-            mouse_data = display.Display().screen().root.query_pointer()._data
-            if 'root_x' not in mouse_data or 'root_y' not in mouse_data:
-                return None
+            cursor_locator = CursorLocatorFactory().create()
+            return cursor_locator.get_cursor_position()
         # pylint: disable=bare-except
         except:
             # We don't really care about the specific error here. If we can't
             # get the pointer, then just move on.
             return None
-
-        return (mouse_data["root_x"], mouse_data["root_y"])
 
     def _grab_selection_fallback(self, delay: int=0, capture_cursor: bool=False):
         """
