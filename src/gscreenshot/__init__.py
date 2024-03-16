@@ -143,6 +143,9 @@ class Gscreenshot(object):
                 )
             }
 
+        if session_is_wayland():
+            del available['theme']
+
         available.update(self._stamps)
         return available
 
