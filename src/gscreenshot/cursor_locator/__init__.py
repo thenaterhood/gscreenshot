@@ -13,6 +13,7 @@ class CursorLocator():
         """constructor"""
 
     def get_cursor_position(self) -> typing.Optional[typing.Tuple[int, int]]:
+        '''Return the cursor position as a tuple of (x, y)'''
         raise NotImplementedError()
 
     @staticmethod

@@ -16,10 +16,7 @@ class ScreenshotTest(unittest.TestCase):
         self.image = Mock()
         self.screenshot = Screenshot(self.image)
 
-    @mock.patch('src.gscreenshot.screenshooter.display')
-    def test_add_fake_cursor(self, mock_xlib):
-        mock_xlib.Display().screen().root.query_pointer()._data = {'root_x': 20, 'root_y': 40}
-
+    def test_add_fake_cursor(self):
         original_img = Image.open(
                 resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
             )
@@ -41,5 +38,5 @@ class ScreenshotTest(unittest.TestCase):
         )
         self.assertLess(
             len(set(ImageChops.difference(expected_img, self.screenshot.get_image()).getdata())),  # type: ignore
-            100,
+            2,
             "cursor was not stamped onto the test image correctly")

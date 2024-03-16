@@ -11,7 +11,6 @@ from gscreenshot.util import session_is_wayland
 
 class NoSupportedCursorLocatorError(Exception):
     """NoSupportedCursorLocatorError"""
-    pass
 
 
 class CursorLocatorFactory(object):
