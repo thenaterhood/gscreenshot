@@ -42,7 +42,7 @@ class Slurp(RegionSelector):
         """
         ret = self._get_boundary_interactive([
             'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
-            '-b', '#00000011', '-s', '#00000011'])
+            '-b', '#00000011', '-s', '#00000011', '-c', '#808080FF'])
         # Sleep so we hopefully don't catch the edge of slurp closing
         sleep(0.1)
         return ret
@@ -56,7 +56,7 @@ class Slurp(RegionSelector):
         """
         ret = self._get_boundary_interactive([
             'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
-            '-b', '#00000011', '-s', '#00000011'])
+            '-b', '#00000011', '-s', '#00000011', '-c', '#808080FF'])
         # Sleep so we hopefully don't catch the edge of slurp closing
         sleep(0.1)
         return ret
