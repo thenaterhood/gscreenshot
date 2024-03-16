@@ -304,11 +304,11 @@ class View(object):
 
             if selected is not None and selected in cursors:
                 self._cursor_selection_dropdown.set_active(
-                    selected_idx
+                    selected_idx-1
                 )
             elif cursor_name == "theme":
                 self._cursor_selection_dropdown.set_active(
-                    len(self._cursor_selection_items)-1
+                    0
                 )
 
     def run(self):
