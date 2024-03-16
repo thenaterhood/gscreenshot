@@ -150,7 +150,13 @@ class Gscreenshot(object):
         return available
 
     def get_cursor_by_name(self, name: typing.Optional[str]):
+        '''
+        Get the cursor glyph that goes by the given name. This is
+        safe to call with None or bad names and will return a default
+        value.
+        '''
         cursors = self.get_available_cursors()
+        #pylint: disable=consider-iterating-dictionary
         default = list(cursors.keys())[0]
 
         if name and name in cursors.keys():
