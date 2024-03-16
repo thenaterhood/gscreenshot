@@ -73,7 +73,7 @@ class XdgPortalScreenshot:
 
         request_token = f"gscreenshot_{token_hex}"
 
-        options = { 'handle_token': request_token }
+        options = { 'handle_token': request_token, 'interactive': False }
 
         self.bus.add_signal_receiver(
             self.callback,

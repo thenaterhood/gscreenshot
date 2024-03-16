@@ -119,8 +119,8 @@ msgid "Using {0} screenshot backend"
 msgstr "Usando la herramienta de captura de pantalla de {0}"
 
 #: src/gscreenshot/frontend/gtk.py:152
-msgid "Your clipboard doesn't support persistence and xclip isn't available."
-msgstr "Su portapapeles no admite la persistencia y xclip no está instalado."
+msgid "Your clipboard doesn't support persistence and {0} isn't available."
+msgstr "Su portapapeles no admite la persistencia y {0} no está instalado."
 
 #: src/gscreenshot/frontend/gtk.py:161
 msgid "Please install xdg-open to open files."
@@ -171,8 +171,8 @@ msgstr "No se tomó ninguna captura de pantalla"
 msgid "Failed to save screenshot!"
 msgstr "¡No se pudo guardar la captura de pantalla!"
 
-msgid "Could not clip image! Xclip failed to run."
-msgstr "No se pudo copiar la imagen. Xclip no se pudo ejecutar."
+msgid "Could not clip image! {0} failed to run."
+msgstr "No se pudo copiar la imagen. {0} no se pudo ejecutar."
 
 msgid "Your screenshot was saved to {0}"
 msgstr "Tu captura de pantalla se guardó en {0}"
