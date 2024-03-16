@@ -1,3 +1,6 @@
+'''
+Classes for capturing the cursor position using Gtk
+'''
 #pylint: disable=wrong-import-order
 #pylint: disable=wrong-import-position
 #pylint: disable=ungrouped-imports
@@ -41,7 +44,7 @@ class GtkCursorLocatorWindow(Gtk.Window):
     def __init__(self):
         '''constructor'''
         self.position = None
-        super(GtkCursorLocatorWindow, self).__init__()
+        super().__init__()
         self.set_title("gscreenshot")
         self.set_position(Gtk.WindowPosition.CENTER)
         self.fullscreen()

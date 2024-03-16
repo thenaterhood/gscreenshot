@@ -92,7 +92,7 @@ class Screenshooter(object):
         try:
             cursor_locator = CursorLocatorFactory().create()
         # pylint: disable=bare-except
-        except Exception as e:
+        except:
             cursor_locator = None
 
         if cursor_locator is not None:

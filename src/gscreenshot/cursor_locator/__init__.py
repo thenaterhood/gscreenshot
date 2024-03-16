@@ -11,7 +11,6 @@ class CursorLocator():
 
     def __init__(self):
         """constructor"""
-        pass
 
     def get_cursor_position(self) -> typing.Optional[typing.Tuple[int, int]]:
         raise NotImplementedError()

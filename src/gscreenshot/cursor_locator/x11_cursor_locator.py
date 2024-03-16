@@ -1,3 +1,6 @@
+"""
+Xlib cursor locator classes
+"""
 import typing
 try:
     from Xlib import display
@@ -33,7 +36,7 @@ class X11CursorLocator(CursorLocator):
             return None
 
         return (mouse_data["root_x"], mouse_data["root_y"])
-    
+
     @staticmethod
     def can_run() -> bool:
         '''can_run'''
