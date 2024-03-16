@@ -1,13 +1,14 @@
-from gscreenshot.cursor_locator import CursorLocator
 import typing
-
 try:
     from Xlib import display
 except ImportError:
     display = None
 
+from gscreenshot.cursor_locator import CursorLocator
+
 
 class X11CursorLocator(CursorLocator):
+    '''Xlib-based cursor locator'''
 
     __utilityname__: str = "python-xlib"
 
@@ -35,4 +36,5 @@ class X11CursorLocator(CursorLocator):
     
     @staticmethod
     def can_run() -> bool:
+        '''can_run'''
         return display is not None

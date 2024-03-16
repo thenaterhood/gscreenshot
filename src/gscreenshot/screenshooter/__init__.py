@@ -93,7 +93,6 @@ class Screenshooter(object):
             cursor_locator = CursorLocatorFactory().create()
         # pylint: disable=bare-except
         except Exception as e:
-            print(e)
             cursor_locator = None
 
         if cursor_locator is not None:
@@ -116,7 +115,8 @@ class Screenshooter(object):
         else:
             self.grab_fullscreen(delay, capture_cursor=False)
             if capture_cursor and use_cursor and self._screenshot:
-                if cursor_position := self.get_cursor_position():
+                cursor_position = self.get_cursor_position()
+                if cursor_position is not None:
                     stamp = StampEffect(use_cursor, cursor_position)
                     stamp.set_alias("cursor")
                     self._screenshot.add_effect(stamp)

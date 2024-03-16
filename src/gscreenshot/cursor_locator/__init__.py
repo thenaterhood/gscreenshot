@@ -1,7 +1,11 @@
+'''
+Interface class for integrating cursor locators
+'''
 import typing
 
 
 class CursorLocator():
+    '''Parent class for cursor locator strategies'''
 
     __utilityname__: str = "default"
 
