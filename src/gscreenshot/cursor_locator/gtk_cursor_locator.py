@@ -48,7 +48,7 @@ class GtkCursorLocatorWindow(Gtk.Window):
         self.set_title("gscreenshot")
         self.set_position(Gtk.WindowPosition.CENTER)
         self.fullscreen()
-        self.set_opacity(.25)
+        self.set_opacity(.65)
         self.screen = self.get_screen()
 
         box: Gtk.Grid = Gtk.Grid(
@@ -69,6 +69,7 @@ class GtkCursorLocatorWindow(Gtk.Window):
         box.attach(help_subtext, 0, 1, 1, 1)
         self.add(box)
         self.connect("button_press_event", self.on_button_press)
+        self.connect("key-press-event", self.on_keypress)
 
         self.set_events(Gdk.POINTER_MOTION_MASK
                         | Gdk.BUTTON_PRESS_MASK)
@@ -76,5 +77,10 @@ class GtkCursorLocatorWindow(Gtk.Window):
     def on_button_press(self, _widget, event):
         '''handle button press'''
         self.position = (int(event.x), int(event.y))
+        self.destroy()
+        Gtk.main_quit()
+
+    def on_keypress(self, _widget, event):
+        '''handle keypress'''
         self.destroy()
         Gtk.main_quit()
