@@ -80,7 +80,7 @@ class GtkCursorLocatorWindow(Gtk.Window):
         self.destroy()
         Gtk.main_quit()
 
-    def on_keypress(self, _widget, event):
+    def on_keypress(self, _widget, _event):
         '''handle keypress'''
         self.destroy()
         Gtk.main_quit()
