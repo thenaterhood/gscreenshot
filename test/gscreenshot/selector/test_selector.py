@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import Mock
 import mock
 
-from pkg_resources import resource_filename
 from PIL import Image
 from PIL import ImageChops
 from gscreenshot.selector import SelectionCancelled, SelectionParseError
