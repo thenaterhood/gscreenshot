@@ -1,8 +1,8 @@
+from importlib.resources import as_file, files
 import unittest
 from unittest.mock import Mock
 from PIL import Image
 import mock
-from pkg_resources import resource_filename
 
 from src.gscreenshot.frontend.gtk import Presenter
 
@@ -12,9 +12,11 @@ class GtkPresenterTest(unittest.TestCase):
     def setUp(self):
         self.app = Mock()
         self.app.get_available_cursors.return_value = {}
-        self.app.get_thumbnail.return_value = Image.open(
-                resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
-            )
+        pixmaps_path = "gscreenshot.resources.pixmaps"
+        with as_file(files(pixmaps_path).joinpath('gscreenshot.png')) as png_path:
+            self.app.get_thumbnail.return_value = Image.open(
+                    png_path
+                )
         self.screenshot_collection = Mock()
         self.app.get_screenshot_collection.return_value = self.screenshot_collection
         self.view = Mock()
