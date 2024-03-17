@@ -53,7 +53,7 @@ class Screenshot(object):
             if effect.enabled:
                 image = effect.apply_to(image)
 
-        return image
+        return image.convert("RGB")
 
     def get_preview(self, width: int, height: int, with_border=False) -> Image.Image:
         '''
