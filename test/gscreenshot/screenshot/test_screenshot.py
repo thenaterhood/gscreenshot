@@ -27,7 +27,7 @@ class ScreenshotTest(unittest.TestCase):
                     )
                 )
 
-        expected_img = Image.open("../test/gscreenshot/screenshot/cursor_overlay_expected.png")
+        expected_img = Image.open("../test/gscreenshot/screenshot/cursor_overlay_expected.png").convert("RGB")
 
         self.screenshot = Screenshot(original_img)
 
