@@ -235,16 +235,19 @@ At this point, you can install gscreenshot itself by running
 * PIL/python-pillow + slop + python-xlib
 * Scrot only (any version) (cursor capture will not work in some scenarios, region selection may be glitchy due to scrot issues)
 
+Feel free to mix and match, though some combinations may work better than others.
+As of gscreenshot 3.5.0 python-xlib is _optional_ for full cursor capture functionality but will require an extra click.
+
 ## For full functionality on Wayland, the recommended packages are:
 
-* grim (for screenshots)
+* xdg-desktop-portal for your environment (for screenshots)
 * slurp (for region selection)
 * xdg-open (for opening screenshots in your image viewer)
 * wl-clipboard (for copy to clipboard)
 
 ## For alternate Wayland configurations, choose from one of the following combinations:
 
-* xdg-desktop-portal + slurp + python-dbus
+* grim + slurp + python-dbus
 
 You can install X11 and Wayland package configurations in parallel - gscreenshot will detect if your
 session is Wayland or X11.
