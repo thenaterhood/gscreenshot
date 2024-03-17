@@ -143,8 +143,26 @@ class Gscreenshot(object):
                 )
             }
 
+        if session_is_wayland():
+            del available['theme']
+
         available.update(self._stamps)
         return available
+
+    def get_cursor_by_name(self, name: typing.Optional[str]):
+        '''
+        Get the cursor glyph that goes by the given name. This is
+        safe to call with None or bad names and will return a default
+        value.
+        '''
+        cursors = self.get_available_cursors()
+        #pylint: disable=consider-iterating-dictionary
+        default = list(cursors.keys())[0]
+
+        if name and name in cursors.keys():
+            return cursors[name]
+
+        return cursors[default]
 
     def show_screenshot_notification(self) -> bool:
         '''
@@ -209,7 +227,8 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_full_display(self, delay: int=0, capture_cursor: bool=False,
-                                cursor_name: str='theme', overwrite: bool=False, count: int=1
+                                cursor_name: typing.Optional[str]=None,
+                                overwrite: bool=False, count: int=1
                                 ) -> typing.Optional[Image.Image]:
         """
         Takes a screenshot of the full display with a
@@ -224,7 +243,7 @@ class Gscreenshot(object):
         if not capture_cursor:
             use_cursor = None
         else:
-            use_cursor = self.get_available_cursors()[cursor_name]
+            use_cursor = self.get_cursor_by_name(cursor_name)
 
         for _ in range(0, count):
             self.screenshooter.grab_fullscreen_(
@@ -245,7 +264,8 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
-                            cursor_name: str='theme', overwrite: bool=False, count: int=1,
+                            cursor_name: typing.Optional[str]=None,
+                            overwrite: bool=False, count: int=1,
                             region: typing.Optional[typing.Tuple[int, int, int, int]]=None
                             ) -> typing.Optional[Image.Image]:
         """
@@ -261,7 +281,7 @@ class Gscreenshot(object):
         if not capture_cursor:
             use_cursor = None
         else:
-            use_cursor = self.get_available_cursors()[cursor_name]
+            use_cursor = self.get_cursor_by_name(cursor_name)
 
         for _ in range(0, count):
             self.screenshooter.grab_selection_(
@@ -283,7 +303,8 @@ class Gscreenshot(object):
 
     #pylint: disable=too-many-arguments
     def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
-                          cursor_name: str='theme', overwrite: bool=False, count: int=1
+                          cursor_name: typing.Optional[str]=None,
+                          overwrite: bool=False, count: int=1
                           ) -> typing.Optional[Image.Image]:
         """
         Interactively takes a screenshot of a selected window
@@ -298,7 +319,7 @@ class Gscreenshot(object):
         if not capture_cursor:
             use_cursor = None
         else:
-            use_cursor = self.get_available_cursors()[cursor_name]
+            use_cursor = self.get_cursor_by_name(cursor_name)
 
         for _ in range(0, count):
             self.screenshooter.grab_window_(

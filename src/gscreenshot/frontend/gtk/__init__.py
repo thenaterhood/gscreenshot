@@ -54,18 +54,19 @@ class Presenter(object):
         self._hide = True
         self._capture_cursor = False
         self._show_preview()
-        self._view.show_cursor_options(self._capture_cursor)
         self._keymappings = {}
         self._overwrite_mode = True
 
         cursors = self._app.get_available_cursors()
         cursors[i18n("custom")] = None
 
-        self._cursor_selection = 'theme'
+        self._cursor_selection = list(cursors.keys())[0]
 
         self._view.update_available_cursors(
                 cursors
                 )
+
+        self._view.show_cursor_options(self._capture_cursor)
 
     def _begin_take_screenshot(self, app_method, **args):
         app_method(delay=self._delay,

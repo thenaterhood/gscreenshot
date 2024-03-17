@@ -257,6 +257,8 @@ class View(object):
         if show and GSCapabilities.ALTERNATE_CURSOR in self._capabilities:
             self._enable_and_show(self._cursor_selection_dropdown)
             self._enable_and_show(self._cursor_selection_label)
+            if self._cursor_selection_dropdown.get_active() < 0:
+                self._cursor_selection_dropdown.set_active(0)
         else:
             self._disable_and_hide(self._cursor_selection_dropdown)
             self._disable_and_hide(self._cursor_selection_label)
@@ -302,11 +304,11 @@ class View(object):
 
             if selected is not None and selected in cursors:
                 self._cursor_selection_dropdown.set_active(
-                    selected_idx
+                    selected_idx-1
                 )
             elif cursor_name == "theme":
                 self._cursor_selection_dropdown.set_active(
-                    len(self._cursor_selection_items)-1
+                    0
                 )
 
     def run(self):
