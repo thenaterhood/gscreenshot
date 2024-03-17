@@ -7,11 +7,11 @@ View class for the GTK frontend
 '''
 
 import gettext
+from importlib.resources import as_file, files
 import io
 import threading
 from time import sleep
 import typing
-from pkg_resources import resource_filename
 import pygtkcompat
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.util import GSCapabilities
@@ -184,9 +184,13 @@ class View(object):
 
         self._window.connect("check-resize", presenter.on_window_resize)
         self._window.connect("window-state-event", presenter.window_state_event_handler)
-        self._window.set_icon_from_file(
-            resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
-        )
+
+        with as_file(
+                files('gscreenshot.resources.pixmaps').joinpath('gscreenshot.png')
+            ) as png:
+            self._window.set_icon_from_file(
+                str(png)
+            )
 
         if self._prev_btn is not None:
             self._prev_btn.connect('clicked', presenter.on_preview_prev_clicked)

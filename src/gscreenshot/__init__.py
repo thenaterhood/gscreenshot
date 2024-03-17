@@ -21,8 +21,9 @@ import subprocess
 import tempfile
 import typing
 
+from importlib.resources import as_file, files
+from importlib.metadata import version
 from datetime import datetime
-from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter
@@ -57,7 +58,10 @@ class Gscreenshot(object):
         constructor
         """
         try:
-            locale_path = resource_filename('gscreenshot.resources', 'locale')
+            with as_file(
+                    files('gscreenshot.resources').joinpath('locale')
+                ) as filename:
+                locale_path = filename
             locale.setlocale(locale.LC_ALL, '')
             # I don't know what's going on with this. This call appears to exist,
             # works fine, and seems required for glade localization to work.
@@ -124,24 +128,25 @@ class Gscreenshot(object):
         Get the alternate pointer pixmaps gscreenshot can use
         Returns {name: PIL.Image}
         '''
-        available = {
-                'theme': None,
-                'adwaita': Image.open(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
+        pixmaps_path = "gscreenshot.resources.pixmaps"
+
+        with \
+            as_file(files(pixmaps_path).joinpath('cursor-adwaita.png')) as adwaita_path,\
+            as_file(files(pixmaps_path).joinpath('cursor-prohibit.png')) as prohibit_path,\
+            as_file(files(pixmaps_path).joinpath('cursor-allow.png')) as allow_path:
+
+            available = {
+                    'theme': None,
+                    'adwaita': Image.open(
+                        adwaita_path
+                    ),
+                    'prohibit': Image.open(
+                        prohibit_path
+                    ),
+                    'allow': Image.open(
+                        allow_path
                     )
-                ),
-                'prohibit': Image.open(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'cursor-prohibit.png'
-                    )
-                ),
-                'allow': Image.open(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'cursor-allow.png'
-                    )
-                )
-            }
+                }
 
         if session_is_wayland():
             del available['theme']
@@ -681,9 +686,9 @@ class Gscreenshot(object):
 
     def get_app_icon(self) -> Image.Image:
         """Returns the application icon"""
-        return Image.open(
-                resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
-                )
+        pixmaps_path = 'gscreenshot.resources.pixmaps'
+        with as_file(files(pixmaps_path).joinpath('gscreenshot.png')) as filename:
+            return Image.open(filename)
 
     def get_program_description(self) -> str:
         """Returns the program description"""
@@ -699,7 +704,7 @@ class Gscreenshot(object):
 
     def get_program_license_text(self) -> str:
         """Returns the license text"""
-        return resource_string('gscreenshot.resources', 'LICENSE').decode('UTF-8')
+        return files('gscreenshot.resources').joinpath('LICENSE').read_text(encoding='UTF-8')
 
     def get_program_license(self) -> str:
         """Returns the license name"""
@@ -708,10 +713,10 @@ class Gscreenshot(object):
     def get_program_version(self, padded: bool=False) -> str:
         """Returns the program version"""
         if not padded:
-            return require("gscreenshot")[0].version
+            return version("gscreenshot")
         else:
-            version = require("gscreenshot")[0].version.split(".")
-            padded_version = [v.rjust(2, "0") for v in version]
+            version_str = version("gscreenshot").split(".")
+            padded_version = [v.rjust(2, "0") for v in version_str]
             return ".".join(padded_version)
 
     def __repr__(self) -> str:

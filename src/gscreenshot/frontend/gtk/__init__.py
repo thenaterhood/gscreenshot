@@ -7,12 +7,12 @@
 Classes for the GTK gscreenshot frontend
 '''
 import gettext
+from importlib.resources import as_file, files
 import io
 import sys
 import threading
 import typing
 from time import sleep
-from pkg_resources import resource_string, resource_filename
 import pygtkcompat
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
 from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
@@ -457,13 +457,14 @@ class Presenter(object):
         version = self._app.get_program_version()
         about.set_version(version)
 
-        about.set_logo(
-                Gtk.gdk.pixbuf_new_from_file(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
-                        )
+        with as_file(
+                files('gscreenshot.resources.pixmaps').joinpath('gscreenshot.png')
+            ) as png_filename:
+            about.set_logo(
+                    Gtk.gdk.pixbuf_new_from_file(
+                        str(png_filename)
                     )
-                )
+            )
 
         self._view.run_dialog(about)
 
@@ -534,8 +535,11 @@ def main():
 
     builder = Gtk.Builder()
     builder.set_translation_domain('gscreenshot')
-    builder.add_from_string(resource_string(
-        'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
+
+    builder.add_from_string(
+        files(
+            'gscreenshot.resources.gui.glade'
+        ).joinpath('main.glade').read_text(encoding='UTF-8'))
 
     window = builder.get_object('window_main')
 
