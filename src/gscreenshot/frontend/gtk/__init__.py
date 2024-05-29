@@ -489,13 +489,20 @@ class Presenter(object):
         self._app.quit()
 
     def _image_to_pixbuf(self, image):
-        descriptor = io.BytesIO()
-        image = image.convert("RGB")
-        image.save(descriptor, "ppm")
-        contents = descriptor.getvalue()
-        descriptor.close()
-        loader = Gtk.gdk.PixbufLoader("pnm")
-        loader.write(contents)
+        for img_format in [("pnm", "ppm"), ("png", "png"), ("jpeg", "jpeg")]:
+            try:
+                loader = Gtk.gdk.PixbufLoader(img_format[0])
+                descriptor = io.BytesIO()
+                image = image.convert("RGB")
+                image.save(descriptor, img_format[1])
+                contents = descriptor.getvalue()
+                descriptor.close()
+
+                loader.write(contents)
+            except GLib.GError:
+                loader.close()
+                continue
+
         pixbuf = loader.get_pixbuf()
         try:
             loader.close()
