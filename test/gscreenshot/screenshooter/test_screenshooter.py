@@ -68,9 +68,9 @@ class ScreenshooterTest(unittest.TestCase):
         self.screenshooter.grab_window_()
         self.assertIsNotNone(self.screenshooter.image)
 
-    @mock.patch('src.gscreenshot.screenshooter.subprocess.check_output')
-    @mock.patch('src.gscreenshot.screenshooter.PIL')
-    @mock.patch('src.gscreenshot.screenshooter.os')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.subprocess.check_output')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.PIL')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.os')
     def test_call_screenshooter_success(self, mock_os, mock_pil, mock_subprocess):
         success = self.screenshooter._call_screenshooter('potato', ['pancake'])
         mock_subprocess.assert_called_once_with(
@@ -78,9 +78,9 @@ class ScreenshooterTest(unittest.TestCase):
         )
         self.assertTrue(success)
 
-    @mock.patch('src.gscreenshot.screenshooter.subprocess.check_output')
-    @mock.patch('src.gscreenshot.screenshooter.PIL')
-    @mock.patch('src.gscreenshot.screenshooter.os')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.subprocess.check_output')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.PIL')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.os')
     def test_call_screenshooter_subprocess_no_params(self, mock_os, mock_pil, mock_subprocess):
         mock_subprocess.side_effect = OSError()
         success = self.screenshooter._call_screenshooter('potato')
@@ -89,9 +89,9 @@ class ScreenshooterTest(unittest.TestCase):
         )
         self.assertFalse(success)
 
-    @mock.patch('src.gscreenshot.screenshooter.subprocess.check_output')
-    @mock.patch('src.gscreenshot.screenshooter.PIL')
-    @mock.patch('src.gscreenshot.screenshooter.os')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.subprocess.check_output')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.PIL')
+    @mock.patch('src.gscreenshot.screenshooter.screenshooter.os')
     def test_call_screenshooter_subprocess_error(self, mock_os, mock_pil, mock_subprocess):
         mock_subprocess.side_effect = OSError()
         success = self.screenshooter._call_screenshooter('potato', ['pancake'])
