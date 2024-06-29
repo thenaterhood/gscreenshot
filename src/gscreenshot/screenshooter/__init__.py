@@ -11,11 +11,10 @@ from gscreenshot.cursor_locator.factory import CursorLocatorFactory
 from gscreenshot.screenshot import Screenshot
 from gscreenshot.screenshot.effects import CropEffect
 from gscreenshot.screenshot.effects import StampEffect
-from gscreenshot.selector import RegionSelector
-from gscreenshot.selector import SelectionExecError, SelectionParseError
-from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
-from gscreenshot.selector.factory import SelectorFactory
-from gscreenshot.util import session_is_wayland, GSCapabilities
+from gscreenshot.selector import RegionSelector, SelectorFactory
+from gscreenshot.selector.exceptions import SelectionExecError, SelectionParseError
+from gscreenshot.selector.exceptions import SelectionCancelled, NoSupportedSelectorError
+from gscreenshot.util import GSCapabilities
 
 
 class Screenshooter(object):

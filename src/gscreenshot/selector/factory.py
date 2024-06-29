@@ -5,9 +5,9 @@ Selector factory module
 import typing
 from gscreenshot.selector.slop import Slop
 from gscreenshot.selector.slurp import Slurp
-from gscreenshot.selector import NoSupportedSelectorError
-from gscreenshot.selector import RegionSelector
 from gscreenshot.util import session_is_wayland
+from .exceptions import NoSupportedSelectorError
+from .region_selector import RegionSelector
 
 
 class SelectorFactory(object):

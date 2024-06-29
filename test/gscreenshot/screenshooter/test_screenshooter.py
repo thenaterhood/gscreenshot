@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import Mock
 import mock
 
-from gscreenshot.selector import SelectionCancelled, SelectionParseError
+from gscreenshot.selector.exceptions import SelectionCancelled, SelectionParseError
 from src.gscreenshot.screenshooter import Screenshooter
 
 

@@ -3,8 +3,8 @@ Wrapper for the slurp screen selector utility
 '''
 from time import sleep
 import typing
-from gscreenshot.selector import RegionSelector
 from gscreenshot.util import find_executable, GSCapabilities
+from .region_selector import RegionSelector
 
 
 class Slurp(RegionSelector):
