@@ -486,6 +486,7 @@ class Presenter(object):
         self._app.quit()
 
     def _image_to_pixbuf(self, image):
+        pixbuf = None
         for img_format in [("pnm", "ppm"), ("png", "png"), ("jpeg", "jpeg")]:
             try:
                 loader = Gtk.gdk.PixbufLoader(img_format[0])
@@ -496,15 +497,15 @@ class Presenter(object):
                 descriptor.close()
 
                 loader.write(contents)
+                pixbuf = loader.get_pixbuf()
             except GLib.GError:
-                loader.close()
                 continue
+            finally:
+                try:
+                    loader.close()
+                except GLib.GError:
+                    pass
 
-        pixbuf = loader.get_pixbuf()
-        try:
-            loader.close()
-        except GLib.GError:
-            pass
         return pixbuf
 
     def _show_preview(self):
@@ -512,7 +513,8 @@ class Presenter(object):
 
         preview_img = self._app.get_thumbnail(width, height, with_border=True)
 
-        self._view.update_preview(self._image_to_pixbuf(preview_img))
+        pixbuf = self._image_to_pixbuf(preview_img)
+        self._view.update_preview(pixbuf)
 
 
 def main():
