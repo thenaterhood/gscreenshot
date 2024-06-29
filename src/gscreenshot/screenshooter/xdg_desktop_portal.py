@@ -31,7 +31,9 @@ try:
 except ImportError:
     DBusGMainLoop = None
 
-from gscreenshot.screenshooter import Screenshooter
+# This MUST be an absolute import path or we either get a circular import
+# or the script doesn't work
+from gscreenshot.screenshooter.screenshooter import Screenshooter
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 
 

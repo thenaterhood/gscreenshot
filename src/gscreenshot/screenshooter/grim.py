@@ -6,7 +6,7 @@ import subprocess
 import typing
 
 from gscreenshot.util import find_executable, GSCapabilities
-from gscreenshot.screenshooter import Screenshooter
+from .screenshooter import Screenshooter
 
 
 class Grim(Screenshooter):

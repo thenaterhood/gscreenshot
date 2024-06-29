@@ -2,8 +2,8 @@
 Wrapper for the slop screen selector utility
 '''
 import typing
-from gscreenshot.selector import RegionSelector
 from gscreenshot.util import find_executable
+from .region_selector import RegionSelector
 
 
 class Slop(RegionSelector):
