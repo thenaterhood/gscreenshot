@@ -11,7 +11,7 @@ from gscreenshot.util import GSCapabilities
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
-#pylint: disable=wrong-import-position
+#pylint: disable=wrong-import-position,wrong-import-order
 from gi.repository import Gtk
 
 from .region_selector import RegionSelector
@@ -108,10 +108,10 @@ class SelectionTool(Gtk.Window):
 
         self.show_all()
 
-    def area_draw(self, _widget, cr):
+    def area_draw(self, _widget, canvas):
         """draws the transparent area of the window"""
-        cr.set_source_rgba(0, 0, 0, .3)
-        cr.paint()
+        canvas.set_source_rgba(0, 0, 0, .3)
+        canvas.paint()
 
     def get_region(self, _widget):
         """gets the region"""
