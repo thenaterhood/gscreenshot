@@ -30,8 +30,15 @@ class Slop(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive(
-            ['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'])
+        return self._get_boundary_interactive([
+                'slop',
+                '--nodecorations=0',
+                '-l',
+                '-c',
+                '0.8,0.8,0.8,0.6',
+                '-f',
+                'X=%x,Y=%y,W=%w,H=%h'
+            ])
 
     def window_select(self) -> typing.Tuple[int, int, int, int]:
         """
@@ -40,8 +47,15 @@ class Slop(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive(
-            ['slop', '--nodecorations=0', '-f', 'X=%x,Y=%y,W=%w,H=%h'])
+        return self._get_boundary_interactive([
+                'slop',
+                '--nodecorations=0',
+                '-l',
+                '-c',
+                '0.8,0.8,0.8,0.6',
+                '-f',
+                'X=%x,Y=%y,W=%w,H=%h'
+            ])
 
     @staticmethod
     def can_run() -> bool:

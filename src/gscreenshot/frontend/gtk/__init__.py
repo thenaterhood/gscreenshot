@@ -12,9 +12,9 @@ import sys
 import threading
 import typing
 from time import sleep
-from pkg_resources import resource_string, resource_filename
 import pygtkcompat
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
+from gscreenshot.compat import get_resource_file, get_resource_string
 from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
 from gscreenshot.frontend.gtk.dialogs import FileSaveDialog, FileOpenDialog
 from gscreenshot.frontend.gtk.view import View
@@ -457,13 +457,10 @@ class Presenter(object):
         version = self._app.get_program_version()
         about.set_version(version)
 
+        png_filename = get_resource_file("gscreenshot.resources.pixmaps", "gscreenshot.png")
         about.set_logo(
-                Gtk.gdk.pixbuf_new_from_file(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
-                        )
-                    )
-                )
+            Gtk.gdk.pixbuf_new_from_file(str(png_filename))
+        )
 
         self._view.run_dialog(about)
 
@@ -489,18 +486,26 @@ class Presenter(object):
         self._app.quit()
 
     def _image_to_pixbuf(self, image):
-        descriptor = io.BytesIO()
-        image = image.convert("RGB")
-        image.save(descriptor, "ppm")
-        contents = descriptor.getvalue()
-        descriptor.close()
-        loader = Gtk.gdk.PixbufLoader("pnm")
-        loader.write(contents)
-        pixbuf = loader.get_pixbuf()
-        try:
-            loader.close()
-        except GLib.GError:
-            pass
+        pixbuf = None
+        for img_format in [("pnm", "ppm"), ("png", "png"), ("jpeg", "jpeg")]:
+            try:
+                loader = Gtk.gdk.PixbufLoader(img_format[0])
+                descriptor = io.BytesIO()
+                image = image.convert("RGB")
+                image.save(descriptor, img_format[1])
+                contents = descriptor.getvalue()
+                descriptor.close()
+
+                loader.write(contents)
+                pixbuf = loader.get_pixbuf()
+            except GLib.GError:
+                continue
+            finally:
+                try:
+                    loader.close()
+                except GLib.GError:
+                    pass
+
         return pixbuf
 
     def _show_preview(self):
@@ -508,7 +513,8 @@ class Presenter(object):
 
         preview_img = self._app.get_thumbnail(width, height, with_border=True)
 
-        self._view.update_preview(self._image_to_pixbuf(preview_img))
+        pixbuf = self._image_to_pixbuf(preview_img)
+        self._view.update_preview(pixbuf)
 
 
 def main():
@@ -534,9 +540,12 @@ def main():
 
     builder = Gtk.Builder()
     builder.set_translation_domain('gscreenshot')
-    builder.add_from_string(resource_string(
-        'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
 
+    builder.add_from_string(
+        get_resource_string(
+            "gscreenshot.resources.gui.glade", "main.glade"
+        )
+    )
     window = builder.get_object('window_main')
 
     capabilities = application.get_capabilities()
