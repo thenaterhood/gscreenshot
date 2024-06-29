@@ -6,6 +6,8 @@ Super jank homebrew selector using a transparent X window
 import typing
 from time import sleep
 import pygtkcompat
+
+from gscreenshot.util import GSCapabilities
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
@@ -29,6 +31,15 @@ class GscreenshotXSelect(RegionSelector):
         constructor
         """
         RegionSelector.__init__(self)
+
+    def get_capabilities(self) -> typing.Dict[str, str]:
+        """
+        Get the features this selector supports
+        """
+        return {
+            GSCapabilities.REGION_SELECTION: self.__utilityname__,
+            GSCapabilities.REUSE_REGION: self.__utilityname__
+        }
 
     def region_select(self) -> typing.Tuple[int, int, int, int]:
         """
