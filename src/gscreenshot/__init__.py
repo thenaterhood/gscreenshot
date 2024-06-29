@@ -22,8 +22,8 @@ import tempfile
 import typing
 
 from datetime import datetime
-from pkg_resources import resource_string, require, resource_filename
 from PIL import Image
+from gscreenshot.compat import get_resource_file, get_resource_string, get_version
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshooter.factory import ScreenshooterFactory
@@ -57,7 +57,7 @@ class Gscreenshot(object):
         constructor
         """
         try:
-            locale_path = resource_filename('gscreenshot.resources', 'locale')
+            locale_path = get_resource_file("gscreenshot.resources", "locale")
             locale.setlocale(locale.LC_ALL, '')
             # I don't know what's going on with this. This call appears to exist,
             # works fine, and seems required for glade localization to work.
@@ -124,24 +124,24 @@ class Gscreenshot(object):
         Get the alternate pointer pixmaps gscreenshot can use
         Returns {name: PIL.Image}
         '''
+        pixmaps_path = "gscreenshot.resources.pixmaps"
+
+        adwaita_path = get_resource_file(pixmaps_path, "cursor-adwaita.png")
+        prohibit_path = get_resource_file(pixmaps_path, "cursor-prohibit.png")
+        allow_path = get_resource_file(pixmaps_path, "cursor-allow.png")
+
         available = {
-                'theme': None,
-                'adwaita': Image.open(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'cursor-adwaita.png'
-                    )
-                ),
-                'prohibit': Image.open(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'cursor-prohibit.png'
-                    )
-                ),
-                'allow': Image.open(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'cursor-allow.png'
-                    )
-                )
-            }
+            'theme': None,
+            'adwaita': Image.open(
+                adwaita_path
+            ),
+            'prohibit': Image.open(
+                prohibit_path
+            ),
+            'allow': Image.open(
+                allow_path
+            )
+        }
 
         if session_is_wayland():
             del available['theme']
@@ -681,9 +681,9 @@ class Gscreenshot(object):
 
     def get_app_icon(self) -> Image.Image:
         """Returns the application icon"""
-        return Image.open(
-                resource_filename('gscreenshot.resources.pixmaps', 'gscreenshot.png')
-                )
+        pixmaps_path = 'gscreenshot.resources.pixmaps'
+        filename = get_resource_file(pixmaps_path, "gscreenshot.png")
+        return Image.open(filename)
 
     def get_program_description(self) -> str:
         """Returns the program description"""
@@ -699,7 +699,7 @@ class Gscreenshot(object):
 
     def get_program_license_text(self) -> str:
         """Returns the license text"""
-        return resource_string('gscreenshot.resources', 'LICENSE').decode('UTF-8')
+        return get_resource_string("gscreenshot.resources", "LICENSE")
 
     def get_program_license(self) -> str:
         """Returns the license name"""
@@ -708,10 +708,10 @@ class Gscreenshot(object):
     def get_program_version(self, padded: bool=False) -> str:
         """Returns the program version"""
         if not padded:
-            return require("gscreenshot")[0].version
+            return get_version()
         else:
-            version = require("gscreenshot")[0].version.split(".")
-            padded_version = [v.rjust(2, "0") for v in version]
+            version_str = get_version().split(".")
+            padded_version = [v.rjust(2, "0") for v in version_str]
             return ".".join(padded_version)
 
     def __repr__(self) -> str:

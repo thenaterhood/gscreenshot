@@ -12,9 +12,9 @@ import sys
 import threading
 import typing
 from time import sleep
-from pkg_resources import resource_string, resource_filename
 import pygtkcompat
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
+from gscreenshot.compat import get_resource_file, get_resource_string
 from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
 from gscreenshot.frontend.gtk.dialogs import FileSaveDialog, FileOpenDialog
 from gscreenshot.frontend.gtk.view import View
@@ -457,13 +457,10 @@ class Presenter(object):
         version = self._app.get_program_version()
         about.set_version(version)
 
+        png_filename = get_resource_file("gscreenshot.resources.pixmaps", "gscreenshot.png")
         about.set_logo(
-                Gtk.gdk.pixbuf_new_from_file(
-                    resource_filename(
-                        'gscreenshot.resources.pixmaps', 'gscreenshot.png'
-                        )
-                    )
-                )
+            Gtk.gdk.pixbuf_new_from_file(str(png_filename))
+        )
 
         self._view.run_dialog(about)
 
@@ -541,9 +538,12 @@ def main():
 
     builder = Gtk.Builder()
     builder.set_translation_domain('gscreenshot')
-    builder.add_from_string(resource_string(
-        'gscreenshot.resources.gui.glade', 'main.glade').decode('UTF-8'))
 
+    builder.add_from_string(
+        get_resource_string(
+            "gscreenshot.resources.gui.glade", "main.glade"
+        )
+    )
     window = builder.get_object('window_main')
 
     capabilities = application.get_capabilities()
