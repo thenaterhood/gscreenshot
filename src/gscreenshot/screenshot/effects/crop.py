@@ -3,7 +3,7 @@ Crop effect
 '''
 
 from PIL import Image
-from gscreenshot.screenshot.effects import ScreenshotEffect
+from .screenshot_effect import ScreenshotEffect
 
 
 class CropEffect(ScreenshotEffect):

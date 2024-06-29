@@ -3,7 +3,7 @@ Stamp effect
 '''
 import typing
 from PIL import Image
-from gscreenshot.screenshot.effects import ScreenshotEffect
+from .screenshot_effect import ScreenshotEffect
 
 
 class StampEffect(ScreenshotEffect):
