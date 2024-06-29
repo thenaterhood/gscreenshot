@@ -2,7 +2,7 @@
 Screenshot container classes for gscreenshot
 '''
 import typing
-from . import Screenshot
+from .screenshot import Screenshot
 
 
 class ScreenshotCollection(object):
