@@ -19,7 +19,7 @@ from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
 from gscreenshot.frontend.gtk.dialogs import FileSaveDialog, FileOpenDialog
 from gscreenshot.frontend.gtk.view import View
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
-from gscreenshot.screenshot.effects.crop import CropEffect
+from gscreenshot.screenshot.effects import CropEffect
 
 pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')

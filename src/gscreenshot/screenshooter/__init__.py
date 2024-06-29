@@ -9,8 +9,8 @@ import PIL.Image
 from gscreenshot.cursor_locator.factory import CursorLocatorFactory
 
 from gscreenshot.screenshot import Screenshot
-from gscreenshot.screenshot.effects.crop import CropEffect
-from gscreenshot.screenshot.effects.stamp import StampEffect
+from gscreenshot.screenshot.effects import CropEffect
+from gscreenshot.screenshot.effects import StampEffect
 from gscreenshot.selector import RegionSelector
 from gscreenshot.selector import SelectionExecError, SelectionParseError
 from gscreenshot.selector import SelectionCancelled, NoSupportedSelectorError
