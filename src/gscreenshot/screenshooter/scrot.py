@@ -4,8 +4,8 @@ Integration for the Scrot screenshot utility
 import subprocess
 import typing
 
-from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import GSCapabilities
+from .screenshooter import Screenshooter
 
 
 class Scrot(Screenshooter):

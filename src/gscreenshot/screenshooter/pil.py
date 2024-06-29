@@ -2,8 +2,9 @@
 Integration for the PIL screenshot functionality
 '''
 from time import sleep
-from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.screenshot import Screenshot
+from .screenshooter import Screenshooter
+
 
 SUPPORTED_PLATFORM = False
 

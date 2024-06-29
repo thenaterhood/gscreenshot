@@ -4,9 +4,9 @@ ImageMagick screenshot class
 from time import sleep
 import typing
 
-from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import find_executable
 from gscreenshot.util import GSCapabilities
+from .screenshooter import Screenshooter
 
 
 class ImageMagick(Screenshooter):

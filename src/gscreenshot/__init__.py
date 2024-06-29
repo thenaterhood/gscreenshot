@@ -25,8 +25,7 @@ from datetime import datetime
 from PIL import Image
 from gscreenshot.compat import get_resource_file, get_resource_string, get_version
 from gscreenshot.screenshot import ScreenshotCollection
-from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.screenshooter.factory import ScreenshooterFactory
+from gscreenshot.screenshooter import Screenshooter, ScreenshooterFactory
 from gscreenshot.util import session_is_wayland
 
 _ = gettext.gettext
