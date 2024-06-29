@@ -4,6 +4,7 @@ Selector factory module
 
 import typing
 from gscreenshot.util import session_is_wayland
+from .gscreenshot_x_select import GscreenshotXSelect
 from .exceptions import NoSupportedSelectorError
 from .region_selector import RegionSelector
 from .slop import Slop
@@ -17,6 +18,7 @@ class SelectorFactory(object):
         self.screenselector:typing.Optional[RegionSelector] = screenselector
         self.xorg_selectors = [
                 Slop,
+                GscreenshotXSelect,
                 ]
 
         self.wayland_selectors = [
