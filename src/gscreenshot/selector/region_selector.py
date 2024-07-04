@@ -1,5 +1,6 @@
 import subprocess
 import typing
+from gscreenshot.scaling import get_scaling_factor
 from gscreenshot.util import GSCapabilities
 from .exceptions import SelectionError, SelectionExecError, SelectionCancelled, SelectionParseError
 
@@ -50,7 +51,7 @@ class RegionSelector():
         return False
 
     def _get_boundary_interactive(self, params: typing.List[str]
-                                ) -> typing.Tuple[int, int, int, int]:
+                                ) -> typing.Tuple[float, float, float, float]:
         """
         Runs the selector and returns the parsed output. This accepts a list
         that will be passed directly to subprocess.Popen and expects the
@@ -89,7 +90,7 @@ class RegionSelector():
             raise SelectionExecError(f"{params[0]} was not found") #from exception
 
     def _parse_selection_output(self, region_output: typing.List[str]
-                                ) -> typing.Tuple[int, int, int, int]:
+                                ) -> typing.Tuple[float, float, float, float]:
         '''
         Parses output from a region selection tool in the format
         X=%x,Y=%y,W=%w,H=%h OR X=%x\nY=%x\nW=%w\nH=%h.
@@ -106,13 +107,14 @@ class RegionSelector():
                     spl = comma_split.split("=")
                     region_parsed[spl[0]] = int(spl[1])
 
+        scaling_factor = get_scaling_factor()
         # (left, upper, right, lower)
         try:
             crop_box = (
-                region_parsed['X'],
-                region_parsed['Y'],
-                region_parsed['X'] + region_parsed['W'],
-                region_parsed['Y'] + region_parsed['H']
+                region_parsed['X'] * scaling_factor,
+                region_parsed['Y'] * scaling_factor,
+                (region_parsed['X'] + region_parsed['W']) * scaling_factor,
+                (region_parsed['Y'] + region_parsed['H']) * scaling_factor,
             )
         except KeyError:
             #pylint: disable=raise-missing-from

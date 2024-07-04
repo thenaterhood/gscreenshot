@@ -41,7 +41,7 @@ class GscreenshotXSelect(RegionSelector):
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self) -> typing.Tuple[int, int, int, int]:
+    def region_select(self):
         """
         Select an arbitrary region of the screen
 
@@ -50,7 +50,7 @@ class GscreenshotXSelect(RegionSelector):
         """
         return self._get_boundary_interactive([])
 
-    def window_select(self) -> typing.Tuple[int, int, int, int]:
+    def window_select(self):
         """
         Selects a window from the screen
 
@@ -59,7 +59,7 @@ class GscreenshotXSelect(RegionSelector):
         """
         return self._get_boundary_interactive([])
 
-    def _get_boundary_interactive(self, _params) -> typing.Tuple[int, int, int, int]:
+    def _get_boundary_interactive(self, _params):
         selection_tool = SelectionTool()
         Gtk.main()
         while Gtk.events_pending():
