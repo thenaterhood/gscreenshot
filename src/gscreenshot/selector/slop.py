@@ -1,7 +1,6 @@
 '''
 Wrapper for the slop screen selector utility
 '''
-import typing
 from gscreenshot.util import find_executable
 from .region_selector import RegionSelector
 
