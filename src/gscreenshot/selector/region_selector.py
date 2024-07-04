@@ -1,5 +1,6 @@
 import subprocess
 import typing
+from gscreenshot.scaling import get_scaling_factor
 from gscreenshot.util import GSCapabilities
 from .exceptions import SelectionError, SelectionExecError, SelectionCancelled, SelectionParseError
 
@@ -106,13 +107,14 @@ class RegionSelector():
                     spl = comma_split.split("=")
                     region_parsed[spl[0]] = int(spl[1])
 
+        scaling_factor = get_scaling_factor()
         # (left, upper, right, lower)
         try:
             crop_box = (
-                region_parsed['X'],
-                region_parsed['Y'],
-                region_parsed['X'] + region_parsed['W'],
-                region_parsed['Y'] + region_parsed['H']
+                region_parsed['X'] * scaling_factor,
+                region_parsed['Y'] * scaling_factor,
+                (region_parsed['X'] + region_parsed['W']) * scaling_factor,
+                (region_parsed['Y'] + region_parsed['H']) * scaling_factor,
             )
         except KeyError:
             #pylint: disable=raise-missing-from

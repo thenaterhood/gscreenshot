@@ -218,7 +218,7 @@ class Screenshooter(object):
 
         try:
             cursor_locator = CursorLocatorFactory().create()
-            return cursor_locator.get_cursor_position()
+            return cursor_locator.get_cursor_position_adjusted()
         # pylint: disable=bare-except
         except:
             # We don't really care about the specific error here. If we can't
