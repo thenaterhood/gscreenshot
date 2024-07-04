@@ -51,7 +51,7 @@ class RegionSelector():
         return False
 
     def _get_boundary_interactive(self, params: typing.List[str]
-                                ) -> typing.Tuple[int, int, int, int]:
+                                ) -> typing.Tuple[float, float, float, float]:
         """
         Runs the selector and returns the parsed output. This accepts a list
         that will be passed directly to subprocess.Popen and expects the
@@ -90,7 +90,7 @@ class RegionSelector():
             raise SelectionExecError(f"{params[0]} was not found") #from exception
 
     def _parse_selection_output(self, region_output: typing.List[str]
-                                ) -> typing.Tuple[int, int, int, int]:
+                                ) -> typing.Tuple[float, float, float, float]:
         '''
         Parses output from a region selection tool in the format
         X=%x,Y=%y,W=%w,H=%h OR X=%x\nY=%x\nW=%w\nH=%h.

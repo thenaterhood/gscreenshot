@@ -33,7 +33,7 @@ class Slurp(RegionSelector):
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self) -> typing.Tuple[int, int, int, int]:
+    def region_select(self):
         """
         Select an arbitrary region of the screen
 
@@ -47,7 +47,7 @@ class Slurp(RegionSelector):
         sleep(0.1)
         return ret
 
-    def window_select(self) -> typing.Tuple[int, int, int, int]:
+    def window_select(self):
         """
         Selects a window from the screen
 
