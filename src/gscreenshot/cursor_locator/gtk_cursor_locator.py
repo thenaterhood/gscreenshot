@@ -5,9 +5,9 @@ Classes for capturing the cursor position using Gtk
 #pylint: disable=wrong-import-position
 #pylint: disable=ungrouped-imports
 import typing
-import pygtkcompat
-pygtkcompat.enable()
-pygtkcompat.enable_gtk(version='3.0')
+
+from gi import require_version
+require_version('Gtk', '3.0')
 
 from gi.repository import Gtk, Gdk # type: ignore
 from .cursor_locator import CursorLocator
