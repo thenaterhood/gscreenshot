@@ -14,6 +14,7 @@ class NoSupportedCursorLocatorError(Exception):
 
 
 def get_cursor_locator(cursor_locator: typing.Optional[CursorLocator] = None):
+    """Gets a workable cursor locator"""
     return CursorLocatorFactory(cursor_locator).create()
 
 
