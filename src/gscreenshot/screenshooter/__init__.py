@@ -1,8 +1,8 @@
-from .factory import ScreenshooterFactory
+from .factory import get_screenshooter
 from .screenshooter import Screenshooter
 
 
 __all__ = [
     "Screenshooter",
-    "ScreenshooterFactory",
+    "get_screenshooter",
 ]
