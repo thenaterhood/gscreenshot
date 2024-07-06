@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 Super jank homebrew selector using a transparent X window
 '''
