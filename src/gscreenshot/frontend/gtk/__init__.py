@@ -12,7 +12,6 @@ import sys
 import threading
 import typing
 from time import sleep
-import pygtkcompat
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
 from gscreenshot.compat import get_resource_file, get_resource_string
 from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
@@ -21,12 +20,12 @@ from gscreenshot.frontend.gtk.view import View
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from gscreenshot.screenshot.effects import CropEffect
 
-pygtkcompat.enable()
-pygtkcompat.enable_gtk(version='3.0')
+from gi import require_version
+require_version('Gtk', '3.0')
 from gi.repository import Gdk
 from gi.repository import Gtk
-from gi.repository import GObject
 from gi.repository import GLib
+from gi.repository import GdkPixbuf
 
 i18n = gettext.gettext
 
@@ -489,7 +488,7 @@ class Presenter(object):
         pixbuf = None
         for img_format in [("pnm", "ppm"), ("png", "png"), ("jpeg", "jpeg")]:
             try:
-                loader = Gtk.gdk.PixbufLoader(img_format[0])
+                loader = GdkPixbuf.PixbufLoader()
                 descriptor = io.BytesIO()
                 image = image.convert("RGB")
                 image.save(descriptor, img_format[1])
@@ -584,13 +583,13 @@ def main():
     window.connect("key-press-event", presenter.handle_keypress)
 
     keymappings = {
-        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Escape')):
+        Gdk.keyval_to_lower(Gdk.keyval_from_name('Escape')):
             presenter.on_button_quit_clicked,
-        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('F11')):
+        Gdk.keyval_to_lower(Gdk.keyval_from_name('F11')):
             presenter.on_fullscreen_toggle,
-        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Right')):
+        Gdk.keyval_to_lower(Gdk.keyval_from_name('Right')):
             presenter.on_preview_next_clicked,
-        Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Left')):
+        Gdk.keyval_to_lower(Gdk.keyval_from_name('Left')):
             presenter.on_preview_prev_clicked,
         # Handled in Glade - just here for reference
         #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Insert')):
@@ -601,7 +600,6 @@ def main():
     view.connect_signals(presenter)
     view.run()
 
-    GObject.threads_init() # Start background threads.
     Gtk.main()
 
 if __name__ == "__main__":
