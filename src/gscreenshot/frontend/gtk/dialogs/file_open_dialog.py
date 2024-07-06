@@ -5,11 +5,10 @@
 Dialog boxes for the GTK frontend to gscreenshot
 '''
 import gettext
-import pygtkcompat
 
-pygtkcompat.enable()
-pygtkcompat.enable_gtk(version='3.0')
-from gi.repository import Gtk
+from gi import require_version
+require_version('Gtk', '3.0')
+from gi.repository import Gtk # type: ignore
 
 i18n = gettext.gettext
 
@@ -34,12 +33,11 @@ class FileOpenDialog(object):
 
     def request_file(self):
         '''Run the file selection dialog'''
-        action = Gtk.FILE_CHOOSER_ACTION_OPEN
 
         chooser = Gtk.FileChooserNative(
                 transient_for=self.parent,
                 title=None,
-                action=action,
+                action=Gtk.FileChooserAction.OPEN,
                 filter=self._filter,
                 )
 
@@ -53,7 +51,7 @@ class FileOpenDialog(object):
 
         response = chooser.run()
 
-        if response in [Gtk.RESPONSE_OK, Gtk.ResponseType.ACCEPT]:
+        if response in [Gtk.ResponseType.OK, Gtk.ResponseType.ACCEPT]:
             return_value = chooser.get_filename()
         else:
             return_value = None
