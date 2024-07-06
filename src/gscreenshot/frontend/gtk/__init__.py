@@ -367,7 +367,6 @@ class Presenter(object):
         if not self._view.copy_to_clipboard(pixbuf):
             try:
                 self._app.copy_last_screenshot_to_clipboard()
-                raise GscreenshotClipboardException()
             except GscreenshotClipboardException as error:
                 warning_dialog = WarningDialog(
                     i18n(
