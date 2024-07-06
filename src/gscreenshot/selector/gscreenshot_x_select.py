@@ -1,18 +1,16 @@
-#!/usr/bin/env python
 '''
 Super jank homebrew selector using a transparent X window
 '''
 
 import typing
 from time import sleep
-import pygtkcompat
 
 from gscreenshot.util import GSCapabilities
-pygtkcompat.enable()
-pygtkcompat.enable_gtk(version='3.0')
 
 #pylint: disable=wrong-import-position,wrong-import-order
-from gi.repository import Gtk
+from gi import require_version
+require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk # type: ignore
 
 from .region_selector import RegionSelector
 
@@ -117,7 +115,12 @@ class SelectionTool(Gtk.Window):
         """gets the region"""
         coords = self.get_position()
         size = self.get_allocation()
-        self.set_geometry_hints(None, min_width=-1, min_height=-1)
+
+        geometry = Gdk.Geometry()
+        geometry.min_width = -1
+        geometry.min_height = -1
+
+        self.set_geometry_hints(None, geometry, Gdk.WindowHints(2))
         self.set_opacity(0)
 
         self.region = f"X={coords.root_x},Y={coords.root_y},W={size.width},H={size.height}"

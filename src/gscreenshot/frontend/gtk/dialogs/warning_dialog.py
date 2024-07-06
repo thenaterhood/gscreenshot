@@ -5,11 +5,10 @@
 Dialog boxes for the GTK frontend to gscreenshot
 '''
 import gettext
-import pygtkcompat
 
-pygtkcompat.enable()
-pygtkcompat.enable_gtk(version='3.0')
-from gi.repository import Gtk
+from gi import require_version
+require_version('Gtk', '3.0')
+from gi.repository import Gtk # type: ignore
 
 i18n = gettext.gettext
 
@@ -22,8 +21,8 @@ class WarningDialog():
         self.message_dialog = Gtk.MessageDialog(
                 parent,
                 None,
-                Gtk.MESSAGE_WARNING,
-                Gtk.BUTTONS_OK,
+                Gtk.MessageType.WARNING,
+                Gtk.ButtonsType.OK,
                 message
                 )
 
