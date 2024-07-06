@@ -10,7 +10,7 @@ pygtkcompat.enable()
 pygtkcompat.enable_gtk(version='3.0')
 
 from gi.repository import Gtk, Gdk # type: ignore
-from gscreenshot.cursor_locator import CursorLocator
+from .cursor_locator import CursorLocator
 
 
 class GtkCursorLocator(CursorLocator):

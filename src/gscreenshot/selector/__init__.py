@@ -1,9 +1,9 @@
 
-from .factory import SelectorFactory
+from .factory import get_region_selector
 from .region_selector import RegionSelector
 
 
 __all__ = [
     "RegionSelector",
-    "SelectorFactory",
+    "get_region_selector"
 ]

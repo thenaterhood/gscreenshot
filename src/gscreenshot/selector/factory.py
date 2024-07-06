@@ -11,6 +11,11 @@ from .slop import Slop
 from .slurp import Slurp
 
 
+def get_region_selector(screenselector: typing.Optional[RegionSelector] = None):
+    """Gets a workable region selector"""
+    return SelectorFactory(screenselector).create()
+
+
 class SelectorFactory(object):
     '''Selects and instantiates a usable selector class'''
 

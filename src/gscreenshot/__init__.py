@@ -25,7 +25,7 @@ from datetime import datetime
 from PIL import Image
 from gscreenshot.compat import get_resource_file, get_resource_string, get_version
 from gscreenshot.screenshot import ScreenshotCollection
-from gscreenshot.screenshooter import Screenshooter, ScreenshooterFactory
+from gscreenshot.screenshooter import Screenshooter, get_screenshooter
 from gscreenshot.util import session_is_wayland
 
 _ = gettext.gettext
@@ -69,8 +69,7 @@ class Gscreenshot(object):
             # of crashing if there's a locale issue.
             pass
 
-        screenshooter_factory = ScreenshooterFactory(screenshooter)
-        self.screenshooter = screenshooter_factory.create()
+        self.screenshooter = get_screenshooter(screenshooter)
         self._screenshots = ScreenshotCollection()
 
         self._stamps = {}

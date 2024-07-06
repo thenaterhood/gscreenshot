@@ -14,6 +14,11 @@ from .exceptions import NoSupportedScreenshooterError
 from .screenshooter import Screenshooter
 
 
+def get_screenshooter(screenshooter: typing.Optional[Screenshooter] = None):
+    """Gets a workable screenshooter"""
+    return ScreenshooterFactory(screenshooter).create()
+
+
 class ScreenshooterFactory(object):
     '''Selects and instantiates a usable screenshot class'''
 

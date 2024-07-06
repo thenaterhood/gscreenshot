@@ -6,12 +6,12 @@ import subprocess
 import tempfile
 import typing
 import PIL.Image
-from gscreenshot.cursor_locator.factory import CursorLocatorFactory
+from gscreenshot.cursor_locator.factory import get_cursor_locator
 
 from gscreenshot.screenshot import Screenshot
 from gscreenshot.screenshot.effects import CropEffect
 from gscreenshot.screenshot.effects import StampEffect
-from gscreenshot.selector import RegionSelector, SelectorFactory
+from gscreenshot.selector import RegionSelector, get_region_selector
 from gscreenshot.selector.exceptions import SelectionExecError, SelectionParseError
 from gscreenshot.selector.exceptions import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.util import GSCapabilities
@@ -35,7 +35,7 @@ class Screenshooter(object):
         """
         if selector is None:
             try:
-                self._selector = SelectorFactory().create()
+                self._selector = get_region_selector()
             except NoSupportedSelectorError:
                 self._selector = None
         else:
@@ -89,7 +89,7 @@ class Screenshooter(object):
         capabilities[GSCapabilities.CAPTURE_FULLSCREEN] = self.__utilityname__
 
         try:
-            cursor_locator = CursorLocatorFactory().create()
+            cursor_locator = get_cursor_locator()
         # pylint: disable=bare-except
         except:
             cursor_locator = None
@@ -217,7 +217,7 @@ class Screenshooter(object):
         """
 
         try:
-            cursor_locator = CursorLocatorFactory().create()
+            cursor_locator = get_cursor_locator()
             return cursor_locator.get_cursor_position_adjusted()
         # pylint: disable=bare-except
         except:
