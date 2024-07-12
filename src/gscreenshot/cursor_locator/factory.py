@@ -3,14 +3,19 @@ Utilities for selecting a cursor locator utility
 '''
 
 import typing
-from gscreenshot.cursor_locator import CursorLocator
-from gscreenshot.cursor_locator.gtk_cursor_locator import GtkCursorLocator
-from gscreenshot.cursor_locator.x11_cursor_locator import X11CursorLocator
 from gscreenshot.util import session_is_wayland
+from .cursor_locator import CursorLocator
+from .gtk_cursor_locator import GtkCursorLocator
+from .x11_cursor_locator import X11CursorLocator
 
 
 class NoSupportedCursorLocatorError(Exception):
     """NoSupportedCursorLocatorError"""
+
+
+def get_cursor_locator(cursor_locator: typing.Optional[CursorLocator] = None):
+    """Gets a workable cursor locator"""
+    return CursorLocatorFactory(cursor_locator).create()
 
 
 class CursorLocatorFactory(object):

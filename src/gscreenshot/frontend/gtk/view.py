@@ -11,15 +11,15 @@ import io
 import threading
 from time import sleep
 import typing
-import pygtkcompat
 from gscreenshot.compat import get_resource_file
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.util import GSCapabilities
 
-pygtkcompat.enable()
-pygtkcompat.enable_gtk(version='3.0')
-from gi.repository import Gdk
-from gi.repository import Gtk
+from gi import require_version
+require_version('Gtk', '3.0')
+from gi.repository import Gdk # type: ignore
+from gi.repository import Gtk # type: ignore
+from gi.repository import GdkPixbuf # type: ignore
 
 i18n = gettext.gettext
 
@@ -70,7 +70,7 @@ class View(object):
         self._gallery_position:Gtk.Label = Gtk.Label()
         self._gallery_position.set_size_request(1, 20)
         self._gallery_position.set_opacity(0)
-        self._gallery_position.modify_bg(Gtk.STATE_NORMAL, Gdk.color_parse('#ffff00'))
+        self._gallery_position.modify_bg(0, Gdk.color_parse('#ffff00'))
 
         self._preview_control:Gtk.ButtonBox = Gtk.ButtonBox()
         self._preview_control.set_hexpand(False)
@@ -283,7 +283,7 @@ class View(object):
                 image.save(descriptor, "png")
                 contents = descriptor.getvalue()
                 descriptor.close()
-                loader = Gtk.gdk.PixbufLoader("png")
+                loader = GdkPixbuf.PixbufLoader.new_with_type("png")
                 loader.write(contents)
                 pixbuf = loader.get_pixbuf()
                 loader.close()
@@ -313,7 +313,7 @@ class View(object):
 
     def run(self):
         '''Run the view'''
-        self._window.set_position(Gtk.WIN_POS_CENTER)
+        self._window.set_position(Gtk.WindowPosition.CENTER)
         # Set the initial size of the window
         active_window = Gdk.get_default_root_window()
         while active_window is None:
@@ -361,13 +361,17 @@ class View(object):
 
     def handle_state_event(self, _, event):
         '''Handles a window state event'''
-        self._was_maximized = bool(event.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
+        self._was_maximized = bool(event.new_window_state & Gdk.WindowState.MAXIMIZED)
         self._window_is_fullscreen = bool(
-                            Gtk.gdk.WINDOW_STATE_FULLSCREEN & event.new_window_state)
+                            Gdk.WindowState.FULLSCREEN & event.new_window_state)
 
     def hide(self):
         '''Hide the view'''
-        self._window.set_geometry_hints(None, min_width=-1, min_height=-1)
+        geometry = Gdk.Geometry()
+        geometry.min_width = -1
+        geometry.min_height = -1
+
+        self._window.set_geometry_hints(None, geometry, Gdk.WindowHints(2))
         # We set the opacity to 0 because hiding the window is
         # subject to window closing effects, which can take long
         # enough that the window will still appear in the screenshot
@@ -393,10 +397,13 @@ class View(object):
         self._window.set_opacity(1)
 
         original_window_size = self._window.get_size()
+        geometry = Gdk.Geometry()
+        geometry.min_width = original_window_size.width
+        geometry.min_height = original_window_size.height
         self._window.set_geometry_hints(
             None,
-            min_width=original_window_size.width,
-            min_height=original_window_size.height
+            geometry,
+            Gdk.WindowHints(2)
         )
 
         if self._was_maximized:

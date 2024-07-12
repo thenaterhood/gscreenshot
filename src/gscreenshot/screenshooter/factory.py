@@ -3,15 +3,21 @@ Utilities for selecting a screenshot utility
 '''
 
 import typing
-from gscreenshot.screenshooter import Screenshooter
-from gscreenshot.screenshooter.grim import Grim
-from gscreenshot.screenshooter.imagemagick import ImageMagick
-from gscreenshot.screenshooter.imlib_2 import Imlib2
-from gscreenshot.screenshooter.pil import PILWrapper
-from gscreenshot.screenshooter.scrot import Scrot
-from gscreenshot.screenshooter.xdg_desktop_portal import XdgDesktopPortal
-from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from gscreenshot.util import session_is_wayland
+from .grim import Grim
+from .imagemagick import ImageMagick
+from .imlib_2 import Imlib2
+from .pil import PILWrapper
+from .scrot import Scrot
+from .xdg_desktop_portal import XdgDesktopPortal
+from .exceptions import NoSupportedScreenshooterError
+from .screenshooter import Screenshooter
+
+
+def get_screenshooter(screenshooter: typing.Optional[Screenshooter] = None):
+    """Gets a workable screenshooter"""
+    return ScreenshooterFactory(screenshooter).create()
+
 
 class ScreenshooterFactory(object):
     '''Selects and instantiates a usable screenshot class'''

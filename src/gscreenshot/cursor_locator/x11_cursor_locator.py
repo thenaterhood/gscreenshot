@@ -7,7 +7,7 @@ try:
 except ImportError:
     display = None
 
-from gscreenshot.cursor_locator import CursorLocator
+from .cursor_locator import CursorLocator
 
 
 class X11CursorLocator(CursorLocator):

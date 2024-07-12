@@ -3,8 +3,8 @@ Integration for the imlib2 screenshot utility
 '''
 from time import sleep
 
-from gscreenshot.screenshooter import Screenshooter
 from gscreenshot.util import find_executable
+from .screenshooter import Screenshooter
 
 
 class Imlib2(Screenshooter):

@@ -3,11 +3,17 @@ Selector factory module
 '''
 
 import typing
-from gscreenshot.selector.slop import Slop
-from gscreenshot.selector.slurp import Slurp
-from gscreenshot.selector import NoSupportedSelectorError
-from gscreenshot.selector import RegionSelector
 from gscreenshot.util import session_is_wayland
+from .gscreenshot_x_select import GscreenshotXSelect
+from .exceptions import NoSupportedSelectorError
+from .region_selector import RegionSelector
+from .slop import Slop
+from .slurp import Slurp
+
+
+def get_region_selector(screenselector: typing.Optional[RegionSelector] = None):
+    """Gets a workable region selector"""
+    return SelectorFactory(screenselector).create()
 
 
 class SelectorFactory(object):
@@ -16,11 +22,12 @@ class SelectorFactory(object):
     def __init__(self, screenselector:typing.Optional[RegionSelector]=None):
         self.screenselector:typing.Optional[RegionSelector] = screenselector
         self.xorg_selectors = [
-                Slop
+                Slop,
+                GscreenshotXSelect,
                 ]
 
         self.wayland_selectors = [
-                Slurp
+                Slurp,
                 ]
 
         self.selectors:list = []

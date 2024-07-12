@@ -1,9 +1,8 @@
 '''
 Wrapper for the slop screen selector utility
 '''
-import typing
-from gscreenshot.selector import RegionSelector
 from gscreenshot.util import find_executable
+from .region_selector import RegionSelector
 
 
 class Slop(RegionSelector):
@@ -23,7 +22,7 @@ class Slop(RegionSelector):
         """
         RegionSelector.__init__(self)
 
-    def region_select(self) -> typing.Tuple[int, int, int, int]:
+    def region_select(self):
         """
         Select an arbitrary region of the screen
 
@@ -40,7 +39,7 @@ class Slop(RegionSelector):
                 'X=%x,Y=%y,W=%w,H=%h'
             ])
 
-    def window_select(self) -> typing.Tuple[int, int, int, int]:
+    def window_select(self):
         """
         Selects a window from the screen
 

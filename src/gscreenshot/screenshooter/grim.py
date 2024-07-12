@@ -6,7 +6,7 @@ import subprocess
 import typing
 
 from gscreenshot.util import find_executable, GSCapabilities
-from gscreenshot.screenshooter import Screenshooter
+from .screenshooter import Screenshooter
 
 
 class Grim(Screenshooter):
@@ -46,7 +46,7 @@ class Grim(Screenshooter):
         # Grim doesn't work in all situations. In some we would rather
         # use the xdg-desktop-portal method so we'll do another check
         try:
-            subprocess.check_output(["grim", "-"])
+            subprocess.check_output(["grim", "-"], stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError:
             return False
 

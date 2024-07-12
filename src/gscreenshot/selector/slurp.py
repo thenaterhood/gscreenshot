@@ -3,8 +3,8 @@ Wrapper for the slurp screen selector utility
 '''
 from time import sleep
 import typing
-from gscreenshot.selector import RegionSelector
 from gscreenshot.util import find_executable, GSCapabilities
+from .region_selector import RegionSelector
 
 
 class Slurp(RegionSelector):
@@ -33,7 +33,7 @@ class Slurp(RegionSelector):
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self) -> typing.Tuple[int, int, int, int]:
+    def region_select(self):
         """
         Select an arbitrary region of the screen
 
@@ -47,7 +47,7 @@ class Slurp(RegionSelector):
         sleep(0.1)
         return ret
 
-    def window_select(self) -> typing.Tuple[int, int, int, int]:
+    def window_select(self):
         """
         Selects a window from the screen
 
