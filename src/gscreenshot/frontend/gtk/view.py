@@ -148,9 +148,9 @@ class View(object):
             self._gallery_position.set_text(
                 f"{screenshots.cursor()+1}{unsaved_marker}/{len(screenshots)}")
             self._gallery_position.modify_bg(
-                Gtk.STATE_NORMAL,
+                Gtk.StateType.NORMAL,
                 self._window.get_style_context()
-                    .get_background_color(Gtk.STATE_NORMAL)
+                    .get_background_color(Gtk.StateType.NORMAL)
                     .to_color())
             self._gallery_position.set_opacity(.5)
 
