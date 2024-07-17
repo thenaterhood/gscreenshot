@@ -32,7 +32,7 @@ def get_scaling_from_gdk() -> typing.Optional[float]:
     display = Gdk.Display.get_default()
     monitor = display.get_primary_monitor() or display.get_monitor(0)
     if monitor:
-        return monitor.get_scale_factor(0)
+        return monitor.get_scale_factor()
     return None
 
 
