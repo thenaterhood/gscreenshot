@@ -6,7 +6,7 @@ import typing
 def get_scaling_factor() -> float:
     """Get the scaling factor for the display"""
     methods = [
-        get_scaling_from_gdk,
+        get_scaling_from_gtk,
         get_scaling_from_qt,
         get_scaling_from_xft_dpi,
     ]
@@ -23,14 +23,21 @@ def get_scaling_factor() -> float:
     return 1
 
 
-def get_scaling_from_gdk() -> typing.Optional[float]:
-    """Get scaling factor from Gdk"""
+def get_scaling_from_gtk() -> typing.Optional[float]:
+    """Get scaling factor from Gtk"""
     # pylint: disable=import-outside-toplevel
     import gi
     gi.require_version('Gtk', '3.0')
-    from gi.repository import Gdk # type: ignore
-    display = Gdk.Display.get_default()
-    monitor = display.get_primary_monitor() or display.get_monitor(0)
+    from gi.repository import Gtk # type: ignore
+
+    w = Gtk.Window()
+    screen = w.get_screen()
+    display = screen.get_display()
+    monitor = (
+        display.get_monitor_at_window(screen.get_root_window())
+        or display.get_primary_monitor()
+        or display.get_monitor(0)
+    )
     if monitor:
         return monitor.get_scale_factor()
     return None
