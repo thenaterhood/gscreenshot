@@ -30,8 +30,8 @@ def get_scaling_from_gtk() -> typing.Optional[float]:
     gi.require_version('Gtk', '3.0')
     from gi.repository import Gtk # type: ignore
 
-    w = Gtk.Window()
-    screen = w.get_screen()
+    window = Gtk.Window()
+    screen = window.get_screen()
     display = screen.get_display()
     monitor = (
         display.get_monitor_at_window(screen.get_root_window())
