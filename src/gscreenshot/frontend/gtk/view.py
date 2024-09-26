@@ -449,7 +449,6 @@ class View(object):
 
         This assumes the pixbuf has already been resized appropriately.
         '''
-        # view the previewPixbuf in the image_preview widget
         self._preview.set_from_pixbuf(pixbuf)
 
     def copy_to_clipboard(self, pixbuf):
