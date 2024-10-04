@@ -255,7 +255,7 @@ class Screenshooter(object):
             self._screenshot = Screenshot(PIL.Image.open(self._tempfile))
             os.unlink(self._tempfile)
         except (subprocess.CalledProcessError, IOError, OSError, ScreenshotError) as exc:
-            print(exc)
+            print(exc.__repr__())
 
         return self._screenshot is not None
 

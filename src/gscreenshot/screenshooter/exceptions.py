@@ -10,4 +10,3 @@ class NoSupportedScreenshooterError(BaseException):
 
 class ScreenshotError(BaseException):
     '''Generic screenshot error'''
-    pass
