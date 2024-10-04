@@ -15,6 +15,7 @@ from gscreenshot.selector import RegionSelector, get_region_selector
 from gscreenshot.selector.exceptions import SelectionExecError, SelectionParseError
 from gscreenshot.selector.exceptions import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.util import GSCapabilities
+from .exceptions import ScreenshotError
 
 
 class Screenshooter(object):
@@ -243,15 +244,20 @@ class Screenshooter(object):
             params = []
 
         params = [screenshooter] + params
+        self._screenshot = None
         try:
-            subprocess.check_output(params)
+            screenshot_output = subprocess.check_output(params)
+            if not os.path.exists(self._tempfile):
+                if len(screenshot_output.decode()) > 0:
+                    raise ScreenshotError(f"screenshot failed: {screenshot_output.decode()}")
+                raise ScreenshotError("screenshot failed but provided no output")
+
             self._screenshot = Screenshot(PIL.Image.open(self._tempfile))
             os.unlink(self._tempfile)
-        except (subprocess.CalledProcessError, IOError, OSError):
-            self._screenshot = None
-            return False
+        except (subprocess.CalledProcessError, IOError, OSError, ScreenshotError) as exc:
+            print(repr(exc))
 
-        return True
+        return self._screenshot is not None
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}(selector={self._selector})'
