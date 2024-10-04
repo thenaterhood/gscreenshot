@@ -248,14 +248,14 @@ class Screenshooter(object):
         try:
             screenshot_output = subprocess.check_output(params)
             if not os.path.exists(self._tempfile):
-                if len(screenshot_output.decode()):
+                if len(screenshot_output.decode()) > 0:
                     raise ScreenshotError(f"screenshot failed: {screenshot_output.decode()}")
-                raise ScreenshotError(f"screenshot failed but provided no output")
+                raise ScreenshotError("screenshot failed but provided no output")
 
             self._screenshot = Screenshot(PIL.Image.open(self._tempfile))
             os.unlink(self._tempfile)
-        except (subprocess.CalledProcessError, IOError, OSError, ScreenshotError) as e:
-            print(e)
+        except (subprocess.CalledProcessError, IOError, OSError, ScreenshotError) as exc:
+            print(exc)
 
         return self._screenshot is not None
 
