@@ -98,15 +98,19 @@ class XdgPortalScreenshot:
 
     @staticmethod
     def callback(response, result):
-        '''callback function when a screenshot is completed'''
+        '''
+        callback function when a screenshot is completed
+        Do not raise exceptions or exit in this function - this is a dbus callback
+        and will not fail in a convenient place.
+        '''
         if response == 0:
             uri = result["uri"]
             path = uri.replace("file://", "")
             shutil.move(path, sys.argv[1])
-            loop.quit()
         else:
-            loop.quit()
-            sys.exit(1)
+            print(response, result)
+
+        loop.quit()
 
 
 class XdgDesktopPortal(Screenshooter):
