@@ -74,6 +74,9 @@ class Screenshot(object):
         except AttributeError: # PIL < 9.0
             antialias_algo = Image.ANTIALIAS
 
+        if thumbnail.height/height < .1 and thumbnail.width/width < .1:
+            thumbnail = thumbnail.resize((thumbnail.width*10, thumbnail.height*10))
+
         thumbnail.thumbnail((width, height), antialias_algo)
 
         if with_border:

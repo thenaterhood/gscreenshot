@@ -6,3 +6,7 @@ class NoSupportedScreenshooterError(BaseException):
     def __init__(self, msg="No supported screenshot backend found", required=None):
         BaseException.__init__(self, msg)
         self.required = required
+
+
+class ScreenshotError(BaseException):
+    '''Generic screenshot error'''
