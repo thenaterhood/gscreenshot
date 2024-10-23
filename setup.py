@@ -176,7 +176,7 @@ class LintCommand(Command):
       pass
 
   def run(self):
-    command = ['/usr/bin/pylint', 'src', f'--rcfile=pylintrc']
+    command = ['pylint', 'src', f'--rcfile=pylintrc']
     subprocess.check_call(command)
 
 setup(name='gscreenshot',
