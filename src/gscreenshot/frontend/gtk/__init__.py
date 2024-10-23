@@ -519,11 +519,11 @@ class Presenter(object):
         self._view.update_preview(pixbuf)
 
 
-def main():
+def main(app: typing.Optional[Gscreenshot] = None):
     '''The main function for the GTK frontend'''
 
     try:
-        application = Gscreenshot()
+        application = app or Gscreenshot()
     except NoSupportedScreenshooterError as gscreenshot_error:
         warning = WarningDialog(
             i18n("No supported screenshot backend is available."),
@@ -558,11 +558,12 @@ def main():
             view
             )
 
-    # Lucky 13 to give a tiny bit more time for the desktop environment
-    # to settle down and hide the window before we take our initial
-    # screenshot.
-    sleep(0.13)
-    presenter.on_button_all_clicked()
+    if not application.get_last_image():
+        # Lucky 13 to give a tiny bit more time for the desktop environment
+        # to settle down and hide the window before we take our initial
+        # screenshot.
+        sleep(0.13)
+        presenter.on_button_all_clicked()
 
     accel = Gtk.AccelGroup()
     accel.connect(Gdk.keyval_from_name('S'), Gdk.ModifierType.CONTROL_MASK,

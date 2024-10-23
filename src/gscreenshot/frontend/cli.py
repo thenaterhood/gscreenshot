@@ -3,14 +3,22 @@
 '''
 Gscreenshot's CLI
 '''
-import argparse
 import sys
 import gettext
 
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+from .args import get_args
+
 
 _ = gettext.gettext
+
+
+def resume(app: Gscreenshot):
+    '''Resume or finish a CLI session'''
+    if app.session.get("error", False):
+        sys.exit(1)
+    sys.exit(0)
 
 
 def run():
@@ -26,76 +34,7 @@ def run():
             print(", ".join(gscreenshot_error.required))
         sys.exit(1)
 
-    parser = argparse.ArgumentParser()
-
-    #pylint: disable=line-too-long
-    parser.add_argument(
-            '-d',
-            '--delay',
-            required=False,
-            default=0,
-            help=_("How many seconds to wait before taking the screenshot. Defaults to 0.")
-            )
-    parser.add_argument(
-            '-f',
-            '--filename',
-            required=False,
-            default=False,
-            help=_("Where to store the screenshot file. Defaults to gscreenshot_<time>.png. This can be paired with -c to save and copy. If you specify a filename without a file extension, it will be treated as a directory (creating the tree if needed) and screenshots will be saved there with the default filename scheme.")
-            )
-    parser.add_argument(
-            '-c',
-            '--clip',
-            required=False,
-            action='store_true',
-            help=_("Copy the image to the clipboard. Requires xclip to be installed. This can be paired with -f to save and copy together.")
-            )
-    parser.add_argument(
-            '-o',
-            '--open',
-            required=False,
-            action='store_true',
-            help=_("Open the screenshot in your default viewer.")
-            )
-    parser.add_argument(
-            '-s',
-            '--selection',
-            required=False,
-            action='store_true',
-            help=_("Choose a window or select a region to screenshot.")
-            )
-    parser.add_argument(
-            '-V',
-            '--version',
-            required=False,
-            action='store_true',
-            help=_("Show information about gscreenshot")
-            )
-    parser.add_argument(
-            '-n',
-            '--notify',
-            required=False,
-            action='store_true',
-            help=_("Show a notification when the screenshot is taken. Gscreenshot will automatically show a notification if a screenshot is taken from a different session, so some situations may not need this option.")
-    )
-    parser.add_argument(
-            '-p',
-            '--pointer',
-            required=False,
-            action='store_true',
-            help=_("Capture the cursor.")
-    )
-    parser.add_argument(
-            '-g',
-            '--pointer-glyph',
-            required=False,
-            help=_("The name of a custom cursor glyph ('adwaita', 'prohibit', 'allow') or path to an image.")
-    )
-
-    args = parser.parse_args()
-
-    #pylint: enable=line-too-long
-
+    args = get_args()
 
     if args.version is not False:
         description = gscreenshot.get_program_description()
@@ -128,35 +67,34 @@ def run():
 
     if args.selection is not False:
         gscreenshot.screenshot_selected(
-            delay=args.delay,
+            delay=int(args.delay),
             capture_cursor=args.pointer,
             cursor_name=args.pointer_glyph
         )
     else:
         gscreenshot.screenshot_full_display(
-            delay=args.delay,
+            delay=int(args.delay),
             capture_cursor=args.pointer,
             cursor_name=args.pointer_glyph
         )
 
     if gscreenshot.get_last_image() is None:
         print(_("No screenshot taken."))
-        sys.exit(1)
+        gscreenshot.session["error"] = True
     else:
         if args.notify:
             if not gscreenshot.show_screenshot_notification():
                 print(_("failed to show screenshot notification - is notify-send working?"))
 
         shot_saved = False
-        exit_code = 0
 
         if args.filename is not False:
             shot_saved = gscreenshot.save_last_image(args.filename)
-        elif args.clip is False:
+        elif args.clip is False and not args.gui:
             shot_saved = gscreenshot.save_last_image()
 
         if (args.filename is not False or args.clip is False) and not shot_saved:
-            exit_code = 1
+            gscreenshot.session["error"] = True
             print(_("Failed to save screenshot!"))
 
         if args.open is not False:
@@ -171,5 +109,6 @@ def run():
 
                 if tmp_file is not None:
                     print(_("Your screenshot was saved to {0}").format(tmp_file))
-                exit_code = 1
-        sys.exit(exit_code)
+                gscreenshot.session["error"] = True
+
+    return gscreenshot
