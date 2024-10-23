@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 
-from logging import INFO
-from setuptools import setup, Command, logging
-import errno
+from setuptools import setup, Command
 import glob
 import subprocess
-import sys
 import os
 
 try:
