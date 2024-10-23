@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from logging import INFO
+from setuptools import setup, Command, logging
 import errno
 import glob
 import subprocess
@@ -64,6 +65,13 @@ def build_data_files(version):
     This code assumes there will only ever be one file getting installed
     at a particular path. For gscreenshot this is fine.
     '''
+    try:
+        os.makedirs("generated")
+    except (OSError, FileExistsError) as e:
+        if not os.path.isdir("generated"):
+            raise
+    compile_locales()
+    compile_manpage()
     files = []
     for d in data_files:
         generated_path = os.path.join('generated', d[1][0])
@@ -160,15 +168,24 @@ def compile_manpage():
 pkg_version = get_version_from_specfile()
 
 
-try:
-    os.makedirs("generated")
-except (OSError, FileExistsError) as e:
-    if not os.path.isdir("generated"):
-        raise
-compile_locales()
-compile_manpage()
+class LintCommand(Command):
+  description = 'lint the Python code'
+  user_options = []
+
+  def initialize_options(self):
+      pass
+  
+  def finalize_options(self):
+      pass
+
+  def run(self):
+    command = ['/usr/bin/pylint', 'src', f'--rcfile=pylintrc']
+    subprocess.check_call(command)
 
 setup(name='gscreenshot',
+    cmdclass={
+        'lint': LintCommand,
+    },
     version=pkg_version,
     description='Lightweight GTK frontend to scrot',
     author='Nate Levesque',
