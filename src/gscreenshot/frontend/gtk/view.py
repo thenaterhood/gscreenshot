@@ -107,7 +107,7 @@ class View(object):
             self._disable_and_hide(reuse_region_dropdown)
             selectarea_gtkbox.remove(reuse_region_dropdown)
 
-        self._window.set_opacity(.3)
+        self._window.set_opacity(1)
 
     def _disable_and_hide(self, widget):
         '''disables and hides a widget'''

@@ -4,6 +4,8 @@ Shared utilities for gscreenshot's various frontends
 import signal
 import sys
 import gscreenshot.frontend.cli
+from .args import get_args
+
 
 try:
     import gscreenshot.frontend.gtk
@@ -37,7 +39,12 @@ def delegate():
         print(" ==> WARNING: Please upgrade to Python 3.5 or newer")
 
     with SignalHandler():
-        if (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not GTK_CAPABLE:
-            gscreenshot.frontend.cli.run()
+        args = get_args()
+        app = gscreenshot.frontend.cli.run()
+
+        if args.gui and GTK_CAPABLE:
+            gscreenshot.frontend.gtk.main(app)
+        elif (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not GTK_CAPABLE:
+            gscreenshot.frontend.cli.resume(app)
         else:
-            gscreenshot.frontend.gtk.main()
+            gscreenshot.frontend.gtk.main(app)
