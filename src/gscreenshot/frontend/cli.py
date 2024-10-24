@@ -16,7 +16,7 @@ _ = gettext.gettext
 
 def resume(app: Gscreenshot):
     '''Resume or finish a CLI session'''
-    if app.session.get("error", False):
+    if not app or app.session.get("error", False):
         sys.exit(1)
     sys.exit(0)
 
@@ -32,7 +32,7 @@ def run():
         else:
             print(_("Please install one of the following to use gscreenshot:"))
             print(", ".join(gscreenshot_error.required))
-        sys.exit(1)
+        return None
 
     args = get_args()
 
