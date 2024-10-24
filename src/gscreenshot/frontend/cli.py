@@ -87,8 +87,6 @@ def run():
             if not gscreenshot.show_screenshot_notification():
                 print(_("failed to show screenshot notification - is notify-send working?"))
 
-        shot_saved = False
-
         if args.filename is not False:
             if not gscreenshot.save_last_image(args.filename):
                 print(_("Failed to save screenshot!"))
