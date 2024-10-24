@@ -90,13 +90,13 @@ def run():
         shot_saved = False
 
         if args.filename is not False:
-            shot_saved = gscreenshot.save_last_image(args.filename)
+            if not gscreenshot.save_last_image(args.filename):
+                print(_("Failed to save screenshot!"))
+                gscreenshot.session["error"] = True
         elif args.clip is False and not args.gui:
-            shot_saved = gscreenshot.save_last_image()
-
-        if (args.filename is not False or args.clip is False) and not shot_saved:
-            gscreenshot.session["error"] = True
-            print(_("Failed to save screenshot!"))
+            if not gscreenshot.save_last_image():
+                print(_("Failed to save screenshot!"))
+                gscreenshot.session["error"] = True
 
         if args.open is not False:
             gscreenshot.open_last_screenshot()
