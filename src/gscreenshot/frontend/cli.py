@@ -5,6 +5,7 @@ Gscreenshot's CLI
 '''
 import sys
 import gettext
+import typing
 
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
@@ -14,7 +15,7 @@ from .args import get_args
 _ = gettext.gettext
 
 
-def resume(app: Gscreenshot):
+def resume(app: typing.Optional[Gscreenshot]):
     '''Resume or finish a CLI session'''
     if not app or app.session.get("error", False):
         sys.exit(1)
