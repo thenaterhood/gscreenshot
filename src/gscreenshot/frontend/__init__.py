@@ -42,7 +42,7 @@ def delegate():
         args = get_args()
         app = gscreenshot.frontend.cli.run()
 
-        if args.gui:
+        if args.gui and GTK_CAPABLE:
             gscreenshot.frontend.gtk.main(app)
         elif (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not GTK_CAPABLE:
             gscreenshot.frontend.cli.resume(app)
