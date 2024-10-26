@@ -83,6 +83,7 @@ def run():
         print(_("No screenshot taken."))
         gscreenshot.session["error"] = True
     else:
+        saved_screenshot = False
         if args.notify:
             if not gscreenshot.show_screenshot_notification():
                 print(_("failed to show screenshot notification - is notify-send working?"))
@@ -91,10 +92,18 @@ def run():
             if not gscreenshot.save_last_image(args.filename):
                 print(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
+            else:
+                saved_screenshot = True
         elif args.clip is False and not args.gui:
             if not gscreenshot.save_last_image():
                 print(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
+            else:
+                saved_screenshot = True
+
+        last_shot = gscreenshot.get_screenshot_collection().cursor_current()
+        if saved_screenshot and last_shot:
+            print(last_shot.get_saved_path())
 
         if args.open is not False:
             gscreenshot.open_last_screenshot()
