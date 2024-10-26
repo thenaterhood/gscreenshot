@@ -465,7 +465,7 @@ class Gscreenshot(object):
         return screenshot_fname
 
     def _save_image(self, image: Image.Image, filename: typing.Optional[str]=None,
-                    overwrite: bool=True) -> bool:
+                    overwrite: bool=True) -> typing.Optional[str]:
         '''
         Internal method for saving an image to a file
         '''
@@ -504,7 +504,7 @@ class Gscreenshot(object):
                 file_type = file_extension
 
             if not overwrite and os.path.exists(filename):
-                return False
+                return None
 
             self.cache["last_save_dir"] = os.path.dirname(filename)
             self.save_cache()
@@ -513,7 +513,7 @@ class Gscreenshot(object):
             file_type = 'jpeg'
 
         if file_type not in self.get_supported_formats():
-            return False
+            return None
 
         try:
             # add exif data. This is sketchy but we don't need to
@@ -542,7 +542,7 @@ class Gscreenshot(object):
         if screenshot is not None:
             screenshot.set_saved_path(filename)
 
-        return filename is not None
+        return filename
 
     def save_screenshot_collection(self, foldername: typing.Optional[str]=None) -> bool:
         '''
@@ -561,7 +561,7 @@ class Gscreenshot(object):
         for screenshot in self._screenshots:
             i += 1
             fname = os.path.join(foldername, f"gscreenshot-{i}.png")
-            if not self._save_image(screenshot.get_image(), fname, False):
+            if self._save_image(screenshot.get_image(), fname, False) is not None:
                 return False
 
             screenshot.set_saved_path(fname)
@@ -586,10 +586,10 @@ class Gscreenshot(object):
         if image is None:
             return False
 
-        if self._save_image(image, filename):
+        if saved_path := self._save_image(image, filename):
             screenshot = self._screenshots.cursor_current()
             if screenshot is not None:
-                screenshot.set_saved_path(filename)
+                screenshot.set_saved_path(saved_path)
 
             return True
 

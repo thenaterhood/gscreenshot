@@ -1,6 +1,7 @@
 '''Functions for handling command line arguments'''
 import argparse
 import gettext
+import sys
 
 _ = gettext.gettext
 
@@ -79,4 +80,12 @@ def get_args():
             help=_("Open the gscreenshot GUI. This is the default if no parameters are provided.")
     )
 
-    return parser.parse_args()
+    args = parser.parse_args()
+
+    if 'gscreenshot-cli' in sys.argv[0]:
+        args.gui = False
+
+    if len(sys.argv) == 1:
+        args.gui = True
+
+    return args
