@@ -586,7 +586,8 @@ class Gscreenshot(object):
         if image is None:
             return False
 
-        if saved_path := self._save_image(image, filename):
+        saved_path = self._save_image(image, filename)
+        if saved_path:
             screenshot = self._screenshots.cursor_current()
             if screenshot is not None:
                 screenshot.set_saved_path(saved_path)
