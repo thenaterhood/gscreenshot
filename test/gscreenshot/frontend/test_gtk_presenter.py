@@ -4,7 +4,7 @@ from unittest.mock import Mock
 from PIL import Image
 import mock
 
-from src.gscreenshot.frontend.gtk import Presenter
+from gscreenshot.frontend.gtk.presenter import Presenter
 
 
 class GtkPresenterTest(unittest.TestCase):
