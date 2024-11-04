@@ -72,7 +72,7 @@ class Screenshot(object):
         try:
             antialias_algo = Image.Resampling.LANCZOS
         except AttributeError: # PIL < 9.0
-            antialias_algo = Image.ANTIALIAS
+            antialias_algo = Image.ANTIALIAS # type: ignore
 
         if thumbnail.height/height < .1 and thumbnail.width/width < .1:
             thumbnail = thumbnail.resize((thumbnail.width*10, thumbnail.height*10))

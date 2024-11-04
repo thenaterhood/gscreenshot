@@ -8,7 +8,7 @@ from .args import get_args
 
 
 try:
-    import gscreenshot.frontend.gtk
+    import gscreenshot.frontend.gtk.presenter
     GTK_CAPABLE = True
 except ValueError:
     GTK_CAPABLE = False
