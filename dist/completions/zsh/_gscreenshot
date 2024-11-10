@@ -3,7 +3,7 @@
 function _gscreenshot {
     suggestions=()
 
-    for opt in $(gscreenshot --help | grep -- -- | cut -d "," -f 2 | awk '{print $1}'); do
+    for opt in $(gscreenshot --help | grep -E -- "--\w+ " | cut -d "," -f 2 | awk '{print $1}'); do
         case "$opt" in
         --filename)
             opt="$opt:file:_directories"

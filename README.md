@@ -75,6 +75,11 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
     * %%: A literal %
     * The full list of strftime format options in their standard format. See the examples section.
 
+\--gui
+:   Open the gscreenshot GUI. This is the default if no options are passed to gscreenshot.
+    This can be combined with other parameters to change, for example, the initial screenshot
+    taken when gscreenshot starts.s
+
 -c, \--clip
 :   Copy the resulting screenshot to the clipboard. Relies on xclip or wl-clipboard.
 

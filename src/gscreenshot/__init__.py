@@ -41,12 +41,13 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
-    __slots__ = ['screenshooter', 'cache', '_screenshots', '_stamps']
+    __slots__ = ['screenshooter', 'cache', 'session', '_screenshots', '_stamps']
 
     screenshooter: Screenshooter
     cache: typing.Dict[str, str]
     _screenshots: ScreenshotCollection
     _stamps: typing.Dict[str, Image.Image]
+    session: typing.Dict[str, typing.Any]
 
     # generated using piexif
     EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
@@ -55,6 +56,7 @@ class Gscreenshot(object):
         """
         constructor
         """
+        self.session = {}
         try:
             locale_path = get_resource_file("gscreenshot.resources", "locale")
             locale.setlocale(locale.LC_ALL, '')
@@ -463,7 +465,7 @@ class Gscreenshot(object):
         return screenshot_fname
 
     def _save_image(self, image: Image.Image, filename: typing.Optional[str]=None,
-                    overwrite: bool=True) -> bool:
+                    overwrite: bool=True) -> typing.Optional[str]:
         '''
         Internal method for saving an image to a file
         '''
@@ -502,7 +504,7 @@ class Gscreenshot(object):
                 file_type = file_extension
 
             if not overwrite and os.path.exists(filename):
-                return False
+                return None
 
             self.cache["last_save_dir"] = os.path.dirname(filename)
             self.save_cache()
@@ -511,7 +513,7 @@ class Gscreenshot(object):
             file_type = 'jpeg'
 
         if file_type not in self.get_supported_formats():
-            return False
+            return None
 
         try:
             # add exif data. This is sketchy but we don't need to
@@ -540,7 +542,7 @@ class Gscreenshot(object):
         if screenshot is not None:
             screenshot.set_saved_path(filename)
 
-        return filename is not None
+        return filename
 
     def save_screenshot_collection(self, foldername: typing.Optional[str]=None) -> bool:
         '''
@@ -559,7 +561,7 @@ class Gscreenshot(object):
         for screenshot in self._screenshots:
             i += 1
             fname = os.path.join(foldername, f"gscreenshot-{i}.png")
-            if not self._save_image(screenshot.get_image(), fname, False):
+            if self._save_image(screenshot.get_image(), fname, False) is not None:
                 return False
 
             screenshot.set_saved_path(fname)
@@ -584,10 +586,11 @@ class Gscreenshot(object):
         if image is None:
             return False
 
-        if self._save_image(image, filename):
+        saved_path = self._save_image(image, filename)
+        if saved_path:
             screenshot = self._screenshots.cursor_current()
             if screenshot is not None:
-                screenshot.set_saved_path(filename)
+                screenshot.set_saved_path(saved_path)
 
             return True
 
