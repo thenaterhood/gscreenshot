@@ -1,5 +1,7 @@
 import unittest
 
+import mock
+
 from src.gscreenshot.selector import RegionSelector\
 
 
@@ -23,26 +25,34 @@ class SelectorTest(unittest.TestCase):
     def setUp(self):
         self.selector = BaseSelector()
 
-    def test_parse_output_oneline(self):
+    @mock.patch('src.gscreenshot.selector.region_selector.get_scaling_factor')
+    def test_parse_output_oneline(self, get_scaling_factor):
 
         self.selector.mock_output = ["X=1,Y=2,W=3,H=4"]
+        get_scaling_factor.return_value = 1
         region = self.selector.region_select()
         self.assertEqual((1, 2, 4, 6), region)
 
-    def test_parse_output_oneline_extra_lines(self):
+    @mock.patch('src.gscreenshot.selector.region_selector.get_scaling_factor')
+    def test_parse_output_oneline_extra_lines(self, get_scaling_factor):
 
         self.selector.mock_output = ["", "X=1,Y=2,W=3,H=4", ""]
+        get_scaling_factor.return_value = 1
         region = self.selector.region_select()
         self.assertEqual((1, 2, 4, 6), region)
 
-    def test_parse_output_online_extra_garbage(self):
+    @mock.patch('src.gscreenshot.selector.region_selector.get_scaling_factor')
+    def test_parse_output_online_extra_garbage(self, get_scaling_factor):
 
         self.selector.mock_output = ["ASDFSDFSDF", "X=1,Y=2,W=3,H=4", "45"]
+        get_scaling_factor.return_value = 1
         region = self.selector.region_select()
         self.assertEqual((1, 2, 4, 6), region)
 
-    def test_parse_output_multiline(self):
+    @mock.patch('src.gscreenshot.selector.region_selector.get_scaling_factor')
+    def test_parse_output_multiline(self, get_scaling_factor):
 
         self.selector.mock_output = ["X=1", "Y=2", "W=3" ,"H=4"]
+        get_scaling_factor.return_value = 1
         region = self.selector.region_select()
         self.assertEqual((1, 2, 4, 6), region)
