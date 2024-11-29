@@ -139,7 +139,7 @@ class RegionSelector():
             try:
                 color = tuple(float(int(selection_box_rgba[i:i+2], 16)/255) for i in (0, 2, 4))
             except (IndexError, ValueError):
-                return (0.8, 0.8, 0.8, 0.6)
+                color = (0.8, 0.8, 0.8, 0.6)
 
         return color
 

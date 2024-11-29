@@ -14,7 +14,7 @@ class BaseSelector(RegionSelector):
     def can_run():
         return True
 
-    def region_select(self):
+    def region_select(self, selection_color_rgba=None):
         return self._parse_selection_output(self.mock_output)
 
 
