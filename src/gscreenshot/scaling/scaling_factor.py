@@ -30,7 +30,8 @@ def get_scaling() -> typing.Tuple[str, float]:
 
             if scaling:
                 name, scale = scaling
-                if scale and abs(scale - 1) > 0.01:  # Check if scale is significantly different from 1
+                # Check if scale is significantly different from 1
+                if scale and abs(scale - 1) > 0.01:
                     return name, scale if scale >= 1 else 1
         # pylint: disable=bare-except
         except:
@@ -51,19 +52,20 @@ def get_scaling_factor() -> float:
 
 
 def get_scaling_from_env() -> typing.Optional[typing.Tuple[str, float]]:
+    """Get scaling factor from environment variables"""
 
     gdk_scale = os.environ.get("GDK_SCALE")
     if gdk_scale:
         try:
             return "GDK_SCALE", float(gdk_scale)
-        except:
+        except ValueError:
             pass
 
     qt_scale = os.environ.get("QT_SCALE_FACTOR")
     if qt_scale:
         try:
             return "QT_SCALE_FACTOR", float(qt_scale)
-        except:
+        except ValueError:
             pass
 
     return None
@@ -90,6 +92,8 @@ def get_scaling_from_gtk() -> typing.Optional[typing.Tuple[str, float]]:
 
 
 def get_scaling_from_wlr_randr() -> typing.Optional[typing.Tuple[str, float]]:
+    """Get scaling from wlr-randr"""
+    # pylint: disable=import-outside-toplevel
     import subprocess
     try:
         output = subprocess.check_output(['wlr-randr'], text=True)
@@ -97,7 +101,9 @@ def get_scaling_from_wlr_randr() -> typing.Optional[typing.Tuple[str, float]]:
             if 'current' in line and 'scale' in line:
                 return "wlr-randr", float(line.split('scale')[1].strip())
     except (subprocess.CalledProcessError, ValueError, FileNotFoundError):
-        return None
+        pass
+
+    return None
 
 
 def get_scaling_from_xft_dpi() -> typing.Optional[typing.Tuple[str, float]]:
