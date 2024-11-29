@@ -95,6 +95,10 @@ class Gscreenshot(object):
         return self.screenshooter.get_capabilities_()
 
     def set_select_color(self, select_color_rgba: str):
+        '''
+        Set the selection color for region selection
+        This accepts an RGBA hexadecimal string.
+        '''
         self._select_color = select_color_rgba
 
     def register_stamp_image(self, fname: str,

@@ -89,6 +89,10 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 -s, \--selection
 :   Use a region selection utility to select a region of the screen to capture (if available).
 
+--select-color
+:   RGB or RGBA hex value for the selection color box. Defaults to "#cccccc55". This can be used to
+    remove transparency from the selection box if a compositor is not in use.
+
 -V, \--version
 :   Display the version, supported features, and additional relevant information.
 
