@@ -6,6 +6,33 @@ import sys
 _ = gettext.gettext
 
 
+def enable_gui(params) -> bool:
+    '''Whether to show the GUI based on args'''
+
+    if 'gscreenshot-cli' in sys.argv[0]:
+        return False
+
+    if len(sys.argv) == 1:
+        return True
+
+    if params.gui:
+        return True
+
+    fake_args = []
+    for arg in sys.argv:
+        if "--select-color" in arg:
+            fake_args.append(arg)
+        elif "-g" in arg or "--pointer-glyph" in arg:
+            fake_args.append(arg)
+        elif "--gui" in arg:
+            fake_args.append(arg)
+
+    if len(fake_args) == len(sys.argv) - 1:
+        return True
+
+    return params.gui
+
+
 def get_args():
     '''Get the parsed command line arguments'''
     parser = argparse.ArgumentParser()
@@ -79,13 +106,14 @@ def get_args():
             action='store_true',
             help=_("Open the gscreenshot GUI. This is the default if no parameters are provided.")
     )
+    parser.add_argument(
+            '--select-color',
+            required=False,
+            help=_("The color to use for the selection box. Optional.")
+    )
 
     args = parser.parse_args()
 
-    if 'gscreenshot-cli' in sys.argv[0]:
-        args.gui = False
-
-    if len(sys.argv) == 1:
-        args.gui = True
+    args.gui = enable_gui(args)
 
     return args

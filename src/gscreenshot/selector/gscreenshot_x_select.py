@@ -39,26 +39,36 @@ class GscreenshotXSelect(RegionSelector):
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self):
+    def region_select(self, selection_box_rgba: typing.Optional[str]=None):
         """
         Select an arbitrary region of the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive([])
+        if selection_box_rgba:
+            color = RegionSelector._rgba_hex_to_decimals(selection_box_rgba)
+        else:
+            color = (0, 0, 0, .3)
 
-    def window_select(self):
+        return self._get_boundary_interactive([color])
+
+    def window_select(self, selection_box_rgba: typing.Optional[str]=None):
         """
         Selects a window from the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive([])
+        if selection_box_rgba:
+            color = RegionSelector._rgba_hex_to_decimals(selection_box_rgba)
+        else:
+            color = (0, 0, 0, .3)
+
+        return self._get_boundary_interactive([color])
 
     def _get_boundary_interactive(self, _params):
-        selection_tool = SelectionTool()
+        selection_tool = SelectionTool(color=_params[0])
         Gtk.main()
         while Gtk.events_pending():
             Gtk.main_iteration()
@@ -74,9 +84,10 @@ class GscreenshotXSelect(RegionSelector):
 
 class SelectionTool(Gtk.Window):
     """SelectionTool"""
-    def __init__(self):
+    def __init__(self, color = (0, 0, 0, .3)):
         super().__init__()
         self.set_title("Resize to surround your selection")
+        self.color = color
         self.set_position(Gtk.WindowPosition.CENTER)
         self.set_border_width(40)
         self.set_default_size(600, 450)
@@ -108,7 +119,7 @@ class SelectionTool(Gtk.Window):
 
     def area_draw(self, _widget, canvas):
         """draws the transparent area of the window"""
-        canvas.set_source_rgba(0, 0, 0, .3)
+        canvas.set_source_rgba(*self.color)
         canvas.paint()
 
     def get_region(self, _widget):

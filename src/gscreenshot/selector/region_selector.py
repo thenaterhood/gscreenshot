@@ -25,7 +25,8 @@ class RegionSelector():
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self) -> typing.Tuple[int, int, int, int]:
+    def region_select(self, selection_box_rgba: typing.Optional[str] = None
+                      ) -> typing.Tuple[int, int, int, int]:
         """
         Select an arbitrary region of the screen
 
@@ -34,7 +35,8 @@ class RegionSelector():
         """
         raise SelectionError("Not implemented")
 
-    def window_select(self) -> typing.Tuple[int, int, int, int]:
+    def window_select(self, selection_box_rgba: typing.Optional[str]=None
+                      ) -> typing.Tuple[int, int, int, int]:
         """
         Selects a window from the screen
 
@@ -121,6 +123,25 @@ class RegionSelector():
             raise SelectionParseError("Unexpected output") #from exception
 
         return crop_box
+
+    @staticmethod
+    def _rgba_hex_to_decimals(selection_box_rgba: typing.Optional[str]
+                          ) -> typing.Tuple:
+        selection_box_rgba = selection_box_rgba if selection_box_rgba else "#cccccc99"
+        selection_box_rgba = selection_box_rgba.strip("#")
+
+        try:
+            color = tuple(float(int(selection_box_rgba[i:i+2], 16)/255) for i in (0, 2, 4, 6))
+        except (IndexError, ValueError):
+            pass
+
+        if not color:
+            try:
+                color = tuple(float(int(selection_box_rgba[i:i+2], 16)/255) for i in (0, 2, 4))
+            except (IndexError, ValueError):
+                color = (0.8, 0.8, 0.8, 0.6)
+
+        return color
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}()'

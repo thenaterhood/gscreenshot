@@ -41,7 +41,7 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
-    __slots__ = ['screenshooter', 'cache', 'session', '_screenshots', '_stamps']
+    __slots__ = ['screenshooter', 'cache', 'session', '_screenshots', '_stamps', '_select_color']
 
     screenshooter: Screenshooter
     cache: typing.Dict[str, str]
@@ -75,6 +75,7 @@ class Gscreenshot(object):
         self._screenshots = ScreenshotCollection()
 
         self._stamps = {}
+        self._select_color = None
 
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
@@ -92,6 +93,13 @@ class Gscreenshot(object):
         Get the features supported in the current setup
         '''
         return self.screenshooter.get_capabilities_()
+
+    def set_select_color(self, select_color_rgba: str):
+        '''
+        Set the selection color for region selection
+        This accepts an RGBA hexadecimal string.
+        '''
+        self._select_color = select_color_rgba
 
     def register_stamp_image(self, fname: str,
         name: typing.Optional[str]=None
@@ -288,7 +296,8 @@ class Gscreenshot(object):
                 delay,
                 capture_cursor,
                 use_cursor=use_cursor,
-                region=region
+                region=region,
+                select_color_rgba=self._select_color,
             )
 
             if self.screenshooter.screenshot is not None:
@@ -325,7 +334,8 @@ class Gscreenshot(object):
             self.screenshooter.grab_window_(
                 delay,
                 capture_cursor,
-                use_cursor=use_cursor
+                use_cursor=use_cursor,
+                select_color_rgba=self._select_color,
             )
 
             if self.screenshooter.screenshot is not None:
