@@ -219,6 +219,9 @@ msgstr "Cursor Alternativo"
 msgid "capture_full_screen"
 msgstr "Captura Todos"
 
+msgid "scaling_detection"
+msgstr "Detección de escala"
+
 msgid "The name of a custom cursor glyph ('adwaita', 'prohibit', 'allow') or path to an image."
 msgstr "El nombre de un glifo de cursor («adwaita», «prohibit», «allow») o la ruta a una imagen."
 
