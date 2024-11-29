@@ -79,6 +79,9 @@ def run():
             cursor_name=args.pointer_glyph
         )
 
+    if args.select_color:
+        gscreenshot.set_select_color(args.select_color)
+
     if gscreenshot.get_last_image() is None:
         print(_("No screenshot taken."))
         gscreenshot.session["error"] = True

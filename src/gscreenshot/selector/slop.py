@@ -1,6 +1,7 @@
 '''
 Wrapper for the slop screen selector utility
 '''
+import typing
 from gscreenshot.util import find_executable
 from .region_selector import RegionSelector
 
@@ -22,36 +23,50 @@ class Slop(RegionSelector):
         """
         RegionSelector.__init__(self)
 
-    def region_select(self):
+    def region_select(self, selection_box_rgba: typing.Optional[str]=None):
         """
         Select an arbitrary region of the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
+        if selection_box_rgba:
+            color = ",".join(
+                [str(rgba) for rgba in RegionSelector._rgba_hex_to_decimals(selection_box_rgba)]
+            )
+        else:
+            color = "0.8,0.8,0.8,0.6"
+
         return self._get_boundary_interactive([
                 'slop',
                 '--nodecorations=0',
                 '-l',
                 '-c',
-                '0.8,0.8,0.8,0.6',
+                color,
                 '-f',
                 'X=%x,Y=%y,W=%w,H=%h'
             ])
 
-    def window_select(self):
+    def window_select(self, selection_box_rgba: typing.Optional[str]=None):
         """
         Selects a window from the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
+        if selection_box_rgba:
+            color = ",".join(
+                [str(rgba) for rgba in RegionSelector._rgba_hex_to_decimals(selection_box_rgba)]
+            )
+        else:
+            color = "0.8,0.8,0.8,0.6"
+
         return self._get_boundary_interactive([
                 'slop',
                 '--nodecorations=0',
                 '-l',
                 '-c',
-                '0.8,0.8,0.8,0.6',
+                color,
                 '-f',
                 'X=%x,Y=%y,W=%w,H=%h'
             ])

@@ -33,30 +33,34 @@ class Slurp(RegionSelector):
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self):
+    def region_select(self, selection_box_rgba: typing.Optional[str]=None):
         """
         Select an arbitrary region of the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
+        selection_box_rgba = selection_box_rgba if selection_box_rgba else "#cccccc55"
+
         ret = self._get_boundary_interactive([
             'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
-            '-b', '#00000011', '-s', '#cccccc55', '-c', '#808080FF'])
+            '-b', '#00000000', '-s', selection_box_rgba, '-c', '#808080FF'])
         # Sleep so we hopefully don't catch the edge of slurp closing
         sleep(0.1)
         return ret
 
-    def window_select(self):
+    def window_select(self, selection_box_rgba: typing.Optional[str]=None):
         """
         Selects a window from the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
+        selection_box_rgba = selection_box_rgba if selection_box_rgba else "#cccccc55"
+
         ret = self._get_boundary_interactive([
             'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
-            '-b', '#00000011', '-s', '#cccccc55', '-c', '#808080FF'])
+            '-s', selection_box_rgba, '-c', '#808080FF'])
         # Sleep so we hopefully don't catch the edge of slurp closing
         sleep(0.1)
         return ret

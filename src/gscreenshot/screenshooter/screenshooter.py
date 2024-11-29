@@ -138,7 +138,8 @@ class Screenshooter(object):
 
     def grab_selection_(self, delay: int=0, capture_cursor: bool=False,
                         use_cursor: typing.Optional[PIL.Image.Image]=None,
-                        region: typing.Optional[typing.Tuple[int, int, int, int]]=None):
+                        region: typing.Optional[typing.Tuple[int, int, int, int]]=None,
+                        select_color_rgba: typing.Optional[str]=None):
         """
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
@@ -165,7 +166,7 @@ class Screenshooter(object):
             return
 
         try:
-            crop_box = self._selector.region_select()
+            crop_box = self._selector.region_select(selection_box_rgba=select_color_rgba)
         except SelectionCancelled:
             print("Selection was cancelled")
             self.grab_fullscreen_(delay, capture_cursor, use_cursor)
@@ -187,13 +188,14 @@ class Screenshooter(object):
             self._screenshot.add_effect(crop)
 
     def grab_window_(self, delay: int=0, capture_cursor: bool=False,
-                     use_cursor: typing.Optional[PIL.Image.Image]=None):
+                     use_cursor: typing.Optional[PIL.Image.Image]=None,
+                    select_color_rgba: typing.Optional[str]=None):
         '''
         Internal API method for grabbing a window. This should not
         be overridden by extending classes. Implement grab_window instead.
 
         '''
-        self.grab_selection_(delay, capture_cursor, use_cursor)
+        self.grab_selection_(delay, capture_cursor, use_cursor, select_color_rgba=select_color_rgba)
 
     def grab_window(self, delay: int=0, capture_cursor: bool=False):
         """

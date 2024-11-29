@@ -79,6 +79,11 @@ def get_args():
             action='store_true',
             help=_("Open the gscreenshot GUI. This is the default if no parameters are provided.")
     )
+    parser.add_argument(
+            '--select-color',
+            required=False,
+            help=_("The color to use for the selection box. Optional.")
+    )
 
     args = parser.parse_args()
 
