@@ -96,7 +96,7 @@ def get_scaling_from_wlr_randr() -> typing.Optional[typing.Tuple[str, float]]:
     # pylint: disable=import-outside-toplevel
     import subprocess
     try:
-        output = subprocess.check_output(['wlr-randr'], text=True)
+        output = subprocess.check_output(['wlr-randr'], text=True, stderr=subprocess.PIPE)
         for line in output.splitlines():
             if 'current' in line and 'scale' in line:
                 return "wlr-randr", float(line.split('scale')[1].strip())
@@ -111,7 +111,7 @@ def get_scaling_from_xft_dpi() -> typing.Optional[typing.Tuple[str, float]]:
     # pylint: disable=import-outside-toplevel
     import subprocess
     try:
-        output = subprocess.check_output(['xrdb', '-query']).decode('utf-8')
+        output = subprocess.check_output(['xrdb', '-query'], stderr=subprocess.PIPE).decode('utf-8')
         for line in output.split('\n'):
             if line.startswith('Xft.dpi:'):
                 dpi = float(line.split(':')[1].strip())
