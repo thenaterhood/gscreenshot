@@ -56,3 +56,11 @@ class SelectorTest(unittest.TestCase):
         get_scaling_factor.return_value = 1
         region = self.selector.region_select()
         self.assertEqual((1, 2, 4, 6), region)
+
+    @mock.patch('src.gscreenshot.selector.region_selector.get_scaling_factor')
+    def test_scaling_factor_200(self, get_scaling_factor):
+
+        self.selector.mock_output = ["X=1,Y=2,W=3,H=4"]
+        get_scaling_factor.return_value = 2
+        region = self.selector.region_select()
+        self.assertEqual((2, 4, 8, 12), region)
