@@ -136,6 +136,7 @@ class Screenshooter(object):
             "Not implemented. Fullscreen grab called with delay " + str(delay)
             )
 
+    #pylint: disable=too-many-arguments
     def grab_selection_(self, delay: int=0, capture_cursor: bool=False,
                         use_cursor: typing.Optional[PIL.Image.Image]=None,
                         region: typing.Optional[typing.Tuple[int, int, int, int]]=None,
