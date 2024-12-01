@@ -78,7 +78,7 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 \--gui
 :   Open the gscreenshot GUI. This is the default if no options are passed to gscreenshot.
     This can be combined with other parameters to change, for example, the initial screenshot
-    taken when gscreenshot starts.s
+    taken when gscreenshot starts.
 
 -c, \--clip
 :   Copy the resulting screenshot to the clipboard. Relies on xclip or wl-clipboard.
@@ -107,6 +107,15 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 -g, \--pointer-glyph
 :   Use an alternate image when capturing the cursor. "adwaita", "prohibit", "allow" are built in, or pass
     a file path to use a custom image.
+
+-v
+:  Show more gscreenshot output
+
+-vv
+:  Show all debugging output from gscreenshot
+
+-vvv
+:  Show all debugging output from gscreenshot and supporting libraries (which provide logging)
 
 # EXAMPLES
 
