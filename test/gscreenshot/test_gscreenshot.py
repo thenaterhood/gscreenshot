@@ -327,3 +327,14 @@ class GscreenshotTest(unittest.TestCase):
             stdout=None,
             stderr=None
         )
+
+    def test_select_color(self):
+        self.gscreenshot.set_select_color("#00000000")
+        self.gscreenshot.screenshot_selected(delay=5, capture_cursor=False)
+        self.gscreenshot.screenshooter.grab_selection_.assert_called_with(
+            5,
+            False,
+            use_cursor=None,
+            region=None,
+            select_color_rgba="#00000000",
+        )

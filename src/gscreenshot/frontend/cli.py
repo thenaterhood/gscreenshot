@@ -24,10 +24,10 @@ def resume(app: typing.Optional[Gscreenshot]):
     sys.exit(0)
 
 
-def run():
+def run(app: typing.Optional[Gscreenshot] = None, args = None):
     '''Run the CLI frontend'''
     try:
-        gscreenshot = Gscreenshot()
+        gscreenshot = app or Gscreenshot()
     except NoSupportedScreenshooterError as gscreenshot_error:
         log.error(_("No supported screenshot backend is available."))
         if gscreenshot_error.required is None:
@@ -37,7 +37,8 @@ def run():
             log.error(", ".join(gscreenshot_error.required))
         return None
 
-    args = get_args()
+    if not args:
+        args = get_args()
 
     logging.basicConfig(level=args.log_level)
 

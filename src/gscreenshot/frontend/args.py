@@ -47,7 +47,7 @@ def get_log_level():
     return logging.WARN
 
 
-def get_args():
+def get_args(args = None):
     '''Get the parsed command line arguments'''
     parser = argparse.ArgumentParser()
 
@@ -132,9 +132,9 @@ def get_args():
             help=_("Verbosity. Add more v for more verbosity. -v, -vv, and -vvv are supported"),
     )
 
-    args = parser.parse_args()
+    parsed_args = parser.parse_args(args)
 
-    args.gui = enable_gui(args)
-    args.log_level = get_log_level()
+    parsed_args.gui = enable_gui(parsed_args)
+    parsed_args.log_level = get_log_level()
 
-    return args
+    return parsed_args
