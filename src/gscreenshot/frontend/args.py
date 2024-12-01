@@ -1,6 +1,7 @@
 '''Functions for handling command line arguments'''
 import argparse
 import gettext
+import logging
 import sys
 
 _ = gettext.gettext
@@ -26,11 +27,24 @@ def enable_gui(params) -> bool:
             fake_args.append(arg)
         elif "--gui" in arg:
             fake_args.append(arg)
+        elif "-v" in arg:
+            fake_args.append(arg)
 
     if len(fake_args) == len(sys.argv) - 1:
         return True
 
     return params.gui
+
+
+def get_log_level():
+    '''Get the log level from sys.argv'''
+    if "-v" in sys.argv:
+        return logging.INFO
+
+    if "-vv" in sys.argv or "-vvv" in sys.argv:
+        return logging.DEBUG
+
+    return logging.WARN
 
 
 def get_args():
@@ -111,9 +125,16 @@ def get_args():
             required=False,
             help=_("The color to use for the selection box. Optional.")
     )
+    parser.add_argument(
+            '-v',
+            required=False,
+            action='store_true',
+            help=_("Verbosity. Add more v for more verbosity. -v, -vv, and -vvv are supported"),
+    )
 
     args = parser.parse_args()
 
     args.gui = enable_gui(args)
+    args.log_level = get_log_level()
 
     return args

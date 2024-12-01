@@ -1,9 +1,12 @@
+import logging
 import subprocess
 import typing
 from gscreenshot.scaling import get_scaling_factor
 from gscreenshot.util import GSCapabilities
 from .exceptions import SelectionError, SelectionExecError, SelectionCancelled, SelectionParseError
 
+
+log = logging.getLogger(__name__)
 
 class RegionSelector():
     '''Region selection interface'''
@@ -53,7 +56,7 @@ class RegionSelector():
         return False
 
     def _get_boundary_interactive(self, params: typing.List[str]
-                                ) -> typing.Tuple[float, float, float, float]:
+                                ) -> typing.Optional[typing.Tuple[float, float, float, float]]:
         """
         Runs the selector and returns the parsed output. This accepts a list
         that will be passed directly to subprocess.Popen and expects the
@@ -68,10 +71,12 @@ class RegionSelector():
             ) as selector_process:
 
                 try:
+                    log.debug("running selector %s", params)
                     stdout, stderr = selector_process.communicate(timeout=60)
                 except subprocess.TimeoutExpired:
                     selector_process.kill()
                     #pylint: disable=raise-missing-from
+                    log.warning("selection timed out")
                     raise SelectionExecError(f"{params[0]} selection timed out")
 
                 return_code = selector_process.returncode
@@ -90,6 +95,10 @@ class RegionSelector():
         except OSError:
             #pylint: disable=raise-missing-from
             raise SelectionExecError(f"{params[0]} was not found") #from exception
+        except subprocess.CalledProcessError as exc:
+            log.info("failed to run %s: %s", params, exc)
+
+        return None
 
     def _parse_selection_output(self, region_output: typing.List[str]
                                 ) -> typing.Tuple[float, float, float, float]:
@@ -100,6 +109,7 @@ class RegionSelector():
         Returns a tuple of the X and Y coordinates of the corners:
         (X top left, Y top left, X bottom right, Y bottom right)
         '''
+        log.debug("parsing selector output '%s'", region_output)
         region_parsed = {}
         # We iterate through the output so we're not reliant
         # on the order or number of lines in the output
@@ -120,13 +130,16 @@ class RegionSelector():
             )
         except KeyError:
             #pylint: disable=raise-missing-from
+            log.info("unparseable region")
             raise SelectionParseError("Unexpected output") #from exception
 
+        log.debug("got crop box %s", crop_box)
         return crop_box
 
     @staticmethod
     def _rgba_hex_to_decimals(selection_box_rgba: typing.Optional[str]
                           ) -> typing.Tuple:
+        log.debug("converting '%s' to RGB(A) decimals", selection_box_rgba)
         selection_box_rgba = selection_box_rgba if selection_box_rgba else "#cccccc99"
         selection_box_rgba = selection_box_rgba.strip("#").strip()
         color = None
@@ -134,12 +147,20 @@ class RegionSelector():
         try:
             color = tuple(float(int(selection_box_rgba[i:i+2], 16)/255) for i in (0, 2, 4, 6))
         except (IndexError, ValueError):
-            pass
+            log.debug(
+                "RGB(A) input '%s' is missing alpha channel - retrying without alpha",
+                selection_box_rgba
+            )
 
         if not color:
             try:
                 color = tuple(float(int(selection_box_rgba[i:i+2], 16)/255) for i in (0, 2, 4))
-            except (IndexError, ValueError):
+            except (IndexError, ValueError) as exc:
+                log.info(
+                    "RGB(A) input '%s' is invalid, using defaults: %s",
+                    selection_box_rgba,
+                    exc
+                )
                 color = (0.8, 0.8, 0.8, 0.6)
 
         return color

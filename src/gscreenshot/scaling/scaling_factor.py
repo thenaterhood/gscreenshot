@@ -1,9 +1,13 @@
 """Functions to handle scaled displays"""
 
+import logging
 import os
 import typing
 
 from gscreenshot.util import session_is_wayland
+
+
+log = logging.getLogger(__name__)
 
 
 def get_scaling() -> typing.Tuple[str, float]:
@@ -30,12 +34,14 @@ def get_scaling() -> typing.Tuple[str, float]:
 
             if scaling:
                 name, scale = scaling
+                log.debug("got scale factor = %f from strategy %s", scale, name)
                 # Check if scale is significantly different from 1
                 if scale and abs(scale - 1) > 0.01:
+                    log.debug("using scale factor = %f strategy = %s", scale, name)
                     return name, scale if scale >= 1 else 1
-        # pylint: disable=bare-except
-        except:
-            pass
+        # pylint: disable=broad-exception-caught
+        except Exception as exc:
+            log.info("unable to get scaling factor: %s", exc)
 
     return "None", 1
 

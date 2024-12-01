@@ -14,6 +14,7 @@ import gettext
 import io
 import json
 import locale
+import logging
 import os
 import platform
 import sys
@@ -28,7 +29,9 @@ from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter, get_screenshooter
 from gscreenshot.util import session_is_wayland
 
+
 _ = gettext.gettext
+log = logging.getLogger(__name__)
 
 
 #pylint: disable=missing-class-docstring
@@ -99,6 +102,7 @@ class Gscreenshot(object):
         Set the selection color for region selection
         This accepts an RGBA hexadecimal string.
         '''
+        log.debug("set select color to '%s'", select_color_rgba)
         self._select_color = select_color_rgba
 
     def register_stamp_image(self, fname: str,
@@ -108,6 +112,7 @@ class Gscreenshot(object):
         Adds a new stamp image from a file path
         '''
         if not os.path.exists(fname):
+            log.info("cursor glyph path '%s' does not exist", fname)
             return None
 
         glyph = Image.open(fname).convert("RGBA")
@@ -124,6 +129,7 @@ class Gscreenshot(object):
             name = f"{name[0:8]}..."
 
         self._stamps[name] = glyph
+        log.debug("added cursor path = '%s', name = '%s'", fname, name)
 
         return name
 
@@ -170,6 +176,7 @@ class Gscreenshot(object):
         if name and name in cursors.keys():
             return cursors[name]
 
+        log.info("cursor glyph name = '%s' does not exist, using default", name)
         return cursors[default]
 
     def show_screenshot_notification(self) -> bool:
@@ -189,7 +196,8 @@ class Gscreenshot(object):
                 'gscreenshot'
             ], check=True, timeout=2)
             return True
-        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            log.info("notify-send failed: %s", exc)
             return False
 
     def run_display_mismatch_warning(self):
@@ -222,8 +230,9 @@ class Gscreenshot(object):
         try:
             with open(self.get_cache_file(), "w", encoding="UTF-8") as cachefile:
                 json.dump(self.cache, cachefile)
+                log.debug("wrote cache file '%s'", self.get_cache_file())
         except FileNotFoundError:
-            print(_("unable to save cache file"))
+            log.warning(_("unable to save cache file - file not found"))
 
     def get_screenshooter_name(self) -> str:
         """Gets the name of the current screenshooter"""
@@ -422,7 +431,12 @@ class Gscreenshot(object):
            run through strftime.
         '''
         if "$" not in filename and "%" not in filename:
+            log.debug(
+                "filename '%s' did not contain templating, not interpolating", filename
+            )
             return filename
+
+        interpolated = f"{filename}"
 
         general_replacements:typing.Dict[str, str] = {
             '$$': '$',
@@ -438,12 +452,18 @@ class Gscreenshot(object):
             })
 
         for fmt, replacement in general_replacements.items():
-            filename = filename.replace(fmt, replacement)
+            interpolated = interpolated.replace(fmt, replacement)
 
         now = datetime.now()
-        filename = now.strftime(filename)
+        interpolated = now.strftime(interpolated)
 
-        return filename
+        log.debug(
+            "interpolated filename - received template '%s', converted to '%s'",
+            filename,
+            interpolated
+        )
+
+        return interpolated
 
     def get_time_foldername(self) -> str:
         '''Generates a time-based folder name'''
@@ -497,12 +517,13 @@ class Gscreenshot(object):
                 # there with a time-based filename.
                 try:
                     os.makedirs(filename)
-                except (IOError, OSError):
+                    log.debug("created directory tree for '%s'", filename)
+                except (IOError, OSError) as exc:
                     # Likely the directory already exists, so
                     # we'll throw the exception away.
                     # If we fail to save, we'll return a status
                     # saying so, so we'll be okay.
-                    pass
+                    log.info("failed to create tree for '%s': %s", filename, exc)
 
                 filename = os.path.join(
                         filename,
@@ -523,6 +544,7 @@ class Gscreenshot(object):
             file_type = 'jpeg'
 
         if file_type not in self.get_supported_formats():
+            log.info("unrecognized image format '%s'", file_type)
             return None
 
         try:
@@ -545,7 +567,8 @@ class Gscreenshot(object):
             with open(filename, "wb") as file_pointer:
                 image.save(file_pointer, file_type.upper(), exif=exif_data)
 
-        except IOError:
+        except IOError as exc:
+            log.info("failed to save screenshot: %s", exc)
             filename = None
 
         screenshot = self._screenshots.cursor_current()
@@ -565,7 +588,10 @@ class Gscreenshot(object):
             foldername = self.interpolate_filename(foldername)
 
         if not os.path.exists(foldername):
-            os.makedirs(foldername)
+            try:
+                os.makedirs(foldername)
+            except (IOError, OSError) as exc:
+                log.info("failed to make tree '%s': %s", foldername, exc)
 
         i = 0
         for screenshot in self._screenshots:
@@ -620,7 +646,8 @@ class Gscreenshot(object):
         try:
             subprocess.run(['xdg-open', screenshot_fname], check=True)
             return True
-        except (subprocess.CalledProcessError, IOError, OSError):
+        except (subprocess.CalledProcessError, IOError, OSError) as exc:
+            log.warning("failed to open screenshot with xdg-open: %s", exc)
             return False
 
     def copy_last_screenshot_to_clipboard(self) -> bool:
@@ -667,8 +694,9 @@ class Gscreenshot(object):
 
                     xclip.communicate(input=png_data.getvalue())
                     return True
-            except (OSError, subprocess.CalledProcessError):
+            except (OSError, subprocess.CalledProcessError) as exc:
                 #pylint: disable=raise-missing-from
+                log.warning("failed to clip screenshot with clipper = '%s': %s", clipper_name, exc)
                 raise GscreenshotClipboardException(clipper_name)
 
     def get_last_save_directory(self) -> str:

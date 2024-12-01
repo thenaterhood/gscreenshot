@@ -3,6 +3,7 @@
 '''
 Gscreenshot's CLI
 '''
+import logging
 import sys
 import gettext
 import typing
@@ -12,6 +13,7 @@ from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from .args import get_args
 
 
+log = logging.getLogger(__name__)
 _ = gettext.gettext
 
 
@@ -27,15 +29,17 @@ def run():
     try:
         gscreenshot = Gscreenshot()
     except NoSupportedScreenshooterError as gscreenshot_error:
-        print(_("No supported screenshot backend is available."))
+        log.error(_("No supported screenshot backend is available."))
         if gscreenshot_error.required is None:
-            print(_("Please install one to use gscreenshot."))
+            log.error(_("Please install one to use gscreenshot."))
         else:
-            print(_("Please install one of the following to use gscreenshot:"))
-            print(", ".join(gscreenshot_error.required))
+            log.error(_("Please install one of the following to use gscreenshot:"))
+            log.error(", ".join(gscreenshot_error.required))
         return None
 
     args = get_args()
+
+    logging.basicConfig(level=args.log_level)
 
     if args.version is not False:
         description = gscreenshot.get_program_description()
@@ -63,7 +67,7 @@ def run():
             if pointer_name:
                 args.pointer_glyph = pointer_name
             else:
-                print(_("Unable to open pointer"))
+                log.warning(_("Unable to open pointer"))
                 args.pointer_glyph = 'theme'
 
     if args.selection is not False:
@@ -83,23 +87,23 @@ def run():
         gscreenshot.set_select_color(args.select_color)
 
     if gscreenshot.get_last_image() is None:
-        print(_("No screenshot taken."))
+        log.error(_("No screenshot taken."))
         gscreenshot.session["error"] = True
     else:
         saved_screenshot = False
         if args.notify:
             if not gscreenshot.show_screenshot_notification():
-                print(_("failed to show screenshot notification - is notify-send working?"))
+                log.warning(_("failed to show screenshot notification - is notify-send working?"))
 
         if args.filename is not False:
             if not gscreenshot.save_last_image(args.filename):
-                print(_("Failed to save screenshot!"))
+                log.warning(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
             else:
                 saved_screenshot = True
         elif args.clip is False and not args.gui:
             if not gscreenshot.save_last_image():
-                print(_("Failed to save screenshot!"))
+                log.warning(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
             else:
                 saved_screenshot = True
@@ -116,10 +120,10 @@ def run():
                 gscreenshot.copy_last_screenshot_to_clipboard()
             except GscreenshotClipboardException as error:
                 tmp_file = gscreenshot.save_and_return_path()
-                print(_("Could not clip image! {0} failed to run.").format(error))
+                log.warning(_("Could not clip image! {0} failed to run.").format(error))
 
                 if tmp_file is not None:
-                    print(_("Your screenshot was saved to {0}").format(tmp_file))
+                    log.warning(_("Your screenshot was saved to {0}").format(tmp_file))
                 gscreenshot.session["error"] = True
 
     return gscreenshot
