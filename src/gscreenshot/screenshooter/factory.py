@@ -1,7 +1,7 @@
 '''
 Utilities for selecting a screenshot utility
 '''
-
+import logging
 import typing
 from gscreenshot.util import session_is_wayland
 from .grim import Grim
@@ -12,6 +12,9 @@ from .scrot import Scrot
 from .xdg_desktop_portal import XdgDesktopPortal
 from .exceptions import NoSupportedScreenshooterError
 from .screenshooter import Screenshooter
+
+
+log = logging.getLogger(__name__)
 
 
 def get_screenshooter(screenshooter: typing.Optional[Screenshooter] = None):
@@ -47,12 +50,15 @@ class ScreenshooterFactory(object):
     def create(self) -> Screenshooter:
         '''Returns a screenshooter instance'''
         if self.screenshooter is not None:
+            log.debug("using predefined screenshotter '%s'", self.screenshooter.__utilityname__)
             return self.screenshooter
 
         for shooter in self.screenshooters:
             if shooter.can_run():
+                log.debug("using autodetected screenshooter '%s", {shooter.__utilityname__})
                 return shooter()
 
+        log.info("no supported screenshotter available")
         raise NoSupportedScreenshooterError(
                 "No supported screenshot backend available",
                 [x.__utilityname__ for x in self.screenshooters if x.__utilityname__ is not None]

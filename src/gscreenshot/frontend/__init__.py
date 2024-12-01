@@ -1,10 +1,15 @@
 '''
 Shared utilities for gscreenshot's various frontends
 '''
+import logging
+import logging.config
 import signal
 import sys
 import gscreenshot.frontend.cli
 from .args import get_args
+
+
+log = logging.getLogger(__name__)
 
 
 try:
@@ -40,6 +45,45 @@ def delegate():
 
     with SignalHandler():
         args = get_args()
+
+        class GscreenshotLogFilter(logging.Filter):
+            '''Gscreenshot log filter'''
+            def filter(self, record):
+                if "-vvv" in sys.argv:
+                    return True
+                return 'gscreenshot' in record.pathname
+
+        logging_config = {
+            'version': 1,
+            'disable_existing_loggers': False,
+            'formatters': {
+                'standard': {
+                    'format': '%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+                },
+            },
+            'filters': {
+                'global_filter': {
+                    '()': GscreenshotLogFilter,
+                }
+            },
+            'handlers': {
+                'default': {
+                    'level': 'DEBUG',
+                    'formatter': 'standard',
+                    'class': 'logging.StreamHandler',
+                    'filters': ['global_filter']
+                },
+            },
+            'loggers': {
+                '': {  # root logger
+                    'handlers': ['default'],
+                    'level': args.log_level,
+                    'propagate': True
+                }
+            }
+        }
+        logging.config.dictConfig(logging_config)
+
         app = gscreenshot.frontend.cli.run()
 
         if args.gui and GTK_CAPABLE:
