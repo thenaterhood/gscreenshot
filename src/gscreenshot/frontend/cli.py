@@ -61,6 +61,9 @@ def run():
         print(_("Licensed as {0}").format(gscreenshot.get_program_license()))
         sys.exit(0)
 
+    if args.select_color:
+        gscreenshot.set_select_color(args.select_color)
+
     if args.pointer_glyph:
         if args.pointer_glyph not in gscreenshot.get_available_cursors():
             pointer_name = gscreenshot.register_stamp_image(args.pointer_glyph)
@@ -82,9 +85,6 @@ def run():
             capture_cursor=args.pointer,
             cursor_name=args.pointer_glyph
         )
-
-    if args.select_color:
-        gscreenshot.set_select_color(args.select_color)
 
     if gscreenshot.get_last_image() is None:
         log.error(_("No screenshot taken."))
