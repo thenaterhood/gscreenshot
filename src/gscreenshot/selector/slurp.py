@@ -40,11 +40,23 @@ class Slurp(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        selection_box_rgba = selection_box_rgba if selection_box_rgba else "#cccccc55"
+        params = [
+            'slurp',
+            '-f',
+            'X=%x,Y=%y,W=%w,H=%h',
+        ]
 
-        ret = self._get_boundary_interactive([
-            'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
-            '-b', '#00000000', '-s', selection_box_rgba, '-c', '#808080FF'])
+        if selection_box_rgba:
+            params.extend([
+                '-b',
+                '#00000000',
+                '-s',
+                selection_box_rgba,
+                '-c',
+                '#808080FF',
+            ])
+
+        ret = self._get_boundary_interactive(params)
         # Sleep so we hopefully don't catch the edge of slurp closing
         sleep(0.1)
         return ret
@@ -56,11 +68,23 @@ class Slurp(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        selection_box_rgba = selection_box_rgba if selection_box_rgba else "#cccccc55"
+        params = [
+            'slurp',
+            '-f',
+            'X=%x,Y=%y,W=%w,H=%h',
+        ]
 
-        ret = self._get_boundary_interactive([
-            'slurp', '-f', 'X=%x,Y=%y,W=%w,H=%h',
-            '-s', selection_box_rgba, '-c', '#808080FF'])
+        if selection_box_rgba:
+            params.extend([
+                '-b',
+                '#00000000',
+                '-s',
+                selection_box_rgba,
+                '-c',
+                '#808080FF',
+            ])
+
+        ret = self._get_boundary_interactive(params)
         # Sleep so we hopefully don't catch the edge of slurp closing
         sleep(0.1)
         return ret

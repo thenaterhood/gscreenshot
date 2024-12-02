@@ -30,22 +30,24 @@ class Slop(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
+        params = [
+            'slop',
+            '--nodecorations=0',
+            '-f',
+            'X=%x,Y=%y,W=%w,H=%h'
+        ]
+
         if selection_box_rgba:
             color = ",".join(
                 [str(rgba) for rgba in RegionSelector._rgba_hex_to_decimals(selection_box_rgba)]
             )
-        else:
-            color = "0.8,0.8,0.8,0.6"
-
-        return self._get_boundary_interactive([
-                'slop',
-                '--nodecorations=0',
+            params.extend([
                 '-l',
                 '-c',
                 color,
-                '-f',
-                'X=%x,Y=%y,W=%w,H=%h'
             ])
+
+        return self._get_boundary_interactive(params)
 
     def window_select(self, selection_box_rgba: typing.Optional[str]=None):
         """
@@ -54,22 +56,24 @@ class Slop(RegionSelector):
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
+        params = [
+            'slop',
+            '--nodecorations=0',
+            '-f',
+            'X=%x,Y=%y,W=%w,H=%h'
+        ]
+
         if selection_box_rgba:
             color = ",".join(
                 [str(rgba) for rgba in RegionSelector._rgba_hex_to_decimals(selection_box_rgba)]
             )
-        else:
-            color = "0.8,0.8,0.8,0.6"
-
-        return self._get_boundary_interactive([
-                'slop',
-                '--nodecorations=0',
+            params.extend([
                 '-l',
                 '-c',
                 color,
-                '-f',
-                'X=%x,Y=%y,W=%w,H=%h'
             ])
+
+        return self._get_boundary_interactive(params)
 
     @staticmethod
     def can_run() -> bool:
