@@ -91,7 +91,8 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 
 --select-color
 :   RGB or RGBA hex value for the selection color box. Defaults to "#cccccc55". This can be used to
-    remove transparency from the selection box if a compositor is not in use.
+    remove transparency from the selection box if a compositor is not in use. An empty string '' is
+    also accepted to use the underlying selection utility's defaults.
 
 -V, \--version
 :   Display the version, supported features, and additional relevant information.

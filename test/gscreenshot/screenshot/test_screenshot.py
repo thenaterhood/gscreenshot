@@ -24,7 +24,7 @@ class ScreenshotTest(unittest.TestCase):
             original_img = Image.open(gscreenshot_png)
             cursor_img = Image.open(adwaita)
 
-        expected_img = Image.open("../test/gscreenshot/screenshot/cursor_overlay_expected.png").convert("RGB")
+        expected_img = Image.open("test/gscreenshot/screenshot/cursor_overlay_expected.png").convert("RGB")
 
         self.screenshot = Screenshot(original_img)
 

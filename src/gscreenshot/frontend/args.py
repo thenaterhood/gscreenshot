@@ -123,7 +123,8 @@ def get_args(args = None):
     parser.add_argument(
             '--select-color',
             required=False,
-            help=_("The color to use for the selection box. Optional.")
+            default="#cccccc99",
+            help=_("Optional. The color to use for the selection box. Accepts an RGB/RGBA hex string or '' to use the underlying tool's defaults.")
     )
     parser.add_argument(
             '-v',
