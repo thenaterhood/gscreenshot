@@ -40,7 +40,7 @@ class GscreenshotXSelect(RegionSelector):
         }
 
     def region_select(self, selection_box_rgba: typing.Optional[str]=None,
-                      selection_border_weight: typing.Optional[str]=None):
+                      selection_border_weight: typing.Optional[int]=None):
         """
         Select an arbitrary region of the screen
 
