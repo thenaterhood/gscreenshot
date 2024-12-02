@@ -44,7 +44,15 @@ class Gscreenshot(object):
     Gscreenshot application
     """
 
-    __slots__ = ['screenshooter', 'cache', 'session', '_screenshots', '_stamps', '_select_color']
+    __slots__ = [
+        'screenshooter',
+        'cache',
+        'session',
+        '_screenshots',
+        '_stamps',
+        '_select_color',
+        '_select_border_weight',
+    ]
 
     screenshooter: Screenshooter
     cache: typing.Dict[str, str]
@@ -79,6 +87,7 @@ class Gscreenshot(object):
 
         self._stamps = {}
         self._select_color = None
+        self._select_border_weight = None
 
         self.cache = {"last_save_dir": os.path.expanduser("~")}
         if os.path.isfile(self.get_cache_file()):
@@ -104,6 +113,11 @@ class Gscreenshot(object):
         '''
         log.debug("set select color to '%s'", select_color_rgba)
         self._select_color = select_color_rgba
+
+    def set_select_border_weight(self, select_border_weight: int):
+        '''Set the border weight for region selection'''
+        log.debug("set select border weight to '%s'", select_border_weight)
+        self._select_border_weight = select_border_weight
 
     def register_stamp_image(self, fname: str,
         name: typing.Optional[str]=None
@@ -307,6 +321,7 @@ class Gscreenshot(object):
                 use_cursor=use_cursor,
                 region=region,
                 select_color_rgba=self._select_color,
+                select_border_weight=self._select_border_weight,
             )
 
             if self.screenshooter.screenshot is not None:
@@ -345,6 +360,7 @@ class Gscreenshot(object):
                 capture_cursor,
                 use_cursor=use_cursor,
                 select_color_rgba=self._select_color,
+                select_border_weight=self._select_border_weight,
             )
 
             if self.screenshooter.screenshot is not None:

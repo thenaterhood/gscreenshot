@@ -27,6 +27,8 @@ def enable_gui(params) -> bool:
             fake_args.append(arg)
         elif "--gui" in arg:
             fake_args.append(arg)
+        elif "--select-border-weight" in arg:
+            fake_args.append(arg)
         elif "-v" in arg:
             fake_args.append(arg)
 
@@ -125,6 +127,12 @@ def get_args(args = None):
             required=False,
             default="#cccccc99",
             help=_("Optional. The color to use for the selection box. Accepts an RGB/RGBA hex string or '' to use the underlying tool's defaults.")
+    )
+    parser.add_argument(
+            '--select-border-weight',
+            required=False,
+            default=5,
+            help=_("Optional. The thickness of the border of the region selection box.")
     )
     parser.add_argument(
             '-v',

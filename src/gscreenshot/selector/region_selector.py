@@ -28,7 +28,9 @@ class RegionSelector():
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self, selection_box_rgba: typing.Optional[str] = None
+    def region_select(self,
+                      selection_box_rgba: typing.Optional[str] = None,
+                      selection_border_weight: typing.Optional[int] = None,
                       ) -> typing.Tuple[int, int, int, int]:
         """
         Select an arbitrary region of the screen
@@ -38,7 +40,9 @@ class RegionSelector():
         """
         raise SelectionError("Not implemented")
 
-    def window_select(self, selection_box_rgba: typing.Optional[str]=None
+    def window_select(self,
+                      selection_box_rgba: typing.Optional[str]=None,
+                      selection_border_weight: typing.Optional[int]=None,
                       ) -> typing.Tuple[int, int, int, int]:
         """
         Selects a window from the screen

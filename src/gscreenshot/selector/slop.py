@@ -23,7 +23,9 @@ class Slop(RegionSelector):
         """
         RegionSelector.__init__(self)
 
-    def region_select(self, selection_box_rgba: typing.Optional[str]=None):
+    def region_select(self,
+                      selection_box_rgba: typing.Optional[str]=None,
+                      selection_border_weight: typing.Optional[int]=None):
         """
         Select an arbitrary region of the screen
 
@@ -47,9 +49,15 @@ class Slop(RegionSelector):
                 color,
             ])
 
+        if selection_border_weight:
+            params.extend(["-b", str(selection_border_weight)])
+
         return self._get_boundary_interactive(params)
 
-    def window_select(self, selection_box_rgba: typing.Optional[str]=None):
+    def window_select(self,
+                      selection_box_rgba: typing.Optional[str]=None,
+                      selection_border_weight: typing.Optional[int]=None,
+                      ):
         """
         Selects a window from the screen
 
@@ -72,6 +80,9 @@ class Slop(RegionSelector):
                 '-c',
                 color,
             ])
+
+        if selection_border_weight:
+            params.extend(["-b", str(selection_border_weight)])
 
         return self._get_boundary_interactive(params)
 
