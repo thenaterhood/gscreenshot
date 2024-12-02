@@ -49,6 +49,12 @@ class CLITestGscreenshotCalls(unittest.TestCase):
         self.app.set_select_color.assert_called_with("#00000000")
         self.app.screenshot_selected.assert_called_with(delay=5, capture_cursor=False, cursor_name=None)
 
+    def test_selection_weight(self):
+        args = get_args(['--select-border-weight', '20', '--select-color', '', '-s'])
+        run(app=self.app, args=args)
+        self.app.set_select_border_weight.assert_called_with(20)
+        self.app.screenshot_selected.assert_called()
+
     def test_clip_and_open(self):
         args = get_args(["--clip", "--open"])
         run(app=self.app, args=args)

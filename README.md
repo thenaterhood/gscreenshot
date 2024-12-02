@@ -94,6 +94,9 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
     remove transparency from the selection box if a compositor is not in use. An empty string '' is
     also accepted to use the underlying selection utility's defaults.
 
+--select-border-weight
+:   Thickness of the border of the selection box. Defaults to 5.
+
 -V, \--version
 :   Display the version, supported features, and additional relevant information.
 

@@ -64,6 +64,7 @@ class GscreenshotTest(unittest.TestCase):
             use_cursor=None,
             region=None,
             select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -77,6 +78,7 @@ class GscreenshotTest(unittest.TestCase):
             use_cursor=None,
             region=None,
             select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -92,6 +94,7 @@ class GscreenshotTest(unittest.TestCase):
             use_cursor=None,
             region=None,
             select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -105,6 +108,7 @@ class GscreenshotTest(unittest.TestCase):
             False,
             use_cursor=None,
             select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -117,6 +121,7 @@ class GscreenshotTest(unittest.TestCase):
             False,
             use_cursor=None,
             select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -131,6 +136,7 @@ class GscreenshotTest(unittest.TestCase):
             True,
             use_cursor=None,
             select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -337,4 +343,17 @@ class GscreenshotTest(unittest.TestCase):
             use_cursor=None,
             region=None,
             select_color_rgba="#00000000",
+            select_border_weight=None,
+        )
+
+    def test_select_border_weight(self):
+        self.gscreenshot.set_select_border_weight(20)
+        self.gscreenshot.screenshot_selected(delay=5, capture_cursor=False)
+        self.gscreenshot.screenshooter.grab_selection_.assert_called_with(
+            5,
+            False,
+            region=None,
+            use_cursor=None,
+            select_color_rgba=None,
+            select_border_weight=20,
         )

@@ -65,6 +65,15 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
     if args.select_color:
         gscreenshot.set_select_color(args.select_color)
 
+    if args.select_border_weight:
+        try:
+            gscreenshot.set_select_border_weight(int(args.select_border_weight))
+        except ValueError:
+            log.warning(
+                "invalid border weight, unable to make an integer out of '%s'",
+                args.select_border_weight
+            )
+
     if args.pointer_glyph:
         if args.pointer_glyph not in gscreenshot.get_available_cursors():
             pointer_name = gscreenshot.register_stamp_image(args.pointer_glyph)

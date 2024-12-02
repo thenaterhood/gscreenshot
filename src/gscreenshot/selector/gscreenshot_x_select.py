@@ -39,7 +39,8 @@ class GscreenshotXSelect(RegionSelector):
             GSCapabilities.REUSE_REGION: self.__utilityname__
         }
 
-    def region_select(self, selection_box_rgba: typing.Optional[str]=None):
+    def region_select(self, selection_box_rgba: typing.Optional[str]=None,
+                      selection_border_weight: typing.Optional[int]=None):
         """
         Select an arbitrary region of the screen
 
@@ -53,7 +54,9 @@ class GscreenshotXSelect(RegionSelector):
 
         return self._get_boundary_interactive([color])
 
-    def window_select(self, selection_box_rgba: typing.Optional[str]=None):
+    def window_select(self,
+                      selection_box_rgba: typing.Optional[str]=None,
+                      selection_border_weight: typing.Optional[int]=None):
         """
         Selects a window from the screen
 
