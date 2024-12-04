@@ -145,7 +145,7 @@ class RegionSelector():
             log.debug(
                 "region backend is already handling scale factor - skipping adjustment",
             )
-            scaling_factor = 1
+            scaling_factor = 1.0
         else:
             scaling_factor = get_scaling_factor()
 
