@@ -1,7 +1,7 @@
 import logging
 import subprocess
 import typing
-from gscreenshot.scaling import get_scaling_factor
+from gscreenshot.scaling import get_scaling_factor, get_scaling_method_name
 from gscreenshot.util import GSCapabilities
 from .exceptions import SelectionError, SelectionExecError, SelectionCancelled, SelectionParseError
 
@@ -20,13 +20,31 @@ class RegionSelector():
 
     def get_capabilities(self) -> typing.Dict[str, str]:
         """
+        Get supported features. Note that under-the-hood the capabilities
+        of the selector (if applicable) will be added to this.
+
+        Returns:
+            [GSCapabilities]
+        """
+        return {}
+
+    def get_capabilities_(self) -> typing.Dict[str, str]:
+        """
         Get the features this selector supports
         """
-        return {
+        capabilities = self.get_capabilities()
+
+        capabilities.update({
             GSCapabilities.WINDOW_SELECTION: self.__utilityname__,
             GSCapabilities.REGION_SELECTION: self.__utilityname__,
             GSCapabilities.REUSE_REGION: self.__utilityname__
-        }
+        })
+
+        if GSCapabilities.SCALING_DETECTION not in capabilities:
+            scaling_name = get_scaling_method_name()
+            capabilities[GSCapabilities.SCALING_DETECTION] = scaling_name
+
+        return capabilities
 
     def region_select(self,
                       selection_box_rgba: typing.Optional[str] = None,
@@ -123,7 +141,14 @@ class RegionSelector():
                     spl = comma_split.split("=")
                     region_parsed[spl[0]] = int(spl[1])
 
-        scaling_factor = get_scaling_factor()
+        if GSCapabilities.SCALING_DETECTION in self.get_capabilities():
+            log.debug(
+                "region backend is already handling scale factor - skipping adjustment",
+            )
+            scaling_factor = 1
+        else:
+            scaling_factor = get_scaling_factor()
+
         # (left, upper, right, lower)
         try:
             crop_box = (
