@@ -9,7 +9,6 @@ import typing
 import PIL.Image
 from gscreenshot.cursor_locator.factory import get_cursor_locator
 
-from gscreenshot.scaling import get_scaling_method_name
 from gscreenshot.screenshot import Screenshot
 from gscreenshot.screenshot.effects import CropEffect
 from gscreenshot.screenshot.effects import StampEffect
@@ -104,11 +103,8 @@ class Screenshooter(object):
             capabilities[GSCapabilities.ALTERNATE_CURSOR] = cursor_locator.__utilityname__
             capabilities[GSCapabilities.CURSOR_CAPTURE] = cursor_locator.__utilityname__
 
-        scaling_name = get_scaling_method_name()
-        capabilities[GSCapabilities.SCALING_DETECTION] = scaling_name
-
         if self._selector is not None:
-            capabilities.update(self._selector.get_capabilities())
+            capabilities.update(self._selector.get_capabilities_())
 
         return capabilities
 

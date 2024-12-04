@@ -2,7 +2,7 @@
 Wrapper for the slop screen selector utility
 '''
 import typing
-from gscreenshot.util import find_executable
+from gscreenshot.util import GSCapabilities, find_executable
 from .region_selector import RegionSelector
 
 
@@ -22,6 +22,9 @@ class Slop(RegionSelector):
         constructor
         """
         RegionSelector.__init__(self)
+
+    def get_capabilities(self) -> typing.Dict[str, str]:
+        return {GSCapabilities.SCALING_DETECTION: self.__utilityname__}
 
     def region_select(self,
                       selection_box_rgba: typing.Optional[str]=None,

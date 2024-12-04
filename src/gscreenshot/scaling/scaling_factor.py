@@ -13,7 +13,6 @@ log = logging.getLogger(__name__)
 def get_scaling() -> typing.Tuple[str, float]:
     """Get the scaling method and factor"""
     methods = [
-        get_scaling_from_env,
         get_scaling_from_xft_dpi,
         get_scaling_from_gtk,
         get_scaling_from_qt,
@@ -21,12 +20,17 @@ def get_scaling() -> typing.Tuple[str, float]:
 
     if session_is_wayland():
         methods = [
-            get_scaling_from_env,
             get_scaling_from_wlr_randr,
             get_scaling_from_xft_dpi,  # Technically for X, but works with an X bridge
             get_scaling_from_gtk,
             get_scaling_from_qt,
         ]
+
+    scaling = get_scaling_from_env()
+    if scaling:
+        name, scale = scaling
+        log.debug("using scaling factor = %s from strategy %s", scale, name)
+        return name, scale
 
     for method in methods:
         try:
