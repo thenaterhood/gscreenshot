@@ -337,8 +337,7 @@ class View(object):
             gscreenshot_height = gscreenshot_width * .9
 
         self._window.set_size_request(gscreenshot_width, gscreenshot_height)
-
-        self._window.show_all()
+        self.unhide()
 
     def show_actions_menu(self):
         '''
