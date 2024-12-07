@@ -1,6 +1,6 @@
 %define name gscreenshot
-%define version 3.7.1
-%define unmangled_version 3.7.1
+%define version 3.8.0
+%define unmangled_version 3.8.0
 %define release 1
 
 Summary: A simple screenshot tool

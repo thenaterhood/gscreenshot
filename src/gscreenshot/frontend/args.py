@@ -10,7 +10,7 @@ _ = gettext.gettext
 def enable_gui(params) -> bool:
     '''Whether to show the GUI based on args'''
 
-    if 'gscreenshot-cli' in sys.argv[0]:
+    if 'gscreenshot-cli' in sys.argv[0] and not params.gui:
         return False
 
     if len(sys.argv) == 1:

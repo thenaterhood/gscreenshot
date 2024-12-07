@@ -6,9 +6,9 @@ gscreenshot - screenshot frontend (CLI and GUI) for a variety of screenshot back
 
 # SYNOPSIS
 
-gscreenshot [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH]
+gscreenshot [-cosnpv] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH] [--select-color SELECT_COLOR] [--select-border-weight SELECT_BORDER_WEIGHT] [--gui]
 
-gscreenshot-cli [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH]
+gscreenshot-cli [-cosnpv] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH] [--select-color SELECT_COLOR] [--select-border-weight SELECT_BORDER_WEIGHT] [--gui]
 
 # DESCRIPTION
 
@@ -120,6 +120,16 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 
 -vvv
 :  Show all debugging output from gscreenshot and supporting libraries (which provide logging)
+
+# ENVIRONMENT
+
+gscreenshot uses and respects the following environment variables:
+
+GDK\_SCALE
+: Scale factor of the display
+
+QT\_SCALE\_FACTOR
+: Scale factor of the display
 
 # EXAMPLES
 
