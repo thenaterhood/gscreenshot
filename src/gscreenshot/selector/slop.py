@@ -1,7 +1,8 @@
 '''
 Wrapper for the slop screen selector utility
 '''
-from gscreenshot.util import find_executable
+import typing
+from gscreenshot.util import GSCapabilities, find_executable
 from .region_selector import RegionSelector
 
 
@@ -22,39 +23,71 @@ class Slop(RegionSelector):
         """
         RegionSelector.__init__(self)
 
-    def region_select(self):
+    def get_capabilities(self) -> typing.Dict[str, str]:
+        return {GSCapabilities.SCALING_DETECTION: self.__utilityname__}
+
+    def region_select(self,
+                      selection_box_rgba: typing.Optional[str]=None,
+                      selection_border_weight: typing.Optional[int]=None):
         """
         Select an arbitrary region of the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive([
-                'slop',
-                '--nodecorations=0',
+        params = [
+            'slop',
+            '--nodecorations=0',
+            '-f',
+            'X=%x,Y=%y,W=%w,H=%h'
+        ]
+
+        if selection_box_rgba:
+            color = ",".join(
+                [str(rgba) for rgba in RegionSelector._rgba_hex_to_decimals(selection_box_rgba)]
+            )
+            params.extend([
                 '-l',
                 '-c',
-                '0.8,0.8,0.8,0.6',
-                '-f',
-                'X=%x,Y=%y,W=%w,H=%h'
+                color,
             ])
 
-    def window_select(self):
+        if selection_border_weight:
+            params.extend(["-b", str(selection_border_weight)])
+
+        return self._get_boundary_interactive(params)
+
+    def window_select(self,
+                      selection_box_rgba: typing.Optional[str]=None,
+                      selection_border_weight: typing.Optional[int]=None,
+                      ):
         """
         Selects a window from the screen
 
         Returns:
            (x top left, y top left, x bottom right, y bottom right)
         """
-        return self._get_boundary_interactive([
-                'slop',
-                '--nodecorations=0',
+        params = [
+            'slop',
+            '--nodecorations=0',
+            '-f',
+            'X=%x,Y=%y,W=%w,H=%h'
+        ]
+
+        if selection_box_rgba:
+            color = ",".join(
+                [str(rgba) for rgba in RegionSelector._rgba_hex_to_decimals(selection_box_rgba)]
+            )
+            params.extend([
                 '-l',
                 '-c',
-                '0.8,0.8,0.8,0.6',
-                '-f',
-                'X=%x,Y=%y,W=%w,H=%h'
+                color,
             ])
+
+        if selection_border_weight:
+            params.extend(["-b", str(selection_border_weight)])
+
+        return self._get_boundary_interactive(params)
 
     @staticmethod
     def can_run() -> bool:

@@ -1,12 +1,55 @@
 '''Functions for handling command line arguments'''
 import argparse
 import gettext
+import logging
 import sys
 
 _ = gettext.gettext
 
 
-def get_args():
+def enable_gui(params) -> bool:
+    '''Whether to show the GUI based on args'''
+
+    if 'gscreenshot-cli' in sys.argv[0] and not params.gui:
+        return False
+
+    if len(sys.argv) == 1:
+        return True
+
+    if params.gui:
+        return True
+
+    fake_args = []
+    for arg in sys.argv:
+        if "--select-color" in arg:
+            fake_args.append(arg)
+        elif "-g" in arg or "--pointer-glyph" in arg:
+            fake_args.append(arg)
+        elif "--gui" in arg:
+            fake_args.append(arg)
+        elif "--select-border-weight" in arg:
+            fake_args.append(arg)
+        elif "-v" in arg:
+            fake_args.append(arg)
+
+    if len(fake_args) == len(sys.argv) - 1:
+        return True
+
+    return params.gui
+
+
+def get_log_level():
+    '''Get the log level from sys.argv'''
+    if "-v" in sys.argv:
+        return logging.INFO
+
+    if "-vv" in sys.argv or "-vvv" in sys.argv:
+        return logging.DEBUG
+
+    return logging.WARN
+
+
+def get_args(args = None):
     '''Get the parsed command line arguments'''
     parser = argparse.ArgumentParser()
 
@@ -79,13 +122,28 @@ def get_args():
             action='store_true',
             help=_("Open the gscreenshot GUI. This is the default if no parameters are provided.")
     )
+    parser.add_argument(
+            '--select-color',
+            required=False,
+            default="#cccccc99",
+            help=_("Optional. The color to use for the selection box. Accepts an RGB/RGBA hex string or '' to use the underlying tool's defaults.")
+    )
+    parser.add_argument(
+            '--select-border-weight',
+            required=False,
+            default=5,
+            help=_("Optional. The thickness of the border of the region selection box.")
+    )
+    parser.add_argument(
+            '-v',
+            required=False,
+            action='store_true',
+            help=_("Verbosity. Add more v for more verbosity. -v, -vv, and -vvv are supported"),
+    )
 
-    args = parser.parse_args()
+    parsed_args = parser.parse_args(args)
 
-    if 'gscreenshot-cli' in sys.argv[0]:
-        args.gui = False
+    parsed_args.gui = enable_gui(parsed_args)
+    parsed_args.log_level = get_log_level()
 
-    if len(sys.argv) == 1:
-        args.gui = True
-
-    return args
+    return parsed_args

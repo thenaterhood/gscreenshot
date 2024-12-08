@@ -6,9 +6,9 @@ gscreenshot - screenshot frontend (CLI and GUI) for a variety of screenshot back
 
 # SYNOPSIS
 
-gscreenshot [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH]
+gscreenshot [-cosnpv] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH] [--select-color SELECT_COLOR] [--select-border-weight SELECT_BORDER_WEIGHT] [--gui]
 
-gscreenshot-cli [-cosnp] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH]
+gscreenshot-cli [-cosnpv] [-f FILENAME] [-d DELAY] [--help] [-V --version] [-g POINTER_GLYPH] [--select-color SELECT_COLOR] [--select-border-weight SELECT_BORDER_WEIGHT] [--gui]
 
 # DESCRIPTION
 
@@ -78,7 +78,7 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 \--gui
 :   Open the gscreenshot GUI. This is the default if no options are passed to gscreenshot.
     This can be combined with other parameters to change, for example, the initial screenshot
-    taken when gscreenshot starts.s
+    taken when gscreenshot starts.
 
 -c, \--clip
 :   Copy the resulting screenshot to the clipboard. Relies on xclip or wl-clipboard.
@@ -88,6 +88,14 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 
 -s, \--selection
 :   Use a region selection utility to select a region of the screen to capture (if available).
+
+--select-color
+:   RGB or RGBA hex value for the selection color box. Defaults to "#cccccc55". This can be used to
+    remove transparency from the selection box if a compositor is not in use. An empty string '' is
+    also accepted to use the underlying selection utility's defaults.
+
+--select-border-weight
+:   Thickness of the border of the selection box. Defaults to 5.
 
 -V, \--version
 :   Display the version, supported features, and additional relevant information.
@@ -103,6 +111,25 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 -g, \--pointer-glyph
 :   Use an alternate image when capturing the cursor. "adwaita", "prohibit", "allow" are built in, or pass
     a file path to use a custom image.
+
+-v
+:  Show more gscreenshot output
+
+-vv
+:  Show all debugging output from gscreenshot
+
+-vvv
+:  Show all debugging output from gscreenshot and supporting libraries (which provide logging)
+
+# ENVIRONMENT
+
+gscreenshot uses and respects the following environment variables:
+
+GDK\_SCALE
+: Scale factor of the display
+
+QT\_SCALE\_FACTOR
+: Scale factor of the display
 
 # EXAMPLES
 

@@ -1,6 +1,7 @@
 '''
 Interface class for integrating a screenshot utility
 '''
+import logging
 import os
 import subprocess
 import tempfile
@@ -16,6 +17,9 @@ from gscreenshot.selector.exceptions import SelectionExecError, SelectionParseEr
 from gscreenshot.selector.exceptions import SelectionCancelled, NoSupportedSelectorError
 from gscreenshot.util import GSCapabilities
 from .exceptions import ScreenshotError
+
+
+log = logging.getLogger(__name__)
 
 
 class Screenshooter(object):
@@ -100,7 +104,7 @@ class Screenshooter(object):
             capabilities[GSCapabilities.CURSOR_CAPTURE] = cursor_locator.__utilityname__
 
         if self._selector is not None:
-            capabilities.update(self._selector.get_capabilities())
+            capabilities.update(self._selector.get_capabilities_())
 
         return capabilities
 
@@ -110,6 +114,10 @@ class Screenshooter(object):
         Internal API method for grabbing the full screen. This should not
         be overridden by extending classes. Implement grab_fullscreen instead.
         '''
+        log.debug(
+            "grabbing fullscreen: delay = %s capture_cursor = %s, use_cursor = %s",
+            delay, capture_cursor, use_cursor
+        )
         if use_cursor is None and GSCapabilities.CURSOR_CAPTURE in self.get_capabilities():
             self.grab_fullscreen(delay, capture_cursor)
         else:
@@ -132,9 +140,12 @@ class Screenshooter(object):
             "Not implemented. Fullscreen grab called with delay " + str(delay)
             )
 
+    #pylint: disable=too-many-arguments
     def grab_selection_(self, delay: int=0, capture_cursor: bool=False,
                         use_cursor: typing.Optional[PIL.Image.Image]=None,
-                        region: typing.Optional[typing.Tuple[int, int, int, int]]=None):
+                        region: typing.Optional[typing.Tuple[int, int, int, int]]=None,
+                        select_color_rgba: typing.Optional[str]=None,
+                        select_border_weight: typing.Optional[int]=None):
         """
         Internal API method for grabbing a selection. This should not
         be overridden by extending classes. Implement grab_selection instead.
@@ -148,6 +159,10 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
+        log.debug(
+            "grabbing fullscreen: delay = %s capture_cursor = %s, use_cursor = %s",
+            delay, capture_cursor, use_cursor
+        )
         if region is not None:
             self.grab_fullscreen_(delay, capture_cursor, use_cursor)
             if self._screenshot is not None:
@@ -161,7 +176,10 @@ class Screenshooter(object):
             return
 
         try:
-            crop_box = self._selector.region_select()
+            crop_box = self._selector.region_select(
+                selection_box_rgba=select_color_rgba,
+                selection_border_weight=select_border_weight,
+            )
         except SelectionCancelled:
             print("Selection was cancelled")
             self.grab_fullscreen_(delay, capture_cursor, use_cursor)
@@ -183,13 +201,25 @@ class Screenshooter(object):
             self._screenshot.add_effect(crop)
 
     def grab_window_(self, delay: int=0, capture_cursor: bool=False,
-                     use_cursor: typing.Optional[PIL.Image.Image]=None):
+                     use_cursor: typing.Optional[PIL.Image.Image]=None,
+                    select_color_rgba: typing.Optional[str]=None,
+                    select_border_weight: typing.Optional[int]=None):
         '''
         Internal API method for grabbing a window. This should not
         be overridden by extending classes. Implement grab_window instead.
 
         '''
-        self.grab_selection_(delay, capture_cursor, use_cursor)
+        log.debug(
+            "grabbing fullscreen: delay = %s capture_cursor = %s, use_cursor = %s",
+            delay, capture_cursor, use_cursor
+        )
+        self.grab_selection_(
+            delay,
+            capture_cursor,
+            use_cursor,
+            select_color_rgba=select_color_rgba,
+            select_border_weight=select_border_weight
+        )
 
     def grab_window(self, delay: int=0, capture_cursor: bool=False):
         """
@@ -219,11 +249,17 @@ class Screenshooter(object):
 
         try:
             cursor_locator = get_cursor_locator()
-            return cursor_locator.get_cursor_position_adjusted()
+            cursor_location = cursor_locator.get_cursor_position_adjusted()
+            log.debug(
+                "got cursor position = %s cursor_locator = %s",
+                cursor_location, cursor_locator.__utilityname__
+            )
+            return cursor_location
         # pylint: disable=bare-except
         except:
             # We don't really care about the specific error here. If we can't
             # get the pointer, then just move on.
+            log.debug("failed to get cursor location")
             return None
 
     def _grab_selection_fallback(self, delay: int=0, capture_cursor: bool=False):
@@ -234,6 +270,7 @@ class Screenshooter(object):
         Parameters:
             int delay: seconds
         """
+        log.debug("using fallback region selection")
         self.grab_fullscreen(delay, capture_cursor)
 
     def _call_screenshooter(self, screenshooter: str,
@@ -246,6 +283,7 @@ class Screenshooter(object):
         params = [screenshooter] + params
         self._screenshot = None
         try:
+            log.debug("calling screenshotter: %s", params)
             screenshot_output = subprocess.check_output(params)
             if not os.path.exists(self._tempfile):
                 if len(screenshot_output.decode()) > 0:
@@ -255,7 +293,7 @@ class Screenshooter(object):
             self._screenshot = Screenshot(PIL.Image.open(self._tempfile))
             os.unlink(self._tempfile)
         except (subprocess.CalledProcessError, IOError, OSError, ScreenshotError) as exc:
-            print(repr(exc))
+            log.warning("failed to call screenshotter: %s", exc)
 
         return self._screenshot is not None
 

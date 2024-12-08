@@ -171,17 +171,54 @@ class LintCommand(Command):
 
   def initialize_options(self):
       pass
-  
+
   def finalize_options(self):
       pass
 
   def run(self):
-    command = ['pylint', 'src', f'--rcfile=pylintrc']
+    command = ['pylint', 'src', '--rcfile=pylintrc']
     subprocess.check_call(command)
+
+
+class TestCommand(Command):
+    description = 'run the tests'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        command = ['coverage', 'run', '--source', 'src/gscreenshot', '-m', 'pytest', 'test']
+        subprocess.check_call(command)
+
+
+class CoverageCommand(Command):
+    description = 'run the tests and produce a coverage report'
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        command = ['coverage', 'run', '--source', 'src/gscreenshot', '-m', 'pytest', 'test']
+        subprocess.check_call(command)
+        command = ['coverage', 'html']
+        subprocess.check_call(command)
+        command = ['xdg-open', 'htmlcov/index.html']
+        subprocess.check_call(command)
+
 
 setup(name='gscreenshot',
     cmdclass={
         'lint': LintCommand,
+        'test': TestCommand,
+        'coverage': CoverageCommand,
     },
     version=pkg_version,
     description='Lightweight GTK frontend to scrot',

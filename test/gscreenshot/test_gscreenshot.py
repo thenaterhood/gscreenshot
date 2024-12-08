@@ -12,6 +12,7 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_image = Mock()
         self.fake_screenshot = Mock()
         self.fake_screenshot.get_image.return_value = self.fake_image
+        self.fake_screenshooter.__utilityname__ = "mock screenshotter"
 
         self.fake_screenshooter.image = self.fake_image
         self.fake_screenshooter.screenshot = self.fake_screenshot
@@ -61,7 +62,9 @@ class GscreenshotTest(unittest.TestCase):
             0,
             False,
             use_cursor=None,
-            region=None
+            region=None,
+            select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -73,7 +76,9 @@ class GscreenshotTest(unittest.TestCase):
             5,
             False,
             use_cursor=None,
-            region=None
+            region=None,
+            select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -87,7 +92,9 @@ class GscreenshotTest(unittest.TestCase):
             0,
             True,
             use_cursor=None,
-            region=None
+            region=None,
+            select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -99,7 +106,9 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.grab_window_.assert_called_once_with(
             0,
             False,
-            use_cursor=None
+            use_cursor=None,
+            select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -110,7 +119,9 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.grab_window_.assert_called_once_with(
             5,
             False,
-            use_cursor=None
+            use_cursor=None,
+            select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -123,7 +134,9 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_screenshooter.grab_window_.assert_called_once_with(
             0,
             True,
-            use_cursor=None
+            use_cursor=None,
+            select_color_rgba=None,
+            select_border_weight=None,
         )
 
         self.assertEqual(self.fake_image, actual)
@@ -168,7 +181,7 @@ class GscreenshotTest(unittest.TestCase):
 
     def test_get_screenshooter_name(self):
         self.assertEqual(
-            self.fake_screenshooter.__class__.__name__,
+            self.fake_screenshooter.__utilityname__,
             self.gscreenshot.get_screenshooter_name()
             )
 
@@ -319,4 +332,28 @@ class GscreenshotTest(unittest.TestCase):
             stdin=mock_subprocess.PIPE,
             stdout=None,
             stderr=None
+        )
+
+    def test_select_color(self):
+        self.gscreenshot.set_select_color("#00000000")
+        self.gscreenshot.screenshot_selected(delay=5, capture_cursor=False)
+        self.gscreenshot.screenshooter.grab_selection_.assert_called_with(
+            5,
+            False,
+            use_cursor=None,
+            region=None,
+            select_color_rgba="#00000000",
+            select_border_weight=None,
+        )
+
+    def test_select_border_weight(self):
+        self.gscreenshot.set_select_border_weight(20)
+        self.gscreenshot.screenshot_selected(delay=5, capture_cursor=False)
+        self.gscreenshot.screenshooter.grab_selection_.assert_called_with(
+            5,
+            False,
+            region=None,
+            use_cursor=None,
+            select_color_rgba=None,
+            select_border_weight=20,
         )
