@@ -128,3 +128,7 @@ class ScreenshotCollection(object):
     def cursor_to_end(self):
         '''move the cursor to the last (highest) index'''
         self._cursor = len(self._screenshots) - 1
+
+    def has_unsaved(self):
+        '''returns True if there are unsaved screenshots'''
+        return not all(s.saved() for s in self._screenshots)

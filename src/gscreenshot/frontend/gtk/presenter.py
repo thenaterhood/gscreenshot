@@ -13,8 +13,13 @@ import typing
 from PIL import Image
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
 from gscreenshot.compat import get_resource_file
-from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
-from gscreenshot.frontend.gtk.dialogs import FileSaveDialog, FileOpenDialog
+from gscreenshot.frontend.gtk.dialogs import (
+    OpenWithDialog,
+    WarningDialog,
+    FileSaveDialog,
+    FileOpenDialog,
+    ConfirmationDialog,
+)
 from gscreenshot.frontend.gtk.view import View
 from gscreenshot.screenshot.effects import CropEffect
 
@@ -481,6 +486,18 @@ class Presenter(object):
 
     def quit(self, *_):
         '''Exit the app'''
+        screenshot_collection = self._app.get_screenshot_collection()
+        if len(screenshot_collection) > 1 and self._app.get_screenshot_collection().has_unsaved():
+            confirm_dialogue = ConfirmationDialog(
+                message=i18n("There are unsaved screenshots. Quit without saving?")
+            )
+
+            self._view.run_dialog(confirm_dialogue)
+
+            if confirm_dialogue.confirmed:
+                self._app.quit()
+            return
+
         self._app.quit()
 
     def _image_to_pixbuf(self, image):

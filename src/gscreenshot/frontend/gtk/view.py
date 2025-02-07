@@ -468,6 +468,9 @@ class View(object):
     def run_dialog(self, dialog):
         '''Run a dialog window and return the outcome'''
         self._window.set_sensitive(False)
+        if hasattr(dialog, "show_all"):
+            # Jank, but needed until all the dialogs are consistent
+            dialog.show_all()
         result = dialog.run()
         self._window.set_sensitive(True)
 
