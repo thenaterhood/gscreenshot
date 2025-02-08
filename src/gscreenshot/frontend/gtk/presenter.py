@@ -228,6 +228,21 @@ class Presenter(object):
 
         data.set_uris([f"file://{fname}"])
 
+    def on_delete(self, *_):
+        """
+        remove the current screenshot
+        """
+        img = self._app.get_last_image()
+        screenshots = self._app.get_screenshot_collection()
+        current = screenshots.cursor_current()
+        if current:
+            screenshots.remove(current)
+
+            self._view.update_gallery_controls(screenshots)
+            self._show_preview()
+
+        return True
+
     def on_use_last_region_clicked(self, *_):
         '''
         Take a screenshot with the same region as the
@@ -498,9 +513,8 @@ class Presenter(object):
 
             self._view.run_dialog(confirm_dialogue)
 
-            if confirm_dialogue.confirmed:
-                self._app.quit()
-            return
+            if not confirm_dialogue.confirmed:
+                return
 
         self._app.quit()
 
