@@ -505,7 +505,8 @@ class Presenter(object):
             return  # not strictly needed most of the time
 
         screenshot_collection = self._app.get_screenshot_collection()
-        if len(screenshot_collection) > 1 and self._app.get_screenshot_collection().has_unsaved():
+
+        if len(screenshot_collection) > 1 and screenshot_collection.has_unsaved():
             confirm_dialogue = ConfirmationDialog(
                 message=i18n("There are unsaved screenshots. Quit without saving?")
             )
