@@ -1,6 +1,6 @@
 from importlib.resources import as_file, files
 import unittest
-from unittest.mock import Mock
+from unittest.mock import MagicMock
 from PIL import Image
 import mock
 
@@ -10,16 +10,16 @@ from gscreenshot.frontend.gtk.presenter import Presenter
 class GtkPresenterTest(unittest.TestCase):
 
     def setUp(self):
-        self.app = Mock()
+        self.app = MagicMock()
         self.app.get_available_cursors.return_value = {}
         pixmaps_path = "gscreenshot.resources.pixmaps"
         with as_file(files(pixmaps_path).joinpath('gscreenshot.png')) as png_path:
             self.app.get_thumbnail.return_value = Image.open(
                     png_path
                 )
-        self.screenshot_collection = Mock()
+        self.screenshot_collection = MagicMock()
         self.app.get_screenshot_collection.return_value = self.screenshot_collection
-        self.view = Mock()
+        self.view = MagicMock()
         self.view.get_preview_dimensions.return_value = (20, 30)
         self.presenter = Presenter(self.app, self.view)
 
@@ -50,7 +50,9 @@ class GtkPresenterTest(unittest.TestCase):
         self.view.toggle_fullscreen.assert_called_once()
 
     def test_on_button_quit_clicked(self):
+        self.screenshot_collection.len = 1
         self.presenter.on_button_quit_clicked()
+
         self.app.quit.assert_called_once()
 
     def test_on_window_resize(self):
@@ -66,7 +68,7 @@ class GtkPresenterTest(unittest.TestCase):
         self.app.quit.assert_called_once()
 
     def test_capture_cursor_toggled_active(self):
-        widget_mock = Mock()
+        widget_mock = MagicMock()
         widget_mock.get_active.return_value = True
 
         self.presenter.capture_cursor_toggled(widget_mock)

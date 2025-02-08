@@ -353,7 +353,7 @@ class Presenter(object):
 
                     return
 
-                self.quit(None)
+                self.quit(None, skip_warning=True)
 
     def on_button_copy_clicked(self, *_):
         """
@@ -399,7 +399,7 @@ class Presenter(object):
 
                 return
 
-            self.quit(None)
+            self.quit(None, skip_warning=True)
 
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
@@ -422,7 +422,7 @@ class Presenter(object):
                 self._show_preview()
 
                 return
-            self.quit(None)
+            self.quit(None, skip_warning=True)
 
     def on_button_about_clicked(self, *_):
         '''Handle the about button'''
@@ -484,8 +484,12 @@ class Presenter(object):
         self._view.resize()
         self._show_preview()
 
-    def quit(self, *_):
+    def quit(self, *_, skip_warning=False):
         '''Exit the app'''
+        if skip_warning:
+            self._app.quit()
+            return  # not strictly needed most of the time
+
         screenshot_collection = self._app.get_screenshot_collection()
         if len(screenshot_collection) > 1 and self._app.get_screenshot_collection().has_unsaved():
             confirm_dialogue = ConfirmationDialog(
