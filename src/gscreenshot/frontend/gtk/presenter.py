@@ -232,7 +232,6 @@ class Presenter(object):
         """
         remove the current screenshot
         """
-        img = self._app.get_last_image()
         screenshots = self._app.get_screenshot_collection()
         current = screenshots.cursor_current()
         if current:
