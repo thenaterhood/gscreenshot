@@ -68,7 +68,7 @@ class GtkPresenterTest(unittest.TestCase):
         self.app.quit.assert_called_once()
 
 
-    @mock.patch('src.gscreenshot.frontend.gtk.dialogs.ConfirmationDialog')
+    @mock.patch('gscreenshot.frontend.gtk.dialogs.confirm_dialog.ConfirmationDialog')
     def test_on_quit_clicked_with_unsaved(self, _):
         self.screenshot_collection.cursor_current.return_value = MagicMock()
         self.screenshot_collection.__len__.return_value = 2
