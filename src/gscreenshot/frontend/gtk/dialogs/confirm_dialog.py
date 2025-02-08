@@ -26,7 +26,9 @@ class ConfirmationDialog(Gtk.Dialog):
         label = Gtk.Label(label=message)
         label.set_line_wrap(True)
         label.set_max_width_chars(60)
-        label.set_padding(20, 20)
+        label.set_margin_end(20)
+        label.set_margin_start(20)
+        label.set_margin_top(20)
 
         box = self.get_content_area()
         box.add(label)

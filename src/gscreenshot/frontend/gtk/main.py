@@ -101,6 +101,8 @@ def main(app: typing.Optional[Gscreenshot] = None):
             presenter.on_preview_next_clicked,
         Gdk.keyval_to_lower(Gdk.keyval_from_name('Left')):
             presenter.on_preview_prev_clicked,
+        Gdk.keyval_to_lower(Gdk.keyval_from_name('Delete')):
+            presenter.on_delete,
         # Handled in Glade - just here for reference
         #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Insert')):
         #    presenter.overwrite_mode_toggled
