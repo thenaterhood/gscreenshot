@@ -13,7 +13,7 @@ from gi.repository import Gtk # type: ignore
 i18n = gettext.gettext
 
 
-class FileSaveDialog(object):
+class FileSaveDialog():
     '''The 'save as' dialog'''
     def __init__(self, default_filename=None, default_folder=None,
         parent=None, choose_directory=False

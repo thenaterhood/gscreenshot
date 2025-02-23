@@ -19,7 +19,7 @@ except ValueError:
     GTK_CAPABLE = False
 
 
-class SignalHandler(object):
+class SignalHandler():
     """
     Does graceful signal handling
     """

@@ -33,7 +33,7 @@ from gi.repository import GdkPixbuf # type: ignore
 i18n = gettext.gettext
 
 
-class Presenter(object):
+class Presenter():
     '''Presenter class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide',

@@ -7,7 +7,7 @@ from PIL import Image
 from .effects import ScreenshotEffect
 
 
-class Screenshot(object):
+class Screenshot():
     '''
     Represents a screenshot taken via Gscreenshot.
 

@@ -9,7 +9,7 @@ import os
 import sys
 
 
-class GSCapabilities(object):
+class GSCapabilities():
     '''
     Define capability flags for use in gscreenshot.
     These are used to determine what features gscreenshot

@@ -39,7 +39,7 @@ class GscreenshotClipboardException(Exception):
     pass
 
 
-class Gscreenshot(object):
+class Gscreenshot():
     """
     Gscreenshot application
     """

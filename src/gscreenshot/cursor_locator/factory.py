@@ -18,7 +18,7 @@ def get_cursor_locator(cursor_locator: typing.Optional[CursorLocator] = None):
     return CursorLocatorFactory(cursor_locator).create()
 
 
-class CursorLocatorFactory(object):
+class CursorLocatorFactory():
     '''Selects and instantiates a usable cursor finder'''
 
     def __init__(self, cursor_locator=None):
