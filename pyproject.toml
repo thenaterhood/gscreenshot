@@ -48,7 +48,7 @@ disable = [
     "R0902", # (too-many-instance-attributes)
     "R0904", # (too-many-public-methods)
     "R0913", # (too-many-arguments)
-    "R0917", # (too-many-positional-arguments)
+    "too-many-positional-arguments",
     "W0105", # (pointless-string-statement)
 ]
 
