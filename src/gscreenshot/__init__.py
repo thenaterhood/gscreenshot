@@ -236,8 +236,7 @@ class Gscreenshot():
         """
         if 'XDG_CACHE_HOME' in os.environ:
             return os.environ['XDG_CACHE_HOME'] + "/gscreenshot"
-        else:
-            return os.path.expanduser("~/.gscreenshot")
+        return os.path.expanduser("~/.gscreenshot")
 
     def save_cache(self):
         """Writes the cache to disk"""
@@ -764,10 +763,9 @@ class Gscreenshot():
         """Returns the program version"""
         if not padded:
             return get_version()
-        else:
-            version_str = get_version().split(".")
-            padded_version = [v.rjust(2, "0") for v in version_str]
-            return ".".join(padded_version)
+        version_str = get_version().split(".")
+        padded_version = [v.rjust(2, "0") for v in version_str]
+        return ".".join(padded_version)
 
     def __repr__(self) -> str:
         return f'Gscreenshot(screenshooter={self.screenshooter})'
