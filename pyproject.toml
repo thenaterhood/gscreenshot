@@ -45,6 +45,7 @@ disable = [
     "E0401", # (import-error)
     "R0801", # (duplicate-code)
     "R0903", # (too-few-public-methods)
+    "R0902", # (too-many-instance-attributes)
     "R0904", # (too-many-public-methods)
     "R0913", # (too-many-arguments)
     "R0917", # (too-many-positional-arguments)
