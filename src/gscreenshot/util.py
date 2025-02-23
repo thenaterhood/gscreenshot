@@ -7,6 +7,7 @@ Functions:
 #pylint: disable=no-else-return, invalid-name
 import os
 import sys
+import typing
 
 
 class GSCapabilities():
@@ -57,3 +58,18 @@ def session_is_wayland():
     '''Determines if the session running is wayland'''
     return ('XDG_SESSION_TYPE' in os.environ and
             os.environ['XDG_SESSION_TYPE'].lower() == 'wayland')
+
+
+def get_supported_formats() -> typing.List[str]:
+    """
+    Returns the image formats supported for saving to
+
+    Returns:
+        array
+    """
+    supported_formats = [
+        'bmp', 'eps', 'gif', 'jpeg', 'pcx',
+        'pdf', 'ppm', 'tiff', 'png', 'webp',
+        ]
+
+    return supported_formats

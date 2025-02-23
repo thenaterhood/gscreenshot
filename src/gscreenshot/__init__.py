@@ -10,25 +10,33 @@
  - Updated to use modern libraries and formats
  - Further changes will be noted in release notes
 '''
+from datetime import datetime
 import gettext
 import io
 import json
 import locale
 import logging
 import os
-import platform
 import sys
 import subprocess
 import tempfile
 import typing
 
-from datetime import datetime
+from warnings import deprecated
 from PIL import Image
 from gscreenshot.compat import get_resource_file, get_resource_string, get_version
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter, get_screenshooter
-from gscreenshot.util import session_is_wayland
 
+from gscreenshot.util import (
+    get_supported_formats,
+    session_is_wayland,
+)
+from gscreenshot.filename import (
+    get_time_filename,
+    get_time_foldername,
+    interpolate_filename,
+)
 
 _ = gettext.gettext
 log = logging.getLogger(__name__)
@@ -392,19 +400,10 @@ class Gscreenshot():
         '''Returns the screenshot collection'''
         return self._screenshots
 
-    def get_supported_formats(self) -> typing.List[str]:
-        """
-        Returns the image formats supported for saving to
-
-        Returns:
-            array
-        """
-        supported_formats = [
-            'bmp', 'eps', 'gif', 'jpeg', 'pcx',
-            'pdf', 'ppm', 'tiff', 'png', 'webp',
-            ]
-
-        return supported_formats
+    @deprecated("deprecated 3.9.0: use util.get_supported_formats instead")
+    def get_supported_formats(self) -> list[str]:
+        """Get supported image formats"""
+        return get_supported_formats()
 
     def get_thumbnail(self, width: int, height: int, with_border: bool=False
                       ) -> Image.Image:
@@ -424,6 +423,7 @@ class Gscreenshot():
 
         return self.get_app_icon()
 
+    @deprecated("deprecated 3.9.0: use filename.get_time_filename instead")
     def get_time_filename(self) -> str:
         """
         Generates a returns a filename based on the current time
@@ -431,58 +431,30 @@ class Gscreenshot():
         Returns:
             str
         """
-        return self.interpolate_filename("gscreenshot_%Y-%m-%d-%H%M%S.png")
+        return get_time_filename(self._screenshots.cursor_current())
 
+    @deprecated("deprecated 3.9.0: use filename.interpolate_filename instead")
     def interpolate_filename(self, filename:str) -> str:
         '''
         Does interpolation of a filename, as the following:
-           $$   a literal '$'
-           $a   system hostname
-           $h   image's height in pixels
-           $p   image's size in pixels
-           $w   image's width in pixels
+        $$   a literal '$'
+        $a   system hostname
+        $h   image's height in pixels
+        $p   image's size in pixels
+        $w   image's width in pixels
 
-           Format operators starting with "%" are
-           run through strftime.
+        Format operators starting with "%" are
+        run through strftime.
         '''
-        if "$" not in filename and "%" not in filename:
-            log.debug(
-                "filename '%s' did not contain templating, not interpolating", filename
-            )
-            return filename
-
-        interpolated = f"{filename}"
-
-        general_replacements:typing.Dict[str, str] = {
-            '$$': '$',
-            '$a': platform.node()
-        }
-
-        image = self.get_last_image()
-        if image is not None:
-            general_replacements.update({
-                '$h': str(image.height),
-                '$p': str(image.height * image.width),
-                '$w': str(image.width)
-            })
-
-        for fmt, replacement in general_replacements.items():
-            interpolated = interpolated.replace(fmt, replacement)
-
-        now = datetime.now()
-        interpolated = now.strftime(interpolated)
-
-        log.debug(
-            "interpolated filename - received template '%s', converted to '%s'",
+        return interpolate_filename(
             filename,
-            interpolated
+            self._screenshots.cursor_current(),
         )
 
-        return interpolated
-
+    @deprecated("deprecated 3.9.0: use filename.get_time_foldername instead")
     def get_time_foldername(self) -> str:
         '''Generates a time-based folder name'''
-        return self.interpolate_filename("gscreenshot_%Y-%m-%d-%H%M%S")
+        return get_time_foldername(self._screenshots.cursor_current())
 
     def save_and_return_path(self) -> typing.Optional[str]:
         """
@@ -618,7 +590,7 @@ class Gscreenshot():
             screenshot.set_saved_path(fname)
 
         return True
-
+    
     def save_last_image(self, filename: typing.Optional[str]= None) -> bool:
         """
         Saves the last screenshot taken with a given filename.
