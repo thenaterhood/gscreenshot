@@ -466,7 +466,7 @@ class Gscreenshot():
         """
         screenshot_fname = os.path.join(
                 tempfile.gettempdir(),
-                self.get_time_filename()
+                get_time_filename(self._screenshots.cursor_current())
                 )
 
         screenshot = self._screenshots.cursor_current()
@@ -487,9 +487,9 @@ class Gscreenshot():
         Internal method for saving an image to a file
         '''
         if filename is None:
-            filename = self.get_time_filename()
+            filename = get_time_filename(self._screenshots.cursor_current())
         else:
-            filename = self.interpolate_filename(filename)
+            filename = interpolate_filename(filename)
 
         file_type = "png"
 
@@ -514,7 +514,7 @@ class Gscreenshot():
 
                 filename = os.path.join(
                         filename,
-                        self.get_time_filename()
+                        get_time_filename(self._screenshots.cursor_current())
                         )
                 file_type = 'png'
 
@@ -530,7 +530,7 @@ class Gscreenshot():
         if file_type == 'jpg':
             file_type = 'jpeg'
 
-        if file_type not in self.get_supported_formats():
+        if file_type not in get_supported_formats():
             log.info("unrecognized image format '%s'", file_type)
             return None
 
@@ -570,9 +570,9 @@ class Gscreenshot():
         '''
 
         if foldername is None:
-            foldername = self.get_time_foldername()
+            foldername = get_time_foldername(None)
         else:
-            foldername = self.interpolate_filename(foldername)
+            foldername = interpolate_filename(foldername)
 
         if not os.path.exists(foldername):
             try:
