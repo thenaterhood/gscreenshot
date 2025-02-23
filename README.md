@@ -248,7 +248,7 @@ the following, which should be available (or already installed by) your package 
 * gettext
 
 At this point, you can install gscreenshot itself by running
-"sudo pip install -e ."
+"sudo pip install ."
 
 ## For full functionality on X11, the recommended packages are:
 
@@ -332,7 +332,7 @@ Current supported languages are:
 
 The following command should be suitable, with minor adjustments, for creating
 a gscreenshot package.
-python setup.py install --root="$pkgdir/" --optimize=1 --force --single-version-externally-managed
+pip install --root="$pkgdir/" --force --no-dependencies .
 
 # SEE ALSO
 
