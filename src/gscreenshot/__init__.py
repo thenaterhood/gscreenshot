@@ -10,7 +10,6 @@
  - Updated to use modern libraries and formats
  - Further changes will be noted in release notes
 '''
-from datetime import datetime
 import gettext
 import io
 import json
@@ -401,7 +400,7 @@ class Gscreenshot():
         return self._screenshots
 
     @deprecated("deprecated 3.9.0: use util.get_supported_formats instead")
-    def get_supported_formats(self) -> list[str]:
+    def get_supported_formats(self) -> typing.List[str]:
         """Get supported image formats"""
         return get_supported_formats()
 
@@ -590,7 +589,7 @@ class Gscreenshot():
             screenshot.set_saved_path(fname)
 
         return True
-    
+
     def save_last_image(self, filename: typing.Optional[str]= None) -> bool:
         """
         Saves the last screenshot taken with a given filename.

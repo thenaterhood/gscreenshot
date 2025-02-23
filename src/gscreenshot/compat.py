@@ -47,13 +47,13 @@ def get_version():
 
 
 def deprecated(message):
-  """Compatibility function for python < 3.13"""
-  def deprecated_decorator(func):
-      def deprecated_func(*args, **kwargs):
-          warnings.warn("{} is a deprecated function. {}".format(func.__name__, message),
-                        category=DeprecationWarning,
-                        stacklevel=2)
-          warnings.simplefilter('default', DeprecationWarning)
-          return func(*args, **kwargs)
-      return deprecated_func
-  return deprecated_decorator
+    """Compatibility function for python < 3.13"""
+    def deprecated_decorator(func):
+        def deprecated_func(*args, **kwargs):
+            warnings.warn(f"{func.__name__} is a deprecated function. {message}",
+                category=DeprecationWarning,
+                stacklevel=2)
+            warnings.simplefilter('default', DeprecationWarning)
+            return func(*args, **kwargs)
+        return deprecated_func
+    return deprecated_decorator
