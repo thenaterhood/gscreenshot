@@ -38,18 +38,18 @@ where = ["src"]
 [tool.pylint]
 max-line-length = 100
 disable = [
-    "C0103", # (invalid-name)
-    "C0114", # (missing-module-docstring)
-    "C0115", # (missing-class-docstring)
-    "C0116", # (missing-function-docstring)
-    "E0401", # (import-error)
-    "R0801", # (duplicate-code)
-    "R0903", # (too-few-public-methods)
-    "R0902", # (too-many-instance-attributes)
-    "R0904", # (too-many-public-methods)
-    "R0913", # (too-many-arguments)
+    "invalid-name",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "import-error",
+    "duplicate-code",
+    "too-few-public-methods",
+    "too-many-instance-attributes",
+    "too-many-public-methods",
+    "too-many-arguments",
     "too-many-positional-arguments",
-    "W0105", # (pointless-string-statement)
+    "pointless-string-statement",
 ]
 
 [tool.mypy]
