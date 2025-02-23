@@ -24,7 +24,7 @@ from gi.repository import GdkPixbuf # type: ignore
 i18n = gettext.gettext
 
 
-class View(object):
+class View():
     '''View class for the GTK frontend'''
 
     def __init__(self, window, builder, capabilities):

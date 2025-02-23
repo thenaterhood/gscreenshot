@@ -19,7 +19,7 @@ def get_region_selector(screenselector: typing.Optional[RegionSelector] = None):
     return SelectorFactory(screenselector).create()
 
 
-class SelectorFactory(object):
+class SelectorFactory():
     '''Selects and instantiates a usable selector class'''
 
     def __init__(self, screenselector:typing.Optional[RegionSelector]=None):

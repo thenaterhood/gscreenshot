@@ -28,7 +28,7 @@ jobs:
         # uses: cclauss/GitHub-Action-for-pylint@8ef4d22e119fb1cdc0f58f2e95cb1f8d8b0d55e6
         uses: cclauss/GitHub-Action-for-pylint@0.7.0
         with:
-          args: 'python setup.py lint'
+          args: 'pylint src'
 
   pytest:
 

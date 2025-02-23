@@ -22,7 +22,7 @@ from .exceptions import ScreenshotError
 log = logging.getLogger(__name__)
 
 
-class Screenshooter(object):
+class Screenshooter():
     """
     Python interface for a screenshooter
     """

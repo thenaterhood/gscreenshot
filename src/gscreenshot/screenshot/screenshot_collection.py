@@ -5,7 +5,7 @@ import typing
 from .screenshot import Screenshot
 
 
-class ScreenshotCollection(object):
+class ScreenshotCollection():
     '''
     The collection of screenshots taken by gscreenshot
     during the active session

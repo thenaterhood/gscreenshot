@@ -13,7 +13,7 @@ from gi.repository import Gtk # type: ignore
 i18n = gettext.gettext
 
 
-class FileOpenDialog(object):
+class FileOpenDialog():
     '''The 'open a file' dialog'''
     #pylint: disable=too-many-arguments
     def __init__(self, default_filename=None, default_folder=None,
