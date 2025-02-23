@@ -10,9 +10,7 @@ import gettext
 import io
 import threading
 import typing
-from PIL import Image
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
-from gscreenshot.compat import get_resource_file
 from gscreenshot.frontend.gtk.dialogs import (
     OpenWithDialog,
     WarningDialog,
@@ -21,6 +19,15 @@ from gscreenshot.frontend.gtk.dialogs import (
     ConfirmationDialog,
 )
 from gscreenshot.frontend.gtk.view import View
+from gscreenshot.meta import (
+    get_app_icon,
+    get_program_authors,
+    get_program_description,
+    get_program_license_text,
+    get_program_name,
+    get_program_version,
+    get_program_website,
+)
 from gscreenshot.screenshot.effects import CropEffect
 
 from gi import require_version
@@ -442,10 +449,9 @@ class Presenter():
         '''Handle the about button'''
         about = Gtk.AboutDialog(transient_for=self._view.get_window())
 
-        authors = self._app.get_program_authors()
-        about.set_authors(authors)
+        about.set_authors(get_program_authors())
 
-        description = i18n(self._app.get_program_description())
+        description = i18n(get_program_description())
         description += "\n" + i18n("Using {0} screenshot backend").format(
             self._app.get_screenshooter_name()
         )
@@ -459,22 +465,18 @@ class Presenter():
 
         about.set_comments(i18n(description))
 
-        website = self._app.get_program_website()
+        website = get_program_website()
         about.set_website(website)
         about.set_website_label(website)
 
-        name = self._app.get_program_name()
-        about.set_program_name(name)
+        about.set_program_name(get_program_name())
         about.set_title(i18n("About"))
 
-        license_text = self._app.get_program_license_text()
-        about.set_license(license_text)
+        about.set_license(get_program_license_text())
 
-        version = self._app.get_program_version()
-        about.set_version(version)
+        about.set_version(get_program_version())
 
-        png_filename = get_resource_file("gscreenshot.resources.pixmaps", "gscreenshot.png")
-        logo = Image.open(png_filename)
+        logo = get_app_icon()
         about.set_logo(
             self._image_to_pixbuf(logo)
         )

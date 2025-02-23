@@ -9,6 +9,14 @@ import gettext
 import typing
 
 from gscreenshot import Gscreenshot, GscreenshotClipboardException
+from gscreenshot.meta import (
+    get_program_authors,
+    get_program_description,
+    get_program_license,
+    get_program_name,
+    get_program_version,
+    get_program_website,
+)
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from .args import get_args
 
@@ -43,9 +51,9 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
     logging.basicConfig(level=args.log_level)
 
     if args.version is not False:
-        description = gscreenshot.get_program_description()
-        name = gscreenshot.get_program_name()
-        version = gscreenshot.get_program_version()
+        description = get_program_description()
+        name = get_program_name()
+        version = get_program_version()
 
         print(_("Using {0} screenshot backend").format(gscreenshot.get_screenshooter_name()))
         capabilities_formatted = []
@@ -54,12 +62,12 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
 
         print(f"{name} {version}; {description}")
         print(_("Available features: {0}").format(", ".join(capabilities_formatted)))
-        print(gscreenshot.get_program_website())
+        print(get_program_website())
         print("")
         print(_("Author(s)"))
-        print("\n".join(gscreenshot.get_program_authors()))
+        print("\n".join(get_program_authors()))
         print("")
-        print(_("Licensed as {0}").format(gscreenshot.get_program_license()))
+        print(_("Licensed as {0}").format(get_program_license()))
         sys.exit(0)
 
     if args.select_color:

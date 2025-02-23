@@ -23,7 +23,17 @@ import typing
 
 from datetime import datetime
 from PIL import Image
-from gscreenshot.compat import deprecated, get_resource_file, get_resource_string, get_version
+from gscreenshot.compat import deprecated, get_resource_file
+from gscreenshot.meta import (
+    get_app_icon,
+    get_program_authors,
+    get_program_description,
+    get_program_license,
+    get_program_license_text,
+    get_program_name,
+    get_program_version,
+    get_program_website,
+)
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter, get_screenshooter
 
@@ -709,6 +719,7 @@ class Gscreenshot():
         """Returns the path of the last save directory"""
         return self.cache["last_save_dir"]
 
+    @deprecated("deprecated 3.9.0: use meta.get_program_authors instead")
     def get_program_authors(self) -> typing.List[str]:
         """
         Returns the list of authors
@@ -716,47 +727,42 @@ class Gscreenshot():
         Returns:
             string[]
         """
-        authors = [
-                "Nate Levesque <public@thenaterhood.com>",
-                "Original Author (2006)",
-                "matej.horvath <matej.horvath@gmail.com>"
-                ]
+        return get_program_authors()
 
-        return authors
-
+    @deprecated("deprecated 3.9.0: use meta.get_app_icon instead")
     def get_app_icon(self) -> Image.Image:
         """Returns the application icon"""
-        pixmaps_path = 'gscreenshot.resources.pixmaps'
-        filename = get_resource_file(pixmaps_path, "gscreenshot.png")
-        return Image.open(filename)
+        return get_app_icon()
 
+    @deprecated("deprecated 3.9.0: use meta.get_program_description instead")
     def get_program_description(self) -> str:
         """Returns the program description"""
-        return "A simple screenshot tool supporting multiple backends."
+        return get_program_description()
 
+    @deprecated("deprecated 3.9.0: use meta.get_program_website instead")
     def get_program_website(self) -> str:
         """Returns the URL of the program website"""
-        return "https://github.com/thenaterhood/gscreenshot"
+        return get_program_website()
 
+    @deprecated("deprecated 3.9.0: use meta.get_program_name instead")
     def get_program_name(self) -> str:
         """Returns the program name"""
-        return "gscreenshot"
+        return get_program_name()
 
+    @deprecated("deprecated 3.9.0: use meta.get_program_license_text instead")
     def get_program_license_text(self) -> str:
         """Returns the license text"""
-        return get_resource_string("gscreenshot.resources", "LICENSE")
+        return get_program_license_text()
 
+    @deprecated("deprecated 3.9.0: use meta.get_program_license instead")
     def get_program_license(self) -> str:
         """Returns the license name"""
-        return "GPLv2"
+        return get_program_license()
 
+    @deprecated("deprecated 3.9.0: use meta.get_program_version instead")
     def get_program_version(self, padded: bool=False) -> str:
         """Returns the program version"""
-        if not padded:
-            return get_version()
-        version_str = get_version().split(".")
-        padded_version = [v.rjust(2, "0") for v in version_str]
-        return ".".join(padded_version)
+        return get_program_version(padded)
 
     def __repr__(self) -> str:
         return f'Gscreenshot(screenshooter={self.screenshooter})'
