@@ -22,9 +22,9 @@ import subprocess
 import tempfile
 import typing
 
-from warnings import deprecated
+from datetime import datetime
 from PIL import Image
-from gscreenshot.compat import get_resource_file, get_resource_string, get_version
+from gscreenshot.compat import deprecated, get_resource_file, get_resource_string, get_version
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter, get_screenshooter
 
