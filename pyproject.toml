@@ -42,6 +42,7 @@ disable = [
     "C0114", # (missing-module-docstring)
     "C0115", # (missing-class-docstring)
     "C0116", # (missing-function-docstring)
+    "E0401", # (import-error)
     "R0801", # (duplicate-code)
     "R0903", # (too-few-public-methods)
     "R0904", # (too-many-public-methods)
