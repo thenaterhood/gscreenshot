@@ -282,6 +282,8 @@ class Gscreenshot():
         else:
             use_cursor = self.get_cursor_by_name(cursor_name)
 
+        screenshot = None
+
         for _ in range(0, count):
             self.screenshooter.grab_fullscreen_(
                 delay,
@@ -289,15 +291,20 @@ class Gscreenshot():
                 use_cursor=use_cursor
             )
 
-            if self.screenshooter.screenshot is not None:
+            screenshot = self.screenshooter.screenshot
+
+            if screenshot is not None:
                 if overwrite:
-                    self._screenshots.replace(self.screenshooter.screenshot)
+                    self._screenshots.replace(screenshot)
                 else:
-                    self._screenshots.insert(self.screenshooter.screenshot)
+                    self._screenshots.insert(screenshot)
 
         self.run_display_mismatch_warning()
 
-        return self.get_last_image()
+        if screenshot:
+            return screenshot.get_image()
+
+        return None
 
     #pylint: disable=too-many-arguments
     def screenshot_selected(self, delay: int=0, capture_cursor: bool=False,
@@ -315,6 +322,7 @@ class Gscreenshot():
         Returns:
             PIL.Image
         """
+        screenshot = None
         if not capture_cursor:
             use_cursor = None
         else:
@@ -330,15 +338,20 @@ class Gscreenshot():
                 select_border_weight=self._select_border_weight,
             )
 
-            if self.screenshooter.screenshot is not None:
+            screenshot = self.screenshooter.screenshot
+
+            if screenshot is not None:
                 if overwrite:
-                    self._screenshots.replace(self.screenshooter.screenshot)
+                    self._screenshots.replace(screenshot)
                 else:
-                    self._screenshots.insert(self.screenshooter.screenshot)
+                    self._screenshots.insert(screenshot)
 
         self.run_display_mismatch_warning()
 
-        return self.get_last_image()
+        if screenshot:
+            return screenshot.get_image()
+
+        return None
 
     #pylint: disable=too-many-arguments
     def screenshot_window(self, delay: int=0, capture_cursor: bool=False,
@@ -355,6 +368,8 @@ class Gscreenshot():
         Returns:
             PIL.Image
         """
+        screenshot = None
+
         if not capture_cursor:
             use_cursor = None
         else:
@@ -369,15 +384,20 @@ class Gscreenshot():
                 select_border_weight=self._select_border_weight,
             )
 
-            if self.screenshooter.screenshot is not None:
+            screenshot = self.screenshooter.screenshot
+
+            if screenshot is not None:
                 if overwrite:
-                    self._screenshots.replace(self.screenshooter.screenshot)
+                    self._screenshots.replace(screenshot)
                 else:
-                    self._screenshots.insert(self.screenshooter.screenshot)
+                    self._screenshots.insert(screenshot)
 
         self.run_display_mismatch_warning()
 
-        return self.get_last_image()
+        if screenshot:
+            return screenshot.get_image()
+
+        return None
 
     def get_last_image(self) -> typing.Optional[Image.Image]:
         """
