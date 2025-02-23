@@ -1,6 +1,6 @@
 %define name gscreenshot
-%define version 3.8.0
-%define unmangled_version 3.8.0
+%define version 3.9.0
+%define unmangled_version 3.9.0
 %define release 1
 
 Summary: A simple screenshot tool
@@ -36,10 +36,10 @@ echo "gettext"
 %setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
 
 %build
-python3 setup.py build
+python3 -m build
 
 %install
-python3 setup.py install --single-version-externally-managed -O1 --root=$RPM_BUILD_ROOT --record=INSTALLED_FILES
+pip install --root="$pkgdir/" --force --no-dependencies .
 
 %clean
 rm -rf $RPM_BUILD_ROOT
