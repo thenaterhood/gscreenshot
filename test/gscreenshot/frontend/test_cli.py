@@ -1,7 +1,8 @@
 from importlib.resources import as_file, files
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, mock_open
 from PIL import Image
+import mock
 
 from src.gscreenshot.frontend.cli import run
 from src.gscreenshot.frontend.args import get_args
@@ -37,11 +38,12 @@ class CLITestGscreenshotCalls(unittest.TestCase):
         run(app=self.app, args=args)
         self.app.screenshot_selected.assert_called_with(delay=5, capture_cursor=True, cursor_name=None)
 
-    def test_notify(self):
+    @mock.patch('src.gscreenshot.actions.subprocess.run')
+    def test_notify(self, notify):
         args = get_args(["--delay", "5", "--notify"])
         run(app=self.app, args=args)
         self.app.screenshot_full_display.assert_called_with(delay=5, capture_cursor=False, cursor_name=None)
-        self.app.show_screenshot_notification.assert_called()
+        notify.assert_called_once()
 
     def test_selection_color(self):
         args = get_args(["--delay", "5", "--select-color", "#00000000", "-s"])
@@ -55,18 +57,22 @@ class CLITestGscreenshotCalls(unittest.TestCase):
         self.app.set_select_border_weight.assert_called_with(20)
         self.app.screenshot_selected.assert_called()
 
-    def test_clip_and_open(self):
+    @mock.patch('src.gscreenshot.screenshot.actions.copy.subprocess.Popen')
+    @mock.patch('src.gscreenshot.screenshot.actions.xdg_open.subprocess.run')
+    def test_clip_and_open(self, copy, xdg_open):
         args = get_args(["--clip", "--open"])
         run(app=self.app, args=args)
 
         self.app.screenshot_full_display.assert_called()
-        self.app.copy_last_screenshot_to_clipboard.assert_called()
-        self.app.open_last_screenshot.assert_called()
+        copy.assert_called_once()
+        xdg_open.assert_called_once()
 
-    def test_save_filename(self):
+    @mock.patch('builtins.open', new_callable=mock_open, create=True)
+    @mock.patch('src.gscreenshot.screenshot.actions.xdg_open.subprocess.run')
+    def test_save_filename(self, fopen, xdg_open):
         args = get_args(["--open", "--filename", "potato.png"])
         run(app=self.app, args=args)
 
         self.app.screenshot_full_display.assert_called()
-        self.app.save_last_image.assert_called_with("potato.png")
-        self.app.open_last_screenshot.assert_called()
+        fopen.assert_called_once()
+        xdg_open.assert_called_once()

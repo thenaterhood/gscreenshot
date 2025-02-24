@@ -2,8 +2,10 @@
 import logging
 import subprocess
 from typing import Optional, TYPE_CHECKING
-from .save_tmpfile import SaveTmpfileAction
+
 from .screenshot_action import ScreenshotActionError, ScreenshotAction
+from .save_tmpfile import SaveTmpfileAction
+
 
 if TYPE_CHECKING:
     from gscreenshot.screenshot import Screenshot

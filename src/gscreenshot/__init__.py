@@ -38,6 +38,7 @@ from gscreenshot.screenshot.actions import (
     CopyAction,
     SaveAction,
     SaveTmpfileAction,
+    ScreenshotActionError,
     XdgOpenAction
 )
 from gscreenshot.screenshot.screenshot import Screenshot
@@ -518,7 +519,13 @@ class Gscreenshot():
         Returns:
             bool success
         """
-        path = SaveAction(filename=filename).execute(self._screenshots.cursor_current())
+        path = None
+        try:
+            path = SaveAction(filename=filename).execute(self._screenshots.cursor_current())
+        except ScreenshotActionError as exc:
+            log.warning("failed to save image: %s",  str(exc))
+            return False
+
         if path:
             self.cache["last_save_dir"] = os.path.dirname(path)
             self.save_cache()

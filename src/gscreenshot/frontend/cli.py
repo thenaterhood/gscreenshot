@@ -22,6 +22,7 @@ from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from gscreenshot.screenshot.actions import (
     CopyAction,
     ScreenshotActionError,
+    SaveAction,
     SaveTmpfileAction,
     XdgOpenAction,
 )
@@ -123,7 +124,7 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
                 log.warning(_("failed to show screenshot notification - is notify-send working?"))
 
         if args.filename is not False:
-            if not gscreenshot.save_last_image(args.filename):
+            if not SaveAction(filename=args.filename).execute(screenshot):
                 log.warning(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
             else:
