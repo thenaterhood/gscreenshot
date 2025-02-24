@@ -11,18 +11,15 @@
  - Further changes will be noted in release notes
 '''
 import gettext
-import io
 import json
 import locale
 import logging
 import os
 import sys
-import subprocess
-import tempfile
 import typing
 
-from datetime import datetime
 from PIL import Image
+from gscreenshot.actions import NotifyAction
 from gscreenshot.compat import deprecated, get_resource_file
 from gscreenshot.meta import (
     get_app_icon,
@@ -37,8 +34,16 @@ from gscreenshot.meta import (
 from gscreenshot.screenshot import ScreenshotCollection
 from gscreenshot.screenshooter import Screenshooter, get_screenshooter
 
+from gscreenshot.screenshot.actions import (
+    CopyAction,
+    SaveAction,
+    SaveTmpfileAction,
+    XdgOpenAction
+)
+from gscreenshot.screenshot.screenshot import Screenshot
 from gscreenshot.util import (
     get_supported_formats,
+    session_is_mismatched,
     session_is_wayland,
 )
 from gscreenshot.filename import (
@@ -49,11 +54,6 @@ from gscreenshot.filename import (
 
 _ = gettext.gettext
 log = logging.getLogger(__name__)
-
-
-#pylint: disable=missing-class-docstring
-class GscreenshotClipboardException(Exception):
-    pass
 
 
 class Gscreenshot():
@@ -76,9 +76,6 @@ class Gscreenshot():
     _screenshots: ScreenshotCollection
     _stamps: typing.Dict[str, Image.Image]
     session: typing.Dict[str, typing.Any]
-
-    # generated using piexif
-    EXIF_TEMPLATE = b'Exif\x00\x00MM\x00*\x00\x00\x00\x08\x00\x02\x011\x00\x02\x00\x00\x00\x15\x00\x00\x00&\x87i\x00\x04\x00\x00\x00\x01\x00\x00\x00;\x00\x00\x00\x00gscreenshot [[VERSION]]\x00\x00\x01\x90\x03\x00\x02\x00\x00\x00\x14\x00\x00\x00I[[CREATE_DATE]]\x00' #pylint: disable=line-too-long
 
     def __init__(self, screenshooter=None):
         """
@@ -116,6 +113,18 @@ class Gscreenshot():
                     self.save_cache()
         else:
             self.save_cache()
+
+    @property
+    def screenshots(self) -> ScreenshotCollection:
+        return self._screenshots
+
+    @property
+    def current(self) -> Screenshot | None:
+        return self._screenshots.cursor_current()
+
+    @property
+    def current_always(self) -> Screenshot:
+        return self._screenshots.cursor_current_fallback()
 
     def get_capabilities(self) -> typing.Dict[str, str]:
         '''
@@ -210,42 +219,22 @@ class Gscreenshot():
         log.info("cursor glyph name = '%s' does not exist, using default", name)
         return cursors[default]
 
+    @deprecated("deprecated 3.9.0: use NotifyAction().execute")
     def show_screenshot_notification(self) -> bool:
         '''
         Show a notification that a screenshot was taken.
         This method is a "fire-and-forget" and won't
         return a status as to whether it succeeded.
         '''
-        try:
-            # This has a timeout in case the notification
-            # daemon is hanging - don't lock up gscreenshot too
-            subprocess.run([
-                'notify-send',
-                'gscreenshot',
-                _('a screenshot was taken from a script or terminal'),
-                '--icon',
-                'gscreenshot'
-            ], check=True, timeout=2)
-            return True
-        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
-            log.info("notify-send failed: %s", exc)
-            return False
+        return NotifyAction().execute()
 
     def run_display_mismatch_warning(self):
         '''
         Send a notification if the screenshot was taken from a
         non-X11 or wayland session.
         '''
-        if 'XDG_SESSION_ID' not in os.environ:
-            return
-
-        if 'XDG_SESSION_TYPE' not in os.environ:
-            self.show_screenshot_notification()
-            return
-
-        session_type = os.environ['XDG_SESSION_TYPE']
-        if session_type.lower() not in ('x11', 'mir', 'wayland'):
-            self.show_screenshot_notification()
+        if session_is_mismatched():
+            NotifyAction().execute()
 
     def get_cache_file(self) -> str:
         """
@@ -409,6 +398,7 @@ class Gscreenshot():
 
         return None
 
+    @deprecated("deprecated 3.9.0: use Gscreenshot.current.get_image()")
     def get_last_image(self) -> typing.Optional[Image.Image]:
         """
         Returns the last screenshot taken
@@ -434,6 +424,7 @@ class Gscreenshot():
         """Get supported image formats"""
         return get_supported_formats()
 
+    @deprecated("deprecated 3.9.0: use Gscreenshot.current_always.get_preview")
     def get_thumbnail(self, width: int, height: int, with_border: bool=False
                       ) -> Image.Image:
         """
@@ -445,12 +436,7 @@ class Gscreenshot():
         Returns:
             Image
         """
-        screenshot = self._screenshots.cursor_current()
-
-        if screenshot is not None:
-            return screenshot.get_preview(width, height, with_border) or self.get_app_icon()
-
-        return self.get_app_icon()
+        return self.current_always.get_preview(width, height, with_border)
 
     @deprecated("deprecated 3.9.0: use filename.get_time_filename instead")
     def get_time_filename(self) -> str:
@@ -485,6 +471,7 @@ class Gscreenshot():
         '''Generates a time-based folder name'''
         return get_time_foldername(self._screenshots.cursor_current())
 
+    @deprecated("deprecated 3.9.0: use SaveTmpFileAction.execute instead")
     def save_and_return_path(self) -> typing.Optional[str]:
         """
         Saves the last screenshot to /tmp if it hasn't been saved
@@ -493,105 +480,7 @@ class Gscreenshot():
         Returns:
             str
         """
-        screenshot_fname = os.path.join(
-                tempfile.gettempdir(),
-                get_time_filename(self._screenshots.cursor_current())
-                )
-
-        screenshot = self._screenshots.cursor_current()
-        if screenshot is None:
-            return None
-
-        if not screenshot.saved():
-            self.save_last_image(screenshot_fname)
-            screenshot.set_saved_path(screenshot_fname)
-        else:
-            return screenshot.get_saved_path()
-
-        return screenshot_fname
-
-    def _save_image(self, image: Image.Image, filename: typing.Optional[str]=None,
-                    overwrite: bool=True) -> typing.Optional[str]:
-        '''
-        Internal method for saving an image to a file
-        '''
-        if filename is None:
-            filename = get_time_filename(self._screenshots.cursor_current())
-        else:
-            filename = interpolate_filename(filename)
-
-        file_type = "png"
-
-        if "/dev" not in filename or filename.index("/dev") != 0:
-
-            file_extension = os.path.splitext(filename)[1][1:].lower()
-
-            if file_extension == "":
-                # If we don't have any file extension, assume
-                # we were given a directory; create the tree
-                # if it doesn't exist, then store the screenshot
-                # there with a time-based filename.
-                try:
-                    os.makedirs(filename)
-                    log.debug("created directory tree for '%s'", filename)
-                except (IOError, OSError) as exc:
-                    # Likely the directory already exists, so
-                    # we'll throw the exception away.
-                    # If we fail to save, we'll return a status
-                    # saying so, so we'll be okay.
-                    log.info("failed to create tree for '%s': %s", filename, exc)
-
-                filename = os.path.join(
-                        filename,
-                        get_time_filename(self._screenshots.cursor_current())
-                        )
-                file_type = 'png'
-
-            else:
-                file_type = file_extension
-
-            if not overwrite and os.path.exists(filename):
-                return None
-
-            self.cache["last_save_dir"] = os.path.dirname(filename)
-            self.save_cache()
-
-        if file_type == 'jpg':
-            file_type = 'jpeg'
-
-        if file_type not in get_supported_formats():
-            log.info("unrecognized image format '%s'", file_type)
-            return None
-
-        try:
-            # add exif data. This is sketchy but we don't need to
-            # dynamically generate it, just find and replace.
-            # This avoids needing an external library for such a simple
-            # thing.
-            exif_data = self.EXIF_TEMPLATE.replace(
-                '[[VERSION]]'.encode(),
-                self.get_program_version(True).encode()
-            )
-            exif_data = exif_data.replace(
-                '[[CREATE_DATE]]'.encode(),
-                datetime.now().strftime("%Y:%m:%d %H:%M:%S").encode()
-            )
-
-            # open(... , 'w*') truncates the file, so this is not vulnerable
-            # to the 2023 android and windows 11 problem of leaking data from
-            # cropped screenshots.
-            with open(filename, "wb") as file_pointer:
-                image.save(file_pointer, file_type.upper(), exif=exif_data)
-
-        except IOError as exc:
-            log.info("failed to save screenshot: %s", exc)
-            filename = None
-
-        screenshot = self._screenshots.cursor_current()
-        if screenshot is not None:
-            screenshot.set_saved_path(filename)
-
-        return filename
+        return SaveTmpfileAction().execute(self._screenshots.cursor_current())
 
     def save_screenshot_collection(self, foldername: typing.Optional[str]=None) -> bool:
         '''
@@ -613,10 +502,7 @@ class Gscreenshot():
         for screenshot in self._screenshots:
             i += 1
             fname = os.path.join(foldername, f"gscreenshot-{i}.png")
-            if self._save_image(screenshot.get_image(), fname, False) is not None:
-                return False
-
-            screenshot.set_saved_path(fname)
+            SaveAction(filename=fname, overwrite=False).execute(screenshot)
 
         return True
 
@@ -632,22 +518,14 @@ class Gscreenshot():
         Returns:
             bool success
         """
+        path = SaveAction(filename=filename).execute(self._screenshots.cursor_current())
+        if path:
+            self.cache["last_save_dir"] = os.path.dirname(path)
+            self.save_cache()
 
-        image = self.get_last_image()
+        return path is not None
 
-        if image is None:
-            return False
-
-        saved_path = self._save_image(image, filename)
-        if saved_path:
-            screenshot = self._screenshots.cursor_current()
-            if screenshot is not None:
-                screenshot.set_saved_path(saved_path)
-
-            return True
-
-        return False
-
+    @deprecated("deprecated 3.9.0: use XdgOpenAction.execute")
     def open_last_screenshot(self) -> bool:
         """
         Calls xdg to open the screenshot in its default application
@@ -655,17 +533,9 @@ class Gscreenshot():
         Returns:
             bool success
         """
-        screenshot_fname = self.save_and_return_path()
-        if screenshot_fname is None:
-            return False
+        return XdgOpenAction().execute(self._screenshots.cursor_current())
 
-        try:
-            subprocess.run(['xdg-open', screenshot_fname], check=True)
-            return True
-        except (subprocess.CalledProcessError, IOError, OSError) as exc:
-            log.warning("failed to open screenshot with xdg-open: %s", exc)
-            return False
-
+    @deprecated("deprecated 3.9.0: use CopyAction.execute")
     def copy_last_screenshot_to_clipboard(self) -> bool:
         """
         Copies the last screenshot to the clipboard with
@@ -675,45 +545,7 @@ class Gscreenshot():
         Returns:
             bool success
         """
-        image = self.get_last_image()
-
-        if image is None:
-            return False
-
-        params = [
-            'xclip',
-            '-selection',
-            'clipboard',
-            '-t',
-            'image/png'
-            ]
-        clipper_name = "xclip"
-
-        if session_is_wayland():
-            params = [
-                    'wl-copy',
-                    '-t',
-                    'image/png'
-                ]
-            clipper_name = "wl-copy"
-
-        with io.BytesIO() as png_data:
-            image.save(png_data, "PNG")
-
-            try:
-                with subprocess.Popen(
-                    params,
-                    close_fds=True,
-                    stdin=subprocess.PIPE,
-                    stdout=None,
-                    stderr=None) as xclip:
-
-                    xclip.communicate(input=png_data.getvalue())
-                    return True
-            except (OSError, subprocess.CalledProcessError) as exc:
-                #pylint: disable=raise-missing-from
-                log.warning("failed to clip screenshot with clipper = '%s': %s", clipper_name, exc)
-                raise GscreenshotClipboardException(clipper_name)
+        return CopyAction().execute(self._screenshots.cursor_current())
 
     def get_last_save_directory(self) -> str:
         """Returns the path of the last save directory"""

@@ -4,6 +4,7 @@ Screenshot container classes for gscreenshot
 import os
 import typing
 from PIL import Image
+
 from .effects import ScreenshotEffect
 
 

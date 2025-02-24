@@ -8,7 +8,8 @@ import sys
 import gettext
 import typing
 
-from gscreenshot import Gscreenshot, GscreenshotClipboardException
+from gscreenshot import Gscreenshot
+from gscreenshot.actions import NotifyAction
 from gscreenshot.meta import (
     get_program_authors,
     get_program_description,
@@ -18,6 +19,12 @@ from gscreenshot.meta import (
     get_program_website,
 )
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+from gscreenshot.screenshot.actions import (
+    CopyAction,
+    ScreenshotActionError,
+    SaveTmpfileAction,
+    XdgOpenAction,
+)
 from .args import get_args
 
 
@@ -104,13 +111,15 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
             cursor_name=args.pointer_glyph
         )
 
-    if gscreenshot.get_last_image() is None:
+    screenshot = gscreenshot.get_screenshot_collection().cursor_current()
+
+    if screenshot is None:
         log.error(_("No screenshot taken."))
         gscreenshot.session["error"] = True
     else:
         saved_screenshot = False
         if args.notify:
-            if not gscreenshot.show_screenshot_notification():
+            if not NotifyAction().execute():
                 log.warning(_("failed to show screenshot notification - is notify-send working?"))
 
         if args.filename is not False:
@@ -126,19 +135,26 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
             else:
                 saved_screenshot = True
 
-        last_shot = gscreenshot.get_screenshot_collection().cursor_current()
-        if saved_screenshot and last_shot:
-            print(last_shot.get_saved_path())
+        if saved_screenshot and screenshot:
+            print(screenshot.get_saved_path())
 
         if args.open is not False:
-            gscreenshot.open_last_screenshot()
+            try:
+                XdgOpenAction().execute(screenshot)
+            except ScreenshotActionError:
+                log.warning(_("Failed to open screenshot!"))
 
         if args.clip is not False:
             try:
-                gscreenshot.copy_last_screenshot_to_clipboard()
-            except GscreenshotClipboardException as error:
-                tmp_file = gscreenshot.save_and_return_path()
+                CopyAction().execute(screenshot)
+            except ScreenshotActionError as error:
                 log.warning(_("Could not clip image! {0} failed to run.").format(error))
+
+                tmp_file = None
+                try:
+                    tmp_file = SaveTmpfileAction().execute(screenshot)
+                except ScreenshotActionError:
+                    pass
 
                 if tmp_file is not None:
                     log.warning(_("Your screenshot was saved to {0}").format(tmp_file))

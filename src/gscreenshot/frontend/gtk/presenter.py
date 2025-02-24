@@ -10,7 +10,7 @@ import gettext
 import io
 import threading
 import typing
-from gscreenshot import Gscreenshot, GscreenshotClipboardException
+from gscreenshot import Gscreenshot
 from gscreenshot.frontend.gtk.dialogs import (
     OpenWithDialog,
     WarningDialog,
@@ -28,9 +28,16 @@ from gscreenshot.meta import (
     get_program_version,
     get_program_website,
 )
+from gscreenshot.screenshot.actions import (
+    CopyAction,
+    ScreenshotActionError,
+    SaveTmpfileAction,
+    XdgOpenAction,
+)
 from gscreenshot.screenshot.effects import CropEffect
 
 from gi import require_version
+
 require_version('Gtk', '3.0')
 from gi.repository import Gdk # type: ignore
 from gi.repository import Gtk # type: ignore
@@ -228,7 +235,16 @@ class Presenter():
         '''
         Handle dragging and dropping the image preview
         '''
-        fname = self._app.save_and_return_path()
+        screenshot = self._app.current
+        if not screenshot:
+            return
+
+        fname = None
+        action = SaveTmpfileAction()
+        try:
+            fname = action.execute(screenshot)
+        except ScreenshotActionError:
+            pass
 
         if fname is None:
             return
@@ -240,7 +256,7 @@ class Presenter():
         remove the current screenshot
         """
         screenshots = self._app.get_screenshot_collection()
-        current = screenshots.cursor_current()
+        current = self._app.current
         if current:
             screenshots.remove(current)
 
@@ -254,7 +270,7 @@ class Presenter():
         Take a screenshot with the same region as the
         screenshot under the cursor, if applicable
         '''
-        last_screenshot = self._app.get_screenshot_collection().cursor_current()
+        last_screenshot = self._app.current
         region = None
 
         if last_screenshot is not None:
@@ -288,7 +304,7 @@ class Presenter():
         '''
         Handles toggling effects on and off
         '''
-        screenshot = self._app.get_screenshot_collection().cursor_current()
+        screenshot = self._app.current
         if screenshot is None:
             return
 
@@ -348,7 +364,15 @@ class Presenter():
     def on_button_openwith_clicked(self, *_):
         '''Handle the "open with" button'''
         self._view.flash_status_icon(Gtk.STOCK_EXECUTE)
-        fname = self._app.save_and_return_path()
+
+        screenshot = self._app.current
+        if screenshot is None:
+            return
+
+        try:
+            fname = SaveTmpfileAction().execute(screenshot)
+        except ScreenshotActionError:
+            return
 
         if fname is None:
             return
@@ -380,17 +404,16 @@ class Presenter():
         """
         Copy the current screenshot to the clipboard
         """
-        img = self._app.get_last_image()
-
-        if img is None:
+        screenshot = self._app.current
+        if screenshot is None:
             return False
 
-        pixbuf = self._image_to_pixbuf(img)
+        pixbuf = self._image_to_pixbuf(screenshot.get_image())
 
         if not self._view.copy_to_clipboard(pixbuf):
             try:
-                self._app.copy_last_screenshot_to_clipboard()
-            except GscreenshotClipboardException as error:
+                CopyAction().execute(screenshot)
+            except ScreenshotActionError as error:
                 warning_dialog = WarningDialog(
                     i18n(
                         "Your clipboard doesn't support persistence and {0} isn't available."
@@ -424,7 +447,16 @@ class Presenter():
 
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
-        success = self._app.open_last_screenshot()
+        screenshot = self._app.current
+        if not screenshot:
+            return
+
+        success = False
+        try:
+            success = XdgOpenAction().execute(screenshot)
+        except ScreenshotActionError:
+            pass
+
         if not success:
             dialog = WarningDialog(
                 i18n("Please install xdg-open to open files."),
@@ -546,8 +578,7 @@ class Presenter():
 
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()
-
-        preview_img = self._app.get_thumbnail(width, height, with_border=True)
+        preview_img = self._app.current_always.get_preview(width, height, with_border=True)
 
         pixbuf = self._image_to_pixbuf(preview_img)
         self._view.update_preview(pixbuf)
