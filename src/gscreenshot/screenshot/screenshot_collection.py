@@ -2,6 +2,8 @@
 Screenshot container classes for gscreenshot
 '''
 import typing
+
+from gscreenshot.meta import get_app_icon
 from .screenshot import Screenshot
 
 
@@ -120,6 +122,17 @@ class ScreenshotCollection():
             return self._screenshots[self._cursor]
         except IndexError:
             return None
+
+    def cursor_current_fallback(self) -> Screenshot:
+        """
+        Get the screenshot at the current cursor index
+        or the application icon if no screenshot is available
+        """
+        screenshot = self.cursor_current()
+        if not screenshot:
+            return Screenshot(get_app_icon())
+
+        return screenshot
 
     def cursor_to_start(self):
         '''move the cursor to index 0'''

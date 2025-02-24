@@ -1,6 +1,8 @@
 """
 Compatibility functions
 """
+import warnings
+
 try:
     from importlib.resources import as_file, files
 except ImportError:
@@ -42,3 +44,16 @@ def get_version():
 
     # pylint: disable=used-before-assignment
     return require("gscreenshot")[0].version
+
+
+def deprecated(message):
+    """Compatibility function for python < 3.13"""
+    def deprecated_decorator(func):
+        def deprecated_func(*args, **kwargs):
+            warnings.warn(f"{func.__name__} is a deprecated function. {message}",
+                category=DeprecationWarning,
+                stacklevel=2)
+            warnings.simplefilter('default', DeprecationWarning)
+            return func(*args, **kwargs)
+        return deprecated_func
+    return deprecated_decorator

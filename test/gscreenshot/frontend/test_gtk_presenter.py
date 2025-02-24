@@ -30,19 +30,21 @@ class GtkPresenterTest(unittest.TestCase):
         self.view.copy_to_clipboard.assert_called_once()
         self.assertTrue(success)
 
-    def test_on_copy_clicked_gtk_no_persistent_clipboard(self):
+    @mock.patch('src.gscreenshot.screenshot.actions.copy.subprocess.Popen')
+    def test_on_copy_clicked_gtk_no_persistent_clipboard(self, copy):
         self.view.copy_to_clipboard.return_value = False
         self.app.copy_last_screenshot_to_clipboard.return_value = True
         success = self.presenter.on_button_copy_clicked()
-        self.app.copy_last_screenshot_to_clipboard.assert_called_once()
         self.view.copy_to_clipboard.assert_called_once()
+        copy.assert_called_once()
         self.assertTrue(success)
 
-    def test_on_button_open_clicked(self):
+    @mock.patch('src.gscreenshot.screenshot.actions.xdg_open.subprocess.run')
+    def test_on_button_open_clicked(self, xdg_open):
         self.app.open_last_screenshot.return_value = True
         self.screenshot_collection.cursor_current.return_value = None
         self.presenter.on_button_open_clicked()
-        self.app.open_last_screenshot.assert_called_once()
+        xdg_open.assert_called_once()
         self.app.quit.assert_called_once()
 
     def test_on_fullscreen_toggle(self):
@@ -59,7 +61,7 @@ class GtkPresenterTest(unittest.TestCase):
         self.presenter.on_window_resize()
         self.view.resize.assert_called_once()
         # Called once in the constructor already
-        self.assertEqual(self.app.get_thumbnail.call_count, 2)
+        self.assertEqual(self.app.current_always.get_preview.call_count, 2)
 
     def test_on_button_copy_and_close_clicked(self):
         self.screenshot_collection.cursor_current.return_value = None
@@ -79,17 +81,17 @@ class GtkPresenterTest(unittest.TestCase):
         # mocking any of the threading
         self.presenter.on_button_all_clicked()
         self.app.screenshot_full_display.assert_called_once()
-        self.app.get_thumbnail.assert_called_once()
+        self.app.current_always.get_preview.assert_called_once()
         self.view.update_preview.assert_called_once()
 
     def test_on_button_window_clicked(self):
         self.presenter.on_button_window_clicked()
         self.app.screenshot_selected.assert_called_once()
-        self.app.get_thumbnail.assert_called_once()
+        self.app.current_always.get_preview.assert_called_once()
         self.view.update_preview.assert_called_once()
 
     def test_on_button_selectarea_clicked(self):
         self.presenter.on_button_selectarea_clicked()
         self.app.screenshot_selected.assert_called_once()
-        self.app.get_thumbnail.assert_called_once()
+        self.app.current_always.get_preview.assert_called_once()
         self.view.update_preview.assert_called_once()

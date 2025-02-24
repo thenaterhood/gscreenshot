@@ -64,7 +64,7 @@ def main(app: typing.Optional[Gscreenshot] = None):
             view
             )
 
-    if not application.get_last_image():
+    if not application.get_screenshot_collection().cursor_current():
         # Lucky 13 to give a tiny bit more time for the desktop environment
         # to settle down and hide the window before we take our initial
         # screenshot.
