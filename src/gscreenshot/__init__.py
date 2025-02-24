@@ -119,7 +119,7 @@ class Gscreenshot():
         return self._screenshots
 
     @property
-    def current(self) -> Screenshot | None:
+    def current(self) -> typing.Optional[Screenshot]:
         return self._screenshots.cursor_current()
 
     @property

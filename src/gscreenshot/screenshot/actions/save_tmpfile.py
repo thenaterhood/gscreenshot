@@ -2,8 +2,8 @@
 import os
 import tempfile
 from typing import Optional, TYPE_CHECKING
-from gscreenshot.screenshot.actions import SaveAction
 from gscreenshot.filename import get_time_filename
+from .save import SaveAction
 
 from .screenshot_action import ScreenshotAction
 
