@@ -4,6 +4,7 @@ from datetime import datetime
 import logging
 import os
 from typing import Optional, TYPE_CHECKING
+from gscreenshot.cache import GscreenshotCache
 from gscreenshot.filename import get_time_filename, interpolate_filename
 from gscreenshot.util import get_supported_formats
 from gscreenshot.screenshot.actions.screenshot_action import (
@@ -24,6 +25,8 @@ class SaveActionParams():
     overwrite: bool = True
 
     filename: Optional[str] = None
+
+    update_cache: Optional[bool] = False
 
 
 class SaveAction(ScreenshotAction[str | None]):
@@ -122,5 +125,9 @@ class SaveAction(ScreenshotAction[str | None]):
 
         if screenshot is not None:
             screenshot.set_saved_path(filename)
+
+        if self.params.update_cache:
+            cache = GscreenshotCache.load()
+            cache.update_values(write=True, last_save_dir=os.path.dirname(filename))
 
         return filename

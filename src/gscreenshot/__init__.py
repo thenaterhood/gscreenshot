@@ -10,6 +10,7 @@
  - Updated to use modern libraries and formats
  - Further changes will be noted in release notes
 '''
+from dataclasses import asdict
 import gettext
 import json
 import locale
@@ -20,6 +21,7 @@ import typing
 
 from PIL import Image
 from gscreenshot.actions import NotifyAction
+from gscreenshot.cache import GscreenshotCache
 from gscreenshot.compat import deprecated, get_resource_file
 from gscreenshot.meta import (
     get_app_icon,
@@ -64,7 +66,6 @@ class Gscreenshot():
 
     __slots__ = [
         'screenshooter',
-        'cache',
         'session',
         '_screenshots',
         '_stamps',
@@ -73,7 +74,6 @@ class Gscreenshot():
     ]
 
     screenshooter: Screenshooter
-    cache: typing.Dict[str, str]
     _screenshots: ScreenshotCollection
     _stamps: typing.Dict[str, Image.Image]
     session: typing.Dict[str, typing.Any]
@@ -104,16 +104,10 @@ class Gscreenshot():
         self._select_color = None
         self._select_border_weight = None
 
-        self.cache = {"last_save_dir": os.path.expanduser("~")}
-        if os.path.isfile(self.get_cache_file()):
-            with open(self.get_cache_file(), "r", encoding="UTF-8") as cachefile:
-                try:
-                    self.cache = json.load(cachefile)
-                except json.JSONDecodeError:
-                    self.cache = {"last_save_dir": os.path.expanduser("~")}
-                    self.save_cache()
-        else:
-            self.save_cache()
+    @deprecated("deprecated 3.9.0. Use GscreenshotCache directly")
+    @property
+    def cache(self) -> dict[str, str]:
+        return asdict(GscreenshotCache.load())
 
     @property
     def screenshots(self) -> ScreenshotCollection:
@@ -237,22 +231,17 @@ class Gscreenshot():
         if session_is_mismatched():
             NotifyAction().execute()
 
+    @deprecated("deprecated 3.9.0. Use the GscreenshotCache class.")
     def get_cache_file(self) -> str:
         """
         Find the gscreenshot cache file and return its path
         """
-        if 'XDG_CACHE_HOME' in os.environ:
-            return os.environ['XDG_CACHE_HOME'] + "/gscreenshot"
-        return os.path.expanduser("~/.gscreenshot")
+        return GscreenshotCache.get_cache_path()
 
+    @deprecated("deprecated 3.9.0. Use the GscreenshotCache class directly")
     def save_cache(self):
         """Writes the cache to disk"""
-        try:
-            with open(self.get_cache_file(), "w", encoding="UTF-8") as cachefile:
-                json.dump(self.cache, cachefile)
-                log.debug("wrote cache file '%s'", self.get_cache_file())
-        except FileNotFoundError:
-            log.warning(_("unable to save cache file - file not found"))
+        return
 
     def get_screenshooter_name(self) -> str:
         """Gets the name of the current screenshooter"""
@@ -507,6 +496,9 @@ class Gscreenshot():
 
         return True
 
+    @deprecated(
+        "deprecated 3.9.0. Use SaveAction(filename=... , update_cache=True).execute instead"
+    )
     def save_last_image(self, filename: typing.Optional[str]= None) -> bool:
         """
         Saves the last screenshot taken with a given filename.
@@ -521,14 +513,13 @@ class Gscreenshot():
         """
         path = None
         try:
-            path = SaveAction(filename=filename).execute(self._screenshots.cursor_current())
+            path = SaveAction(
+                filename=filename,
+                update_cache=True,
+            ).execute(self._screenshots.cursor_current())
         except ScreenshotActionError as exc:
             log.warning("failed to save image: %s",  str(exc))
             return False
-
-        if path:
-            self.cache["last_save_dir"] = os.path.dirname(path)
-            self.save_cache()
 
         return path is not None
 
@@ -554,9 +545,10 @@ class Gscreenshot():
         """
         return CopyAction().execute(self._screenshots.cursor_current())
 
+    @deprecated("deprecated 3.9.0. Use GscreenshotCache directly.")
     def get_last_save_directory(self) -> str:
         """Returns the path of the last save directory"""
-        return self.cache["last_save_dir"]
+        return GscreenshotCache.load().last_save_dir
 
     @deprecated("deprecated 3.9.0: use meta.get_program_authors instead")
     def get_program_authors(self) -> typing.List[str]:

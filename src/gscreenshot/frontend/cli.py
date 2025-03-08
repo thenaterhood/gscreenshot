@@ -130,7 +130,7 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
             else:
                 saved_screenshot = True
         elif args.clip is False and not args.gui:
-            if not gscreenshot.save_last_image():
+            if not SaveAction().execute(screenshot):
                 log.warning(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
             else:

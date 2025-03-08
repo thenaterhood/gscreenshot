@@ -11,6 +11,7 @@ import io
 import threading
 import typing
 from gscreenshot import Gscreenshot
+from gscreenshot.cache import GscreenshotCache
 from gscreenshot.frontend.gtk.dialogs import (
     OpenWithDialog,
     WarningDialog,
@@ -34,6 +35,7 @@ from gscreenshot.screenshot.actions import (
     SaveTmpfileAction,
     XdgOpenAction,
 )
+from gscreenshot.screenshot.actions.save import SaveAction
 from gscreenshot.screenshot.effects import CropEffect
 
 from gi import require_version
@@ -320,16 +322,20 @@ class Presenter():
         saved = False
         cancelled = False
 
+        screenshot = self._app.current
+        if screenshot is None:
+            return
+
         save_dialog = FileSaveDialog(
                 self._app.get_time_filename(),
-                self._app.get_last_save_directory(),
+                GscreenshotCache.load().last_save_dir,
                 self._view.get_window()
                 )
 
         while not (saved or cancelled):
             fname = self._view.run_dialog(save_dialog)
             if fname is not None:
-                saved = self._app.save_last_image(fname)
+                saved = SaveAction(filename=fname, update_cache=True).execute(screenshot)
             else:
                 cancelled = True
 
