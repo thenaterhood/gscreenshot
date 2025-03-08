@@ -105,7 +105,7 @@ class Gscreenshot():
 
     @deprecated("deprecated 3.9.0. Use GscreenshotCache directly")
     @property
-    def cache(self) -> dict[str, str]:
+    def cache(self) -> typing.Dict[str, str]:
         return asdict(GscreenshotCache.load())
 
     @property
