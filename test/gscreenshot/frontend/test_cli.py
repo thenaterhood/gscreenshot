@@ -4,7 +4,6 @@ from unittest.mock import Mock, mock_open
 from PIL import Image
 import mock
 
-from src.gscreenshot.meta import get_app_icon
 from src.gscreenshot.screenshot.screenshot import Screenshot
 from src.gscreenshot.frontend.cli import run
 from src.gscreenshot.frontend.args import get_args

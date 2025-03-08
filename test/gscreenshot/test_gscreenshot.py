@@ -1,5 +1,4 @@
 import mock
-import subprocess
 import unittest
 from unittest.mock import Mock, mock_open, ANY
 from gscreenshot.screenshot.actions.screenshot_action import ScreenshotActionError

@@ -12,7 +12,6 @@
 '''
 from dataclasses import asdict
 import gettext
-import json
 import locale
 import logging
 import os

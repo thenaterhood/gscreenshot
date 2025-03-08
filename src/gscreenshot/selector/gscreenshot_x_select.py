@@ -1,7 +1,6 @@
 '''
 Super jank homebrew selector using a transparent X window
 '''
-
 import typing
 from time import sleep
 

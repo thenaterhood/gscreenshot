@@ -55,7 +55,7 @@ def build_data_files(version):
     '''
     try:
         os.makedirs("generated")
-    except (OSError, FileExistsError) as e:
+    except (OSError, FileExistsError):
         if not os.path.isdir("generated"):
             raise
     compile_locales()
@@ -72,7 +72,7 @@ def build_data_files(version):
                 updated_data = infile_data.replace('%%VERSION%%', version)
                 try:
                     os.makedirs(os.path.dirname(generated_path))
-                except (OSError, FileExistsError) as e:
+                except (OSError, FileExistsError):
                     if not os.path.isdir(os.path.dirname(generated_path)):
                         raise
 
@@ -135,7 +135,7 @@ def compile_manpage():
             subprocess.check_output(converter)
             success = True
             break
-        except Exception as e:
+        except Exception:
             continue
 
     if not success:
