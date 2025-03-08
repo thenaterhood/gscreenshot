@@ -60,9 +60,8 @@ jobs:
       - name: Install mypy
         run: |
           python3 -m pip install "mypy==1.14" mypy_extensions types-setuptools
-          mypy --install-types
 
       - name: Run mypy
         run: |
-          mypy src/
+          mypy --install-types src/
 
