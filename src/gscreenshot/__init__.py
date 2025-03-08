@@ -103,8 +103,8 @@ class Gscreenshot():
         self._select_color = None
         self._select_border_weight = None
 
-    @deprecated("deprecated 3.9.0. Use GscreenshotCache directly")
     @property
+    @deprecated("deprecated 3.9.0. Use GscreenshotCache directly")
     def cache(self) -> typing.Dict[str, str]:
         return asdict(GscreenshotCache.load())
 
