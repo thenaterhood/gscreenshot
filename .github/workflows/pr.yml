@@ -65,4 +65,4 @@ jobs:
           pwd
           ls
           mypy --version
-          mypy src/ --exclude "compat\.py"
+          mypy --config-file ./pyproject.toml src/ --exclude "compat\.py"
