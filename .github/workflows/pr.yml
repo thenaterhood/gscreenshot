@@ -63,4 +63,4 @@ jobs:
           python3 -m pip install mypy_extensions
           python3 -m pip install types-setuptools
           mypy --version
-          mypy src/ --exclude src/gscreenshot/compat.py
+          mypy src/ --exclude "compat\.py"
