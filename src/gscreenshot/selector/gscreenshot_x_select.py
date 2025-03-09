@@ -1,7 +1,6 @@
 '''
 Super jank homebrew selector using a transparent X window
 '''
-
 import typing
 from time import sleep
 
@@ -10,7 +9,7 @@ from gscreenshot.util import GSCapabilities
 #pylint: disable=wrong-import-position,wrong-import-order
 from gi import require_version
 require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk # type: ignore
+from gi.repository import Gtk, Gdk # type: ignore # noqa: E402
 
 from .region_selector import RegionSelector
 

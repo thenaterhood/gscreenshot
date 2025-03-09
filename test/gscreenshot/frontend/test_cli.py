@@ -4,6 +4,7 @@ from unittest.mock import Mock, mock_open
 from PIL import Image
 import mock
 
+from src.gscreenshot.screenshot.screenshot import Screenshot
 from src.gscreenshot.frontend.cli import run
 from src.gscreenshot.frontend.args import get_args
 
@@ -14,11 +15,14 @@ class CLITestGscreenshotCalls(unittest.TestCase):
         self.app = Mock()
         self.app.get_available_cursors.return_value = {}
         pixmaps_path = "gscreenshot.resources.pixmaps"
+        screenshot = None
         with as_file(files(pixmaps_path).joinpath('gscreenshot.png')) as png_path:
-            self.app.get_thumbnail.return_value = Image.open(
-                    png_path
-                )
+            img = Image.open(png_path)
+            self.app.get_thumbnail.return_value = img
+            screenshot = Screenshot(img)
+
         self.screenshot_collection = Mock()
+        self.screenshot_collection.cursor_current.return_value = screenshot
         self.app.get_screenshot_collection.return_value = self.screenshot_collection
 
     def test_smoke(self):

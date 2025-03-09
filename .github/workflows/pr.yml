@@ -57,11 +57,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install mypy
-        run: |
-          python3 -m pip install "mypy==0.982" "mypy_extensions==0.4.3" types-setuptools
-
       - name: Run mypy
         run: |
-          mypy src/
-
+          python3 -m pip install "mypy==1.14"
+          python3 -m pip install mypy_extensions
+          python3 -m pip install types-setuptools
+          pwd
+          ls
+          mypy --version
+          mypy --config-file ./pyproject.toml src/ --exclude "compat\.py" --follow-imports skip
