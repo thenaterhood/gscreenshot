@@ -4,8 +4,9 @@ Xlib cursor locator classes
 import typing
 try:
     from Xlib import display
+    xlib_available = True
 except ImportError:
-    display = None
+    xlib_available = False
 
 from .cursor_locator import CursorLocator
 
@@ -20,7 +21,7 @@ class X11CursorLocator(CursorLocator):
         Gets the current position of the mouse cursor, if able.
         Returns (x, y) or None.
         """
-        if display is None:
+        if not xlib_available:
             return None
 
         try:

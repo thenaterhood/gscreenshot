@@ -69,7 +69,6 @@ class Screenshot():
         '''
         thumbnail = self.get_image().copy()
 
-        antialias_algo = None
         try:
             antialias_algo = Image.Resampling.LANCZOS
         except AttributeError: # PIL < 9.0

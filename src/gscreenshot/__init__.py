@@ -178,7 +178,7 @@ class Gscreenshot():
         prohibit_path = get_resource_file(pixmaps_path, "cursor-prohibit.png")
         allow_path = get_resource_file(pixmaps_path, "cursor-allow.png")
 
-        available = {
+        available: typing.Dict[str, typing.Optional[Image.Image]] = {
             'theme': None,
             'adwaita': Image.open(
                 adwaita_path

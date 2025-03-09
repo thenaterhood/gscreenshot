@@ -33,11 +33,10 @@ class StampEffect(ScreenshotEffect):
         cursor_height = max(cursor_img.size[0] * cursor_size_ratio, 2)
         cursor_width = max(cursor_img.size[1] * cursor_size_ratio, 2)
 
-        antialias_algo = None
         try:
             antialias_algo = Image.Resampling.LANCZOS
         except AttributeError: # PIL < 9.0
-            antialias_algo = Image.ANTIALIAS
+            antialias_algo = Image.ANTIALIAS # type: ignore
 
         cursor_img.thumbnail((int(cursor_width), int(cursor_height)), antialias_algo)
 
