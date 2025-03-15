@@ -7,28 +7,11 @@
 Classes for the GTK gscreenshot frontend
 '''
 import gettext
-import io
 import threading
 import typing
 from gscreenshot import Gscreenshot
 from gscreenshot.cache import GscreenshotCache
-from gscreenshot.frontend.gtk.dialogs import (
-    OpenWithDialog,
-    WarningDialog,
-    FileSaveDialog,
-    FileOpenDialog,
-    ConfirmationDialog,
-)
 from gscreenshot.frontend.gtk.view import View
-from gscreenshot.meta import (
-    get_app_icon,
-    get_program_authors,
-    get_program_description,
-    get_program_license_text,
-    get_program_name,
-    get_program_version,
-    get_program_website,
-)
 from gscreenshot.screenshot.actions import (
     CopyAction,
     ScreenshotActionError,
@@ -38,19 +21,13 @@ from gscreenshot.screenshot.actions import (
 from gscreenshot.screenshot.actions.save import SaveAction
 from gscreenshot.screenshot.effects import CropEffect
 
-from gi import require_version
-
-require_version('Gtk', '3.0')
-from gi.repository import Gdk # type: ignore
-from gi.repository import Gtk # type: ignore
-from gi.repository import GLib # type: ignore
-from gi.repository import GdkPixbuf # type: ignore
+from gscreenshot.util import get_supported_formats
 
 i18n = gettext.gettext
 
 
 class Presenter():
-    '''Presenter class for the GTK frontend'''
+    '''Presenter class for the frontend'''
 
     __slots__ = ('_delay', '_app', '_hide',
             '_view', '_keymappings', '_capture_cursor',
@@ -93,8 +70,7 @@ class Presenter():
             overwrite=self._overwrite_mode,
             **args)
 
-        # Re-enable UI on the UI thread.
-        GLib.idle_add(self._end_take_screenshot)
+        self._view.idle_add(self._end_take_screenshot)
 
     def _end_take_screenshot(self):
         self._show_preview()
@@ -138,13 +114,11 @@ class Presenter():
 
         return False
 
-    def handle_preview_click_event(self, widget, event, *args):
+    def handle_preview_click_event(self, *args):
         '''
         Handle a click on the screenshot preview widget
         '''
-        # 3 is right click
-        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
-            self._view.show_actions_menu()
+        self._view.handle_preview_click_event(*args)
 
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
@@ -175,20 +149,15 @@ class Presenter():
 
         if cursor_selection == "custom":
 
-            file_filter:Gtk.FileFilter = Gtk.FileFilter()
-            supported_formats = self._app.get_supported_formats()
-            _ = [file_filter.add_mime_type(
-                f"image/{format}") for format in supported_formats
+            formats = [
+                f"image/{format}" for format in get_supported_formats()
                 if format not in ["pdf"]
             ]
 
-            chooser = FileOpenDialog(
-                file_filter=file_filter
-            )
             chosen = None
             cancelled = False
             while not (chosen or cancelled):
-                chosen = self._view.run_dialog(chooser)
+                chosen = self._view.ask_for_file_to_open(formats)
                 if chosen is None:
                     cancelled = True
 
@@ -197,8 +166,7 @@ class Presenter():
                     cursor_selection = self._app.register_stamp_image(chosen)
                 #pylint: disable=broad-except
                 except Exception:
-                    warning = WarningDialog(f"Unable to open {chosen}")
-                    self._view.run_dialog(warning)
+                    self._view.show_warning(f"Unable to open {chosen}")
                     cancelled = True
 
             if cancelled or cursor_selection is None:
@@ -326,14 +294,11 @@ class Presenter():
         if screenshot is None:
             return
 
-        save_dialog = FileSaveDialog(
-                self._app.get_time_filename(),
-                GscreenshotCache.load().last_save_dir,
-                self._view.get_window()
-                )
-
         while not (saved or cancelled):
-            fname = self._view.run_dialog(save_dialog)
+            fname = self._view.ask_for_save_location(
+                self._app.get_time_filename(),
+                GscreenshotCache.load().last_save_dir
+            )
             if fname is not None:
                 saved = SaveAction(filename=fname, update_cache=True).execute(screenshot)
             else:
@@ -341,21 +306,18 @@ class Presenter():
 
         if saved:
             self._view.update_gallery_controls(self._app.get_screenshot_collection())
-            self._view.flash_status_icon("document-save")
+            self._view.notify_save_complete()
 
     def on_button_save_all_clicked(self, *_):
         '''Handle the "save all" button'''
         saved = False
         cancelled = False
-        save_dialog = FileSaveDialog(
-            self._app.get_time_foldername(),
-            self._app.get_last_save_directory(),
-            self._view.get_window(),
-            choose_directory=True
-        )
 
         while not (saved or cancelled):
-            fname = self._view.run_dialog(save_dialog)
+            fname = self._view.ask_for_save_directory(
+                self._app.get_time_foldername(),
+                GscreenshotCache.load().last_save_dir,
+            )
             if fname is not None:
                 self._view.set_busy()
                 saved = self._app.save_screenshot_collection(fname)
@@ -365,12 +327,10 @@ class Presenter():
 
         if saved:
             self._view.update_gallery_controls(self._app.get_screenshot_collection())
-            self._view.flash_status_icon("document-save")
+            self._view.notify_save_complete()
 
     def on_button_openwith_clicked(self, *_):
         '''Handle the "open with" button'''
-        self._view.flash_status_icon(Gtk.STOCK_EXECUTE)
-
         screenshot = self._app.current
         if screenshot is None:
             return
@@ -382,15 +342,12 @@ class Presenter():
 
         if fname is None:
             return
-
-        appchooser = OpenWithDialog()
-
-        self._view.run_dialog(appchooser)
-
-        appinfo = appchooser.appinfo
+        
+        appinfo = self._view.ask_open_with()
 
         if appinfo is not None:
             if appinfo.launch_uris(["file://"+fname], None):
+                self._view.notify_open_complete()
 
                 screenshots = self._app.get_screenshot_collection()
                 current = screenshots.cursor_current()
@@ -414,21 +371,18 @@ class Presenter():
         if screenshot is None:
             return False
 
-        pixbuf = self._image_to_pixbuf(screenshot.get_image())
-
-        if not self._view.copy_to_clipboard(pixbuf):
+        if not self._view.copy_to_clipboard(screenshot.get_image()):
             try:
                 CopyAction().execute(screenshot)
             except ScreenshotActionError as error:
-                warning_dialog = WarningDialog(
+                self._view.show_warning(
                     i18n(
                         "Your clipboard doesn't support persistence and {0} isn't available."
                     ).format(error),
-                    self._view.get_window())
-                self._view.run_dialog(warning_dialog)
+                )
                 return False
 
-        self._view.flash_status_icon("edit-copy")
+        self._view.notify_copy_complete()
         return True
 
     def on_button_copy_and_close_clicked(self, *_):
@@ -464,12 +418,11 @@ class Presenter():
             pass
 
         if not success:
-            dialog = WarningDialog(
-                i18n("Please install xdg-open to open files."),
-                self._view.get_window())
-            self._view.run_dialog(dialog)
+            self._view.show_warning(
+                i18n("Please install xdg-open to open files.")
+            )
         else:
-            self._view.flash_status_icon("document-open")
+            self._view.notify_open_complete()
             screenshots = self._app.get_screenshot_collection()
             current = screenshots.cursor_current()
             if current is not None:
@@ -485,41 +438,7 @@ class Presenter():
 
     def on_button_about_clicked(self, *_):
         '''Handle the about button'''
-        about = Gtk.AboutDialog(transient_for=self._view.get_window())
-
-        about.set_authors(get_program_authors())
-
-        description = i18n(get_program_description())
-        description += "\n" + i18n("Using {0} screenshot backend").format(
-            self._app.get_screenshooter_name()
-        )
-
-        capabilities_formatted = []
-        for capability, provider in self._app.get_capabilities().items():
-            capabilities_formatted.append(f"{i18n(capability)} ({provider})")
-        description += "\n" + i18n("Available features: {0}").format(
-            "\n ".join(capabilities_formatted)
-        )
-
-        about.set_comments(i18n(description))
-
-        website = get_program_website()
-        about.set_website(website)
-        about.set_website_label(website)
-
-        about.set_program_name(get_program_name())
-        about.set_title(i18n("About"))
-
-        about.set_license(get_program_license_text())
-
-        about.set_version(get_program_version())
-
-        logo = get_app_icon()
-        about.set_logo(
-            self._image_to_pixbuf(logo)
-        )
-
-        self._view.run_dialog(about)
+        self._view.show_about(self._app.get_capabilities())
 
     def on_fullscreen_toggle(self, *_):
         '''Handle the window getting toggled to fullscreen'''
@@ -547,44 +466,17 @@ class Presenter():
         screenshot_collection = self._app.get_screenshot_collection()
 
         if len(screenshot_collection) > 1 and screenshot_collection.has_unsaved():
-            confirm_dialogue = ConfirmationDialog(
-                message=i18n("There are unsaved screenshots. Quit without saving?")
+            confirmed = self._view.ask_confirmation(
+                i18n("There are unsaved screenshots. Quit without saving?"),
             )
 
-            self._view.run_dialog(confirm_dialogue)
-
-            if not confirm_dialogue.confirmed:
+            if not confirmed:
                 return
 
         self._app.quit()
-
-    def _image_to_pixbuf(self, image):
-        pixbuf = None
-        for img_format in [("pnm", "ppm"), ("png", "png"), ("jpeg", "jpeg")]:
-            try:
-                loader = GdkPixbuf.PixbufLoader()
-                descriptor = io.BytesIO()
-                image = image.convert("RGB")
-                image.save(descriptor, img_format[1])
-                contents = descriptor.getvalue()
-                descriptor.close()
-
-                loader.write(contents)
-                pixbuf = loader.get_pixbuf()
-                break
-            except GLib.GError:
-                continue
-            finally:
-                try:
-                    loader.close()
-                except GLib.GError:
-                    pass
-
-        return pixbuf
 
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()
         preview_img = self._app.current_always.get_preview(width, height, with_border=True)
 
-        pixbuf = self._image_to_pixbuf(preview_img)
-        self._view.update_preview(pixbuf)
+        self._view.update_preview(preview_img)

@@ -17,13 +17,14 @@ class FileOpenDialog():
     '''The 'open a file' dialog'''
     #pylint: disable=too-many-arguments
     def __init__(self, default_filename=None, default_folder=None,
-        parent=None, choose_directory=False, file_filter=None,
+        parent=None, choose_directory=False, mime_types=None,
     ):
+        
         self.default_filename = default_filename
         self.default_folder = default_folder
         self.parent = parent
         self._choose_directory = choose_directory
-        self._filter = file_filter
+        self._mime_types = mime_types
 
     def run(self):
         ''' Run the dialog'''
@@ -34,11 +35,16 @@ class FileOpenDialog():
     def request_file(self):
         '''Run the file selection dialog'''
 
+        file_filter:Gtk.FileFilter = Gtk.FileFilter()
+
+        if self._mime_types:
+            _ = [file_filter.add_mime_type(format) for format in self._mime_types]
+
         chooser = Gtk.FileChooserNative(
                 transient_for=self.parent,
                 title=None,
                 action=Gtk.FileChooserAction.OPEN,
-                filter=self._filter,
+                filter=file_filter,
                 )
 
         if self.default_filename is not None:
