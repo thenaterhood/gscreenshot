@@ -11,7 +11,7 @@ import threading
 import typing
 from gscreenshot import Gscreenshot
 from gscreenshot.cache import GscreenshotCache
-from gscreenshot.frontend.gtk.view import View
+from gscreenshot.frontend.abstract_view import AbstractGscreenshotView
 from gscreenshot.screenshot.actions import (
     CopyAction,
     ScreenshotActionError,
@@ -36,13 +36,13 @@ class Presenter():
     _delay: int
     _app: Gscreenshot
     _hide: bool
-    _view: View
+    _view: AbstractGscreenshotView
     _keymappings: dict
     _capture_cursor: bool
     _overwrite_mode: bool
-    _cursor_selection: str
+    _cursor_selection: typing.Optional[str]
 
-    def __init__(self, application: Gscreenshot, view: View):
+    def __init__(self, application: Gscreenshot, view: AbstractGscreenshotView):
         self._app = application
         self._view = view
         self._delay = 0
@@ -55,7 +55,7 @@ class Presenter():
         cursors = self._app.get_available_cursors()
         cursors[i18n("custom")] = None
 
-        self._cursor_selection = list(cursors.keys())[0]
+        self._cursor_selection = None
 
         self._view.update_available_cursors(
                 cursors
@@ -122,25 +122,25 @@ class Presenter():
 
     def hide_window_toggled(self, widget):
         '''Toggle the window to hidden'''
-        self._hide = widget.get_active()
+        self._hide = self._view.widget_bool_value(widget)
 
     def capture_cursor_toggled(self, widget):
         '''Toggle capturing cursor'''
-        self._capture_cursor = widget.get_active()
+        self._capture_cursor = self._view.widget_bool_value(widget)
         self._view.show_cursor_options(self._capture_cursor)
 
     def overwrite_mode_toggled(self, widget):
         '''Toggle overwrite or multishot mode'''
-        self._overwrite_mode = widget.get_active()
+        self._overwrite_mode = self._view.widget_bool_value(widget)
 
     def delay_value_changed(self, widget):
         '''Handle a change with the screenshot delay input'''
-        self._delay = widget.get_value()
+        self._delay = self._view.widget_int_value(widget)
 
     def selected_cursor_changed(self, widget):
         '''Handle a change to the selected cursor'''
         try:
-            cursor_selection = widget.get_model()[widget.get_active()][2]
+            cursor_selection = self._view.widget_str_value(widget)
         except IndexError:
             return
 
@@ -278,35 +278,42 @@ class Presenter():
         if screenshot is None:
             return
 
-        if widget.get_active():
+        if self._view.widget_bool_value(widget):
             effect.enable()
         else:
             effect.disable()
 
         self._show_preview()
 
-    def on_button_saveas_clicked(self, *_):
+    def on_button_saveas_clicked(self, *_) -> bool:
         '''Handle the saveas button'''
         saved = False
         cancelled = False
 
         screenshot = self._app.current
         if screenshot is None:
-            return
+            return False
 
         while not (saved or cancelled):
             fname = self._view.ask_for_save_location(
                 self._app.get_time_filename(),
                 GscreenshotCache.load().last_save_dir
             )
+            saved = False
             if fname is not None:
-                saved = SaveAction(filename=fname, update_cache=True).execute(screenshot)
+                try:
+                    saved = SaveAction(filename=fname, update_cache=True).execute(screenshot)
+                except ScreenshotActionError:
+                    self._view.show_warning(i18n("Failed to save screenshot!"))
             else:
                 cancelled = True
 
         if saved:
             self._view.update_gallery_controls(self._app.get_screenshot_collection())
             self._view.notify_save_complete()
+            return True
+
+        return False
 
     def on_button_save_all_clicked(self, *_):
         '''Handle the "save all" button'''
@@ -342,7 +349,7 @@ class Presenter():
 
         if fname is None:
             return
-        
+
         appinfo = self._view.ask_open_with()
 
         if appinfo is not None:
@@ -363,7 +370,7 @@ class Presenter():
 
                 self.quit(None, skip_warning=True)
 
-    def on_button_copy_clicked(self, *_):
+    def on_button_copy_clicked(self, *_) -> bool:
         """
         Copy the current screenshot to the clipboard
         """
@@ -371,7 +378,7 @@ class Presenter():
         if screenshot is None:
             return False
 
-        if not self._view.copy_to_clipboard(screenshot.get_image()):
+        if not self._view.copy_to_clipboard(screenshot):
             try:
                 CopyAction().execute(screenshot)
             except ScreenshotActionError as error:
@@ -477,6 +484,7 @@ class Presenter():
 
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()
-        preview_img = self._app.current_always.get_preview(width, height, with_border=True)
 
-        self._view.update_preview(preview_img)
+        if height > 0 and width > 0:
+            preview_img = self._app.current_always.get_preview(width, height, with_border=True)
+            self._view.update_preview(preview_img)

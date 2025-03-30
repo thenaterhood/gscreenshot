@@ -13,6 +13,7 @@ from time import sleep
 import typing
 from PIL import Image
 from gscreenshot.compat import get_resource_file
+from gscreenshot.frontend.abstract_view import AbstractGscreenshotView
 from gscreenshot.frontend.gtk.dialogs import (
     AboutDialog,
     ConfirmationDialog,
@@ -23,6 +24,7 @@ from gscreenshot.frontend.gtk.dialogs import (
 )
 from gscreenshot.frontend.gtk.util import image_to_pixbuf
 from gscreenshot.screenshot import ScreenshotCollection
+from gscreenshot.screenshot.screenshot import Screenshot
 from gscreenshot.util import GSCapabilities
 
 from gi import require_version
@@ -35,7 +37,7 @@ from gi.repository import GdkPixbuf # type: ignore
 i18n = gettext.gettext
 
 
-class View():
+class View(AbstractGscreenshotView):
     '''View class for the GTK frontend'''
 
     def __init__(self, window, builder, capabilities):
@@ -376,10 +378,6 @@ class View():
         '''
         self._actions_menu.popup_at_pointer()
 
-    def get_window(self):
-        '''Returns the associated window'''
-        return self._window
-
     def toggle_fullscreen(self):
         '''Toggle the window to full screen'''
         if self._window_is_fullscreen:
@@ -495,13 +493,14 @@ class View():
         if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
             self.show_actions_menu()
 
-    def copy_to_clipboard(self, img: Image.Image):
+    def copy_to_clipboard(self, screenshot: Screenshot) -> bool:
         """
         Copy the provided image to the screen's clipboard,
         if it supports persistence
         """
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         display = Gdk.Display.get_default()
+        img = screenshot.get_image()
 
         if display.supports_clipboard_persistence():
             clipboard.set_image(image_to_pixbuf(img))
@@ -509,7 +508,7 @@ class View():
             return True
 
         return False
-    
+
     def show_warning(self, warning: str):
         """
         Show a warning message
@@ -536,8 +535,10 @@ class View():
         self.run_dialog(appchooser)
 
         return appchooser.appinfo
-    
-    def ask_for_save_location(self, default_filename: str, default_folder: str) -> typing.Optional[str]:
+
+    def ask_for_save_location(
+        self, default_filename: str, default_folder: str
+    ) -> typing.Optional[str]:
         """
         Ask the user where to save something
 
@@ -554,8 +555,10 @@ class View():
             return None
 
         return str(ret)
-  
-    def ask_for_save_directory(self, default_folder: str, parent_folder: str) -> typing.Optional[str]:
+
+    def ask_for_save_directory(
+        self, default_folder: str, parent_folder: str
+    ) -> typing.Optional[str]:
         """
         Ask the user for a directory to save to
 
@@ -574,7 +577,7 @@ class View():
             return None
 
         return str(ret)
-    
+
     def ask_for_file_to_open(self, formats=None) -> typing.Optional[str]:
         """
         Ask the user for a file to open
@@ -616,3 +619,18 @@ class View():
             pass
 
         return result
+
+    def widget_bool_value(self, widget) -> bool:
+        if hasattr(widget, "get_active"):
+            return widget.get_active()
+
+        return False
+
+    def widget_int_value(self, widget) -> int:
+        return widget.get_value()
+
+    def widget_str_value(self, widget) -> typing.Optional[str]:
+        if hasattr(widget, "get_model"):
+            return widget.get_model()[widget.get_active()][2]
+
+        return ""

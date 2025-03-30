@@ -1,3 +1,5 @@
+#pylint: disable=wrong-import-order
+#pylint: disable=wrong-import-position
 import io
 from gi import require_version
 
