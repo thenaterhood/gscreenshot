@@ -19,7 +19,7 @@ class FileOpenDialog():
     def __init__(self, default_filename=None, default_folder=None,
         parent=None, choose_directory=False, mime_types=None,
     ):
-        
+
         self.default_filename = default_filename
         self.default_folder = default_folder
         self.parent = parent

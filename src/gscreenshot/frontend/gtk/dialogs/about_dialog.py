@@ -37,7 +37,7 @@ class AboutDialog(Gtk.AboutDialog):
 
         capabilities_formatted = []
         capabilities_rows = []
-        
+
         for capability, provider in capabilities.items():
             capabilities_formatted.append(f"{i18n(capability)} ({provider})")
 
