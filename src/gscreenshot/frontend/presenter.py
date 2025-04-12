@@ -302,7 +302,7 @@ class Presenter():
             saved = False
             if fname is not None:
                 try:
-                    saved = SaveAction(filename=fname, update_cache=True).execute(screenshot)
+                    saved = SaveAction(filename=fname, update_cache=True).execute(screenshot) is not None
                 except ScreenshotActionError:
                     self._view.show_warning(i18n("Failed to save screenshot!"))
             else:

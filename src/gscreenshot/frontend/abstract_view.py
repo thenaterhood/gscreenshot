@@ -164,7 +164,7 @@ class AbstractGscreenshotView():
 
         Returns a file path as a string
         """
-        return
+        return None
 
     def ask_for_save_directory(
         self, default_folder: str, parent_folder: str
@@ -175,7 +175,7 @@ class AbstractGscreenshotView():
         This is not equivalent to ask_for_save_location.
         ask_for_save_location returns a filename whereas this returns a folder name
         """
-        return
+        return None
 
     def ask_for_file_to_open(self, formats=None) -> typing.Optional[str]:
         """
@@ -195,5 +195,5 @@ class AbstractGscreenshotView():
     def widget_int_value(self, widget) -> int:
         return 0
 
-    def widget_str_value(self, widget) -> str:
-        return ""
+    def widget_str_value(self, widget) -> typing.Optional[str]:
+        return None
