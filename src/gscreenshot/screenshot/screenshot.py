@@ -4,10 +4,11 @@ Screenshot container classes for gscreenshot
 import os
 import typing
 from PIL import Image
+
 from .effects import ScreenshotEffect
 
 
-class Screenshot(object):
+class Screenshot():
     '''
     Represents a screenshot taken via Gscreenshot.
 
@@ -68,7 +69,6 @@ class Screenshot(object):
         '''
         thumbnail = self.get_image().copy()
 
-        antialias_algo = None
         try:
             antialias_algo = Image.Resampling.LANCZOS
         except AttributeError: # PIL < 9.0

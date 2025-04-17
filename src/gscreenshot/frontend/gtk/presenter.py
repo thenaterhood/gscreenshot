@@ -10,15 +10,36 @@ import gettext
 import io
 import threading
 import typing
-from PIL import Image
-from gscreenshot import Gscreenshot, GscreenshotClipboardException
-from gscreenshot.compat import get_resource_file
-from gscreenshot.frontend.gtk.dialogs import OpenWithDialog, WarningDialog
-from gscreenshot.frontend.gtk.dialogs import FileSaveDialog, FileOpenDialog
+from gscreenshot import Gscreenshot
+from gscreenshot.cache import GscreenshotCache
+from gscreenshot.frontend.gtk.dialogs import (
+    OpenWithDialog,
+    WarningDialog,
+    FileSaveDialog,
+    FileOpenDialog,
+    ConfirmationDialog,
+)
 from gscreenshot.frontend.gtk.view import View
+from gscreenshot.meta import (
+    get_app_icon,
+    get_program_authors,
+    get_program_description,
+    get_program_license_text,
+    get_program_name,
+    get_program_version,
+    get_program_website,
+)
+from gscreenshot.screenshot.actions import (
+    CopyAction,
+    ScreenshotActionError,
+    SaveTmpfileAction,
+    XdgOpenAction,
+)
+from gscreenshot.screenshot.actions.save import SaveAction
 from gscreenshot.screenshot.effects import CropEffect
 
 from gi import require_version
+
 require_version('Gtk', '3.0')
 from gi.repository import Gdk # type: ignore
 from gi.repository import Gtk # type: ignore
@@ -28,7 +49,7 @@ from gi.repository import GdkPixbuf # type: ignore
 i18n = gettext.gettext
 
 
-class Presenter(object):
+class Presenter():
     '''Presenter class for the GTK frontend'''
 
     __slots__ = ('_delay', '_app', '_hide',
@@ -216,19 +237,42 @@ class Presenter(object):
         '''
         Handle dragging and dropping the image preview
         '''
-        fname = self._app.save_and_return_path()
+        screenshot = self._app.current
+        if not screenshot:
+            return
+
+        fname = None
+        action = SaveTmpfileAction()
+        try:
+            fname = action.execute(screenshot)
+        except ScreenshotActionError:
+            pass
 
         if fname is None:
             return
 
         data.set_uris([f"file://{fname}"])
 
+    def on_delete(self, *_):
+        """
+        remove the current screenshot
+        """
+        screenshots = self._app.get_screenshot_collection()
+        current = self._app.current
+        if current:
+            screenshots.remove(current)
+
+            self._view.update_gallery_controls(screenshots)
+            self._show_preview()
+
+        return True
+
     def on_use_last_region_clicked(self, *_):
         '''
         Take a screenshot with the same region as the
         screenshot under the cursor, if applicable
         '''
-        last_screenshot = self._app.get_screenshot_collection().cursor_current()
+        last_screenshot = self._app.current
         region = None
 
         if last_screenshot is not None:
@@ -262,7 +306,7 @@ class Presenter(object):
         '''
         Handles toggling effects on and off
         '''
-        screenshot = self._app.get_screenshot_collection().cursor_current()
+        screenshot = self._app.current
         if screenshot is None:
             return
 
@@ -278,16 +322,20 @@ class Presenter(object):
         saved = False
         cancelled = False
 
+        screenshot = self._app.current
+        if screenshot is None:
+            return
+
         save_dialog = FileSaveDialog(
                 self._app.get_time_filename(),
-                self._app.get_last_save_directory(),
+                GscreenshotCache.load().last_save_dir,
                 self._view.get_window()
                 )
 
         while not (saved or cancelled):
             fname = self._view.run_dialog(save_dialog)
             if fname is not None:
-                saved = self._app.save_last_image(fname)
+                saved = SaveAction(filename=fname, update_cache=True).execute(screenshot)
             else:
                 cancelled = True
 
@@ -322,7 +370,15 @@ class Presenter(object):
     def on_button_openwith_clicked(self, *_):
         '''Handle the "open with" button'''
         self._view.flash_status_icon(Gtk.STOCK_EXECUTE)
-        fname = self._app.save_and_return_path()
+
+        screenshot = self._app.current
+        if screenshot is None:
+            return
+
+        try:
+            fname = SaveTmpfileAction().execute(screenshot)
+        except ScreenshotActionError:
+            return
 
         if fname is None:
             return
@@ -348,23 +404,22 @@ class Presenter(object):
 
                     return
 
-                self.quit(None)
+                self.quit(None, skip_warning=True)
 
     def on_button_copy_clicked(self, *_):
         """
         Copy the current screenshot to the clipboard
         """
-        img = self._app.get_last_image()
-
-        if img is None:
+        screenshot = self._app.current
+        if screenshot is None:
             return False
 
-        pixbuf = self._image_to_pixbuf(img)
+        pixbuf = self._image_to_pixbuf(screenshot.get_image())
 
         if not self._view.copy_to_clipboard(pixbuf):
             try:
-                self._app.copy_last_screenshot_to_clipboard()
-            except GscreenshotClipboardException as error:
+                CopyAction().execute(screenshot)
+            except ScreenshotActionError as error:
                 warning_dialog = WarningDialog(
                     i18n(
                         "Your clipboard doesn't support persistence and {0} isn't available."
@@ -394,11 +449,20 @@ class Presenter(object):
 
                 return
 
-            self.quit(None)
+            self.quit(None, skip_warning=True)
 
     def on_button_open_clicked(self, *_):
         '''Handle the open button'''
-        success = self._app.open_last_screenshot()
+        screenshot = self._app.current
+        if not screenshot:
+            return
+
+        success = False
+        try:
+            success = XdgOpenAction().execute(screenshot)
+        except ScreenshotActionError:
+            pass
+
         if not success:
             dialog = WarningDialog(
                 i18n("Please install xdg-open to open files."),
@@ -417,16 +481,15 @@ class Presenter(object):
                 self._show_preview()
 
                 return
-            self.quit(None)
+            self.quit(None, skip_warning=True)
 
     def on_button_about_clicked(self, *_):
         '''Handle the about button'''
         about = Gtk.AboutDialog(transient_for=self._view.get_window())
 
-        authors = self._app.get_program_authors()
-        about.set_authors(authors)
+        about.set_authors(get_program_authors())
 
-        description = i18n(self._app.get_program_description())
+        description = i18n(get_program_description())
         description += "\n" + i18n("Using {0} screenshot backend").format(
             self._app.get_screenshooter_name()
         )
@@ -440,22 +503,18 @@ class Presenter(object):
 
         about.set_comments(i18n(description))
 
-        website = self._app.get_program_website()
+        website = get_program_website()
         about.set_website(website)
         about.set_website_label(website)
 
-        name = self._app.get_program_name()
-        about.set_program_name(name)
+        about.set_program_name(get_program_name())
         about.set_title(i18n("About"))
 
-        license_text = self._app.get_program_license_text()
-        about.set_license(license_text)
+        about.set_license(get_program_license_text())
 
-        version = self._app.get_program_version()
-        about.set_version(version)
+        about.set_version(get_program_version())
 
-        png_filename = get_resource_file("gscreenshot.resources.pixmaps", "gscreenshot.png")
-        logo = Image.open(png_filename)
+        logo = get_app_icon()
         about.set_logo(
             self._image_to_pixbuf(logo)
         )
@@ -479,8 +538,24 @@ class Presenter(object):
         self._view.resize()
         self._show_preview()
 
-    def quit(self, *_):
+    def quit(self, *_, skip_warning=False):
         '''Exit the app'''
+        if skip_warning:
+            self._app.quit()
+            return  # not strictly needed most of the time
+
+        screenshot_collection = self._app.get_screenshot_collection()
+
+        if len(screenshot_collection) > 1 and screenshot_collection.has_unsaved():
+            confirm_dialogue = ConfirmationDialog(
+                message=i18n("There are unsaved screenshots. Quit without saving?")
+            )
+
+            self._view.run_dialog(confirm_dialogue)
+
+            if not confirm_dialogue.confirmed:
+                return
+
         self._app.quit()
 
     def _image_to_pixbuf(self, image):
@@ -509,8 +584,7 @@ class Presenter(object):
 
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()
-
-        preview_img = self._app.get_thumbnail(width, height, with_border=True)
+        preview_img = self._app.current_always.get_preview(width, height, with_border=True)
 
         pixbuf = self._image_to_pixbuf(preview_img)
         self._view.update_preview(pixbuf)

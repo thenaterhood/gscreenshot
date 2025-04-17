@@ -64,7 +64,7 @@ def main(app: typing.Optional[Gscreenshot] = None):
             view
             )
 
-    if not application.get_last_image():
+    if not application.get_screenshot_collection().cursor_current():
         # Lucky 13 to give a tiny bit more time for the desktop environment
         # to settle down and hide the window before we take our initial
         # screenshot.
@@ -101,6 +101,8 @@ def main(app: typing.Optional[Gscreenshot] = None):
             presenter.on_preview_next_clicked,
         Gdk.keyval_to_lower(Gdk.keyval_from_name('Left')):
             presenter.on_preview_prev_clicked,
+        Gdk.keyval_to_lower(Gdk.keyval_from_name('Delete')):
+            presenter.on_delete,
         # Handled in Glade - just here for reference
         #Gtk.gdk.keyval_to_lower(Gtk.gdk.keyval_from_name('Insert')):
         #    presenter.overwrite_mode_toggled

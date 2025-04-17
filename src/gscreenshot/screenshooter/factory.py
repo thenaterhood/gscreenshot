@@ -22,7 +22,7 @@ def get_screenshooter(screenshooter: typing.Optional[Screenshooter] = None):
     return ScreenshooterFactory(screenshooter).create()
 
 
-class ScreenshooterFactory(object):
+class ScreenshooterFactory():
     '''Selects and instantiates a usable screenshot class'''
 
     def __init__(self, screenshooter:typing.Optional[Screenshooter]=None):

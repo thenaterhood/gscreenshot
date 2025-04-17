@@ -8,8 +8,24 @@ import sys
 import gettext
 import typing
 
-from gscreenshot import Gscreenshot, GscreenshotClipboardException
+from gscreenshot import Gscreenshot
+from gscreenshot.actions import NotifyAction
+from gscreenshot.meta import (
+    get_program_authors,
+    get_program_description,
+    get_program_license,
+    get_program_name,
+    get_program_version,
+    get_program_website,
+)
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
+from gscreenshot.screenshot.actions import (
+    CopyAction,
+    ScreenshotActionError,
+    SaveAction,
+    SaveTmpfileAction,
+    XdgOpenAction,
+)
 from .args import get_args
 
 
@@ -43,9 +59,9 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
     logging.basicConfig(level=args.log_level)
 
     if args.version is not False:
-        description = gscreenshot.get_program_description()
-        name = gscreenshot.get_program_name()
-        version = gscreenshot.get_program_version()
+        description = get_program_description()
+        name = get_program_name()
+        version = get_program_version()
 
         print(_("Using {0} screenshot backend").format(gscreenshot.get_screenshooter_name()))
         capabilities_formatted = []
@@ -54,12 +70,12 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
 
         print(f"{name} {version}; {description}")
         print(_("Available features: {0}").format(", ".join(capabilities_formatted)))
-        print(gscreenshot.get_program_website())
+        print(get_program_website())
         print("")
         print(_("Author(s)"))
-        print("\n".join(gscreenshot.get_program_authors()))
+        print("\n".join(get_program_authors()))
         print("")
-        print(_("Licensed as {0}").format(gscreenshot.get_program_license()))
+        print(_("Licensed as {0}").format(get_program_license()))
         sys.exit(0)
 
     if args.select_color:
@@ -96,41 +112,50 @@ def run(app: typing.Optional[Gscreenshot] = None, args = None):
             cursor_name=args.pointer_glyph
         )
 
-    if gscreenshot.get_last_image() is None:
+    screenshot = gscreenshot.get_screenshot_collection().cursor_current()
+
+    if screenshot is None:
         log.error(_("No screenshot taken."))
         gscreenshot.session["error"] = True
     else:
         saved_screenshot = False
         if args.notify:
-            if not gscreenshot.show_screenshot_notification():
+            if not NotifyAction().execute():
                 log.warning(_("failed to show screenshot notification - is notify-send working?"))
 
         if args.filename is not False:
-            if not gscreenshot.save_last_image(args.filename):
+            if not SaveAction(filename=args.filename).execute(screenshot):
                 log.warning(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
             else:
                 saved_screenshot = True
         elif args.clip is False and not args.gui:
-            if not gscreenshot.save_last_image():
+            if not SaveAction().execute(screenshot):
                 log.warning(_("Failed to save screenshot!"))
                 gscreenshot.session["error"] = True
             else:
                 saved_screenshot = True
 
-        last_shot = gscreenshot.get_screenshot_collection().cursor_current()
-        if saved_screenshot and last_shot:
-            print(last_shot.get_saved_path())
+        if saved_screenshot and screenshot:
+            print(screenshot.get_saved_path())
 
         if args.open is not False:
-            gscreenshot.open_last_screenshot()
+            try:
+                XdgOpenAction().execute(screenshot)
+            except ScreenshotActionError:
+                log.warning(_("Failed to open screenshot!"))
 
         if args.clip is not False:
             try:
-                gscreenshot.copy_last_screenshot_to_clipboard()
-            except GscreenshotClipboardException as error:
-                tmp_file = gscreenshot.save_and_return_path()
+                CopyAction().execute(screenshot)
+            except ScreenshotActionError as error:
                 log.warning(_("Could not clip image! {0} failed to run.").format(error))
+
+                tmp_file = None
+                try:
+                    tmp_file = SaveTmpfileAction().execute(screenshot)
+                except ScreenshotActionError:
+                    pass
 
                 if tmp_file is not None:
                     log.warning(_("Your screenshot was saved to {0}").format(tmp_file))

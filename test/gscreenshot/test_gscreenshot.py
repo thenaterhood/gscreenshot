@@ -1,8 +1,9 @@
 import mock
-import subprocess
 import unittest
 from unittest.mock import Mock, mock_open, ANY
-from src.gscreenshot import Gscreenshot, GscreenshotClipboardException
+from gscreenshot.screenshot.actions.screenshot_action import ScreenshotActionError
+from gscreenshot.util import session_is_mismatched
+from src.gscreenshot import Gscreenshot
 
 
 class GscreenshotTest(unittest.TestCase):
@@ -210,17 +211,17 @@ class GscreenshotTest(unittest.TestCase):
         success = self.gscreenshot.save_last_image("potato.png")
         self.assertFalse(success)
 
-    @mock.patch('src.gscreenshot.subprocess')
+    @mock.patch('src.gscreenshot.actions.subprocess.run')
     def test_show_screenshot_notification(self, mock_subprocess):
 
         self.gscreenshot.show_screenshot_notification()
-        mock_subprocess.run.assert_called_once_with(
+        mock_subprocess.assert_called_once_with(
             ['notify-send', 'gscreenshot', mock.ANY, '--icon', 'gscreenshot'],
             check=True,
             timeout=2
         )
 
-    @mock.patch('src.gscreenshot.subprocess.run')
+    @mock.patch('src.gscreenshot.actions.subprocess.run')
     def test_show_screenshot_notification_error(self, mock_subprocess):
         mock_subprocess.run.side_effect = OSError("fake error")
         self.gscreenshot.show_screenshot_notification()
@@ -231,44 +232,44 @@ class GscreenshotTest(unittest.TestCase):
         )
 
     @mock.patch('src.gscreenshot.os')
-    @mock.patch('src.gscreenshot.subprocess')
+    @mock.patch('src.gscreenshot.actions.subprocess.run')
     def test_display_mismatch_warning_no_session_id(self, mock_subprocess, mock_os):
         mock_os.environ = {}
         self.gscreenshot.run_display_mismatch_warning()
-        mock_subprocess.run.assert_not_called()
+        mock_subprocess.assert_not_called()
 
-    @mock.patch('src.gscreenshot.os')
-    @mock.patch('src.gscreenshot.subprocess')
-    def test_display_mismatch_warning_no_session_type(self, mock_subprocess, mock_os):
+    @mock.patch('src.gscreenshot.util.os')
+    def test_display_mismatch_warning_no_session_type(self, mock_os):
         mock_os.environ = {'XDG_SESSION_ID': 0}
-        self.gscreenshot.run_display_mismatch_warning()
-        mock_subprocess.run.assert_called_once()
+        self.assertFalse(session_is_mismatched())
 
+    @mock.patch('src.gscreenshot.session_is_mismatched')
     @mock.patch('src.gscreenshot.os')
-    @mock.patch('src.gscreenshot.subprocess')
-    def test_display_mismatch_warning_show_notification(self, mock_subprocess, mock_os):
+    @mock.patch('src.gscreenshot.actions.subprocess.run')
+    def test_display_mismatch_warning_show_notification(self, mock_subprocess, mock_os, session_is_mismatched):
         mock_os.environ = {'XDG_SESSION_ID': 0, 'XDG_SESSION_TYPE': 'fake'}
+        session_is_mismatched.return_value = True
         self.gscreenshot.run_display_mismatch_warning()
         # We have a dedicated test for interactions with notify-send, so don't
         # get into specifics here
-        mock_subprocess.run.assert_called_once()
+        mock_subprocess.assert_called_once()
 
     @mock.patch('src.gscreenshot.os')
-    @mock.patch('src.gscreenshot.subprocess')
+    @mock.patch('src.gscreenshot.actions.subprocess')
     def test_display_mismatch_warning_no_show_notification(self, mock_subprocess, mock_os):
         mock_os.environ = {'XDG_SESSION_ID': 0, 'XDG_SESSION_TYPE': 'X11'}
         self.gscreenshot.run_display_mismatch_warning()
         mock_subprocess.run.assert_not_called()
 
-    @mock.patch('src.gscreenshot.session_is_wayland')
-    @mock.patch('src.gscreenshot.subprocess')
+    @mock.patch('gscreenshot.screenshot.actions.copy.session_is_wayland')
+    @mock.patch('src.gscreenshot.screenshot.actions.copy.subprocess.Popen')
     def test_copy_to_clipboard_x11(self, mock_subprocess, mock_util):
         self.gscreenshot.screenshot_full_display()
         mock_util.return_value = False
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
         self.fake_image.save.assert_called_once()
-
-        mock_subprocess.Popen.assert_called_once_with([
+        mock_util.assert_called_once()
+        mock_subprocess.assert_called_once_with([
             'xclip',
             '-selection',
             'clipboard',
@@ -276,52 +277,50 @@ class GscreenshotTest(unittest.TestCase):
             'image/png'
             ],
             close_fds=True,
-            stdin=mock_subprocess.PIPE,
+            stdin=-1,
             stdout=None,
             stderr=None
         )
 
         self.assertTrue(success)
 
-    @mock.patch('src.gscreenshot.session_is_wayland')
-    @mock.patch('src.gscreenshot.subprocess')
+    @mock.patch('gscreenshot.screenshot.actions.copy.session_is_wayland')
+    @mock.patch('src.gscreenshot.screenshot.actions.copy.subprocess.Popen')
     def test_copy_to_clipboard_wayland(self, mock_subprocess, mock_util):
         mock_util.return_value = True
         self.gscreenshot.screenshot_full_display()
         success = self.gscreenshot.copy_last_screenshot_to_clipboard()
         self.fake_image.save.assert_called_once()
 
-        mock_subprocess.Popen.assert_called_once_with([
+        mock_subprocess.assert_called_once_with([
             'wl-copy',
             '-t',
             'image/png'
             ],
             close_fds=True,
-            stdin=mock_subprocess.PIPE,
+            stdin=-1,
             stdout=None,
             stderr=None
         )
 
         self.assertTrue(success)
 
-    @mock.patch('src.gscreenshot.session_is_wayland')
-    @mock.patch('src.gscreenshot.subprocess')
+    @mock.patch('gscreenshot.screenshot.actions.copy.session_is_wayland')
+    @mock.patch('src.gscreenshot.screenshot.actions.copy.subprocess.Popen')
     def test_copy_to_clipboard_process_error(self, mock_subprocess, mock_util):
         mock_util.return_value = False
-        mock_subprocess.Popen.side_effect = OSError
-        # We can't mock the exception itself
-        mock_subprocess.CalledProcessError = subprocess.CalledProcessError
+        mock_subprocess.side_effect = OSError
         self.gscreenshot.screenshot_full_display()
 
         try:
             self.gscreenshot.copy_last_screenshot_to_clipboard()
             self.assertFalse(True, "expected exception but it didn't happen")
-        except GscreenshotClipboardException as error:
-            self.assertEqual(str(error), "xclip")
+        except ScreenshotActionError as error:
+            self.assertTrue("xclip" in str(error))
 
         self.fake_image.save.assert_called_once()
 
-        mock_subprocess.Popen.assert_called_once_with([
+        mock_subprocess.assert_called_once_with([
             'xclip',
             '-selection',
             'clipboard',
@@ -329,7 +328,7 @@ class GscreenshotTest(unittest.TestCase):
             'image/png'
             ],
             close_fds=True,
-            stdin=mock_subprocess.PIPE,
+            stdin=-1,
             stdout=None,
             stderr=None
         )

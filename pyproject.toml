@@ -1,0 +1,59 @@
+[project]
+name = "gscreenshot"
+description = "Lightweight GTK frontend to scrot"
+readme = "README.md"
+authors = [
+    {name = "Nate Levesque", email = "public@thenaterhood.com"},
+]
+dependencies = [
+    "pillow",
+    "pygobject",
+]
+
+requires-python = ">=3.1"
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/thenaterhood/gscreenshot"
+
+[project.scripts]
+gscreenshot-cli = "gscreenshot.frontend:delegate"
+
+[project.gui-scripts]
+gscreenshot = "gscreenshot.frontend:delegate"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.uv]
+dev-dependencies = [
+  "pytest",
+  "mock",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pylint]
+max-line-length = 100
+disable = [
+    "invalid-name",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "import-error",
+    "duplicate-code",
+    "too-few-public-methods",
+    "too-many-instance-attributes",
+    "too-many-public-methods",
+    "too-many-arguments",
+    "too-many-positional-arguments",
+    "pointless-string-statement",
+]
+
+[tool.mypy]
+ignore_missing_imports = true
+exclude = [
+    "src/gscreenshot/compat.py"
+]

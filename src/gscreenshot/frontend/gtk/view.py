@@ -24,7 +24,7 @@ from gi.repository import GdkPixbuf # type: ignore
 i18n = gettext.gettext
 
 
-class View(object):
+class View():
     '''View class for the GTK frontend'''
 
     def __init__(self, window, builder, capabilities):
@@ -468,6 +468,9 @@ class View(object):
     def run_dialog(self, dialog):
         '''Run a dialog window and return the outcome'''
         self._window.set_sensitive(False)
+        if hasattr(dialog, "show_all"):
+            # Jank, but needed until all the dialogs are consistent
+            dialog.show_all()
         result = dialog.run()
         self._window.set_sensitive(True)
 

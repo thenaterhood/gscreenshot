@@ -11,15 +11,6 @@ except:
     class FileExistsError(BaseException):
         pass
 
-install_requires = [
-    'pillow',
-    ]
-
-test_requires = [
-    'nose',
-    'mock'
-    ]
-
 data_files = [
     ('share/applications', ['dist/desktop/gscreenshot.desktop']),
     ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
@@ -64,7 +55,7 @@ def build_data_files(version):
     '''
     try:
         os.makedirs("generated")
-    except (OSError, FileExistsError) as e:
+    except (OSError, FileExistsError):
         if not os.path.isdir("generated"):
             raise
     compile_locales()
@@ -81,7 +72,7 @@ def build_data_files(version):
                 updated_data = infile_data.replace('%%VERSION%%', version)
                 try:
                     os.makedirs(os.path.dirname(generated_path))
-                except (OSError, FileExistsError) as e:
+                except (OSError, FileExistsError):
                     if not os.path.isdir(os.path.dirname(generated_path)):
                         raise
 
@@ -144,7 +135,7 @@ def compile_manpage():
             subprocess.check_output(converter)
             success = True
             break
-        except Exception as e:
+        except Exception:
             continue
 
     if not success:
@@ -163,21 +154,6 @@ def compile_manpage():
 
 
 pkg_version = get_version_from_specfile()
-
-
-class LintCommand(Command):
-  description = 'lint the Python code'
-  user_options = []
-
-  def initialize_options(self):
-      pass
-
-  def finalize_options(self):
-      pass
-
-  def run(self):
-    command = ['pylint', 'src', '--rcfile=pylintrc']
-    subprocess.check_call(command)
 
 
 class TestCommand(Command):
@@ -216,49 +192,9 @@ class CoverageCommand(Command):
 
 setup(name='gscreenshot',
     cmdclass={
-        'lint': LintCommand,
         'test': TestCommand,
         'coverage': CoverageCommand,
     },
     version=pkg_version,
-    description='Lightweight GTK frontend to scrot',
-    author='Nate Levesque',
-    author_email='public@thenaterhood.com',
-    url='https://github.com/thenaterhood/gscreenshot/archive/master.zip',
-    install_requires=install_requires,
-    tests_require=test_requires,
-    entry_points={
-        'gui_scripts': [
-            'gscreenshot = gscreenshot.frontend:delegate'
-        ],
-        'console_scripts': [
-            'gscreenshot-cli = gscreenshot.frontend:delegate'
-        ]
-    },
-    test_suite='nose.collector',
-    package_dir={'':'src'},
-    packages=[
-        'gscreenshot',
-        'gscreenshot.frontend',
-        'gscreenshot.frontend.gtk',
-        'gscreenshot.frontend.gtk.dialogs',
-        'gscreenshot.cursor_locator',
-        'gscreenshot.scaling',
-        'gscreenshot.screenshooter',
-        'gscreenshot.screenshot',
-        'gscreenshot.screenshot.effects',
-        'gscreenshot.selector',
-        'gscreenshot.resources',
-        'gscreenshot.resources.gui',
-        'gscreenshot.resources.gui.glade',
-        'gscreenshot.resources.locale.en.LC_MESSAGES',
-        'gscreenshot.resources.locale.es.LC_MESSAGES',
-        'gscreenshot.resources.pixmaps'
-        ],
     data_files=build_data_files(pkg_version),
-    package_data={
-        '': ['*.glade', 'LICENSE', '*.png', '*.mo',
-            'gscreenshot.1.gz', '_gscreenshot', 'gscreenshot']
-        },
-    include_package_data=True
     )

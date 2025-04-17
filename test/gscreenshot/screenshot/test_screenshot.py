@@ -1,7 +1,6 @@
 from importlib.resources import as_file, files
 import unittest
 from unittest.mock import Mock
-import mock
 
 from PIL import Image
 from PIL import ImageChops
