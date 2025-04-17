@@ -35,6 +35,9 @@ dev-dependencies = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+gscreenshot = ["*.png", "*.glade", "*.ui", "locale/**/*"]
+
 [tool.pylint]
 max-line-length = 100
 disable = [
