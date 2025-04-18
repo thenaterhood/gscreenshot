@@ -15,6 +15,9 @@ BuildArch: noarch
 BuildRequires: python3
 BuildRequires: python3-setuptools
 BuildRequires: gettext
+BuildRequires: python3-build
+BuildRequires: python3-installer
+BuildRequires: python3-wheel
 Requires: scrot python3 python3-pillow python3-gobject python3-setuptools python3-xlib
 Vendor: Nate Levesque <public@thenaterhood.com>
 Url: https://github.com/thenaterhood/gscreenshot
