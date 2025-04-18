@@ -27,6 +27,9 @@ A graphical and CLI screenshot utility.
 echo "python3"
 echo "python3-setuptools"
 echo "gettext"
+echo "python3-build"
+echo "python3-installer"
+echo "python3-wheel
 
 %if 0%{?fedora} >= 34 || 0%{?is_opensuse} || 0%{?centos_ver} == 8
   echo "pandoc"
@@ -36,10 +39,12 @@ echo "gettext"
 %setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
 
 %build
-python3 -m build
+python -m build --wheel --no-isolation
 
 %install
-pip install --root="$pkgdir/" --force --no-dependencies .
+python -m installer --destdir="$pkgdir" dist/*.whl
+chmod +x "$pkgdir/usr/bin/gscreenshot"
+chmod +x "$pkgdir/usr/bin/gscreenshot-cli"
 
 %clean
 rm -rf $RPM_BUILD_ROOT
