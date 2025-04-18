@@ -5,22 +5,29 @@ on:
 
 jobs:
   build_rpm:
-    name: Build RPM on fedora:latest
-    runs-on: fedora-latest
+    name: Build RPM
+    runs-on: ubuntu-latest
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Set up RPM build environment
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for proper versioning
+
+      - name: Set up RPM build environment on Ubuntu
         run: |
-          if command -v dnf &> /dev/null; then
-            dnf -y install @development-tools rpm-build rpmdevtools python3-devel python3-pip python3-setuptools python3-wheel python3-build
-          else
-            yum -y install @development-tools rpm-build rpmdevtools python3-devel python3-pip python3-setuptools python3-wheel
-            pip3 install build
-          fi
-          rpmdev-setuptree
+          # Install RPM build tools on Ubuntu
+          sudo apt-get update
+          sudo apt-get install -y rpm build-essential python3-dev python3-pip python3-setuptools python3-wheel python3-build python3-installer
+          sudo pip3 install build
+
+          # Create RPM build directories
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          echo "%_topdir $HOME/rpmbuild" > ~/.rpmmacros
 
       - name: Prepare source directory
         run: |
@@ -30,8 +37,9 @@ jobs:
           # Copy all files from the repository to the source directory
           cp -r $(pwd)/* ~/rpmbuild/SOURCES/gscreenshot/
           
-          # Display the structure for verification (optional)
-          find ~/rpmbuild/SOURCES/gscreenshot -type f | sort
+          # Display the structure for verification
+          echo "Files copied to source directory:"
+          find ~/rpmbuild/SOURCES/gscreenshot -type f -name "*.py" | head -10
 
       - name: Build RPM package
         run: |
