@@ -35,6 +35,12 @@ dev-dependencies = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+"*" = ["*.png", "*.glade", "*.ui", "locale/**/*", "LICENSE"]
+
+[tool.setuptools]
+include-package-data = true
+
 [tool.pylint]
 max-line-length = 100
 disable = [
