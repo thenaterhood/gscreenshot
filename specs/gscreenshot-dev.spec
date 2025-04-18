@@ -7,7 +7,6 @@ Summary: A simple screenshot tool
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source0: https://github.com/thenaterhood/gscreenshot/archive/refs/heads/dev.zip
 License: GPLv2
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -36,7 +35,9 @@ echo "python3-wheel
 %endif
 
 %prep
-%setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
+
+%setup -q -c -T
+cp -a %{_sourcedir}/* .
 
 %build
 python -m build --wheel --no-isolation
