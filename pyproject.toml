@@ -36,7 +36,7 @@ dev-dependencies = [
 where = ["src"]
 
 [tool.setuptools.package-data]
-gscreenshot = ["*.png", "*.glade", "*.ui", "locale/**/*"]
+"*" = ["*.png", "*.glade", "*.ui", "locale/**/*"]
 
 [tool.setuptools]
 include-package-data = true
