@@ -13,4 +13,4 @@ jobs:
       id: rpm
       uses: naveenrajm7/rpmbuild@master
       with:
-        spec_file: "specs/gscreenshot.spec"
+        spec_file: "specs/gscreenshot-dev.spec"
