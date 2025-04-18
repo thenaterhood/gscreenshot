@@ -28,12 +28,10 @@ jobs:
           # Create the source directory in the rpmbuild structure
           mkdir -p ~/rpmbuild/SOURCES/gscreenshot
           
-          # Copy all files from the repository to the source directory
-          cp -r $(pwd)/* ~/rpmbuild/SOURCES/gscreenshot/
+          cp -r $(pwd)/* ~/rpmbuild/SOURCES/
           
-          # Display the structure for verification
           echo "Files copied to source directory:"
-          find ~/rpmbuild/SOURCES/gscreenshot -type f
+          find ~/rpmbuild/SOURCES/ -type f
 
           cp $(pwd)/specs/* ~/rpmbuild/SPECS/
 
@@ -42,5 +40,4 @@ jobs:
           # Build both binary and source RPMs
           rpmbuild -ba ~/rpmbuild/SPECS/gscreenshot-dev.spec
           
-          # Output the build result status
           echo "RPM build completed with status: $?"
