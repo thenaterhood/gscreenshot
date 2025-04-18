@@ -33,7 +33,9 @@ jobs:
           
           # Display the structure for verification
           echo "Files copied to source directory:"
-          find ~/rpmbuild/SOURCES/gscreenshot -type f -name "*.py" | head -10
+          find ~/rpmbuild/SOURCES/gscreenshot -type f
+
+          cp $(pwd)/specs/* ~/rpmbuild/SPECS/
 
       - name: Build RPM package
         run: |
