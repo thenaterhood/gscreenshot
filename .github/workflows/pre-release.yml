@@ -1,16 +1,42 @@
-name: RPM Test Build
+name: Canary Build
 on:
   pull_request:
     branches: [ main ]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
+  build_rpm:
+    name: Build RPM on fedora:latest
+    runs-on: fedora-latest
 
-    - name: build RPM package
-      id: rpm
-      uses: naveenrajm7/rpmbuild@master
-      with:
-        spec_file: "specs/gscreenshot-dev.spec"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up RPM build environment
+        run: |
+          if command -v dnf &> /dev/null; then
+            dnf -y install @development-tools rpm-build rpmdevtools python3-devel python3-pip python3-setuptools python3-wheel python3-build
+          else
+            yum -y install @development-tools rpm-build rpmdevtools python3-devel python3-pip python3-setuptools python3-wheel
+            pip3 install build
+          fi
+          rpmdev-setuptree
+
+      - name: Prepare source directory
+        run: |
+          # Create the source directory in the rpmbuild structure
+          mkdir -p ~/rpmbuild/SOURCES/gscreenshot
+          
+          # Copy all files from the repository to the source directory
+          cp -r $(pwd)/* ~/rpmbuild/SOURCES/gscreenshot/
+          
+          # Display the structure for verification (optional)
+          find ~/rpmbuild/SOURCES/gscreenshot -type f | sort
+
+      - name: Build RPM package
+        run: |
+          # Build both binary and source RPMs
+          rpmbuild -ba ~/rpmbuild/SPECS/gscreenshot-dev.spec
+          
+          # Output the build result status
+          echo "RPM build completed with status: $?"
