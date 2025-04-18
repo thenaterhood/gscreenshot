@@ -33,9 +33,7 @@ cp -a %{_sourcedir}/* .
 python -m build --wheel --no-isolation
 
 %install
-python -m installer --destdir="$pkgdir" dist/*.whl
-chmod +x "$pkgdir/usr/bin/gscreenshot"
-chmod +x "$pkgdir/usr/bin/gscreenshot-cli"
+python -m installer --destdir="$pkgdir/" dist/*.whl
 
 %clean
 rm -rf $RPM_BUILD_ROOT
