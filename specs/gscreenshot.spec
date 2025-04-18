@@ -29,7 +29,7 @@ echo "python3-setuptools"
 echo "gettext"
 echo "python3-build"
 echo "python3-installer"
-echo "python3-wheel
+echo "python3-wheel"
 
 %if 0%{?fedora} >= 34 || 0%{?is_opensuse} || 0%{?centos_ver} == 8
   echo "pandoc"
