@@ -42,7 +42,7 @@ echo "python3-wheel
 python -m build --wheel --no-isolation
 
 %install
-python -m installer --destdir="$pkgdir/" dist/*.whl
+python -m installer --destdir="%{buildroot}/" dist/*.whl
 
 %clean
 rm -rf $RPM_BUILD_ROOT
