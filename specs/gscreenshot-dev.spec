@@ -34,6 +34,7 @@ python -m build --wheel --no-isolation
 
 %install
 python -m installer --destdir="%{buildroot}/" dist/*.whl
+find %{buildroot} -type f -or -type l | sed \"s|^%{buildroot}||\" > INSTALLED_FILES
 
 %clean
 rm -rf $RPM_BUILD_ROOT
