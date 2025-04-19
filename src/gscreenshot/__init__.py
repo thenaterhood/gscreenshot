@@ -126,7 +126,7 @@ class Gscreenshot():
         '''
         return self.screenshooter.get_capabilities_()
 
-    def set_select_color(self, select_color_rgba: str):
+    def set_select_color(self, select_color_rgba: typing.Optional[str]):
         '''
         Set the selection color for region selection
         This accepts an RGBA hexadecimal string.
@@ -134,7 +134,7 @@ class Gscreenshot():
         log.debug("set select color to '%s'", select_color_rgba)
         self._select_color = select_color_rgba
 
-    def set_select_border_weight(self, select_border_weight: int):
+    def set_select_border_weight(self, select_border_weight: typing.Optional[int]):
         '''Set the border weight for region selection'''
         log.debug("set select border weight to '%s'", select_border_weight)
         self._select_border_weight = select_border_weight

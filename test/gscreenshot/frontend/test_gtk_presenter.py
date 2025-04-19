@@ -4,7 +4,7 @@ from unittest.mock import MagicMock
 from PIL import Image
 import mock
 
-from gscreenshot.frontend.gtk.presenter import Presenter
+from gscreenshot.frontend.presenter import Presenter
 
 
 class GtkPresenterTest(unittest.TestCase):
@@ -71,10 +71,17 @@ class GtkPresenterTest(unittest.TestCase):
 
     def test_capture_cursor_toggled_active(self):
         widget_mock = MagicMock()
-        widget_mock.get_active.return_value = True
+        self.view.widget_bool_value.return_value = True
 
         self.presenter.capture_cursor_toggled(widget_mock)
         self.view.show_cursor_options.assert_called_with(True)
+
+    def test_capture_cursor_toggled_inactive(self):
+        widget_mock = MagicMock()
+        self.view.widget_bool_value.return_value = False
+
+        self.presenter.capture_cursor_toggled(widget_mock)
+        self.view.show_cursor_options.assert_called_with(False)
 
     def test_on_button_all_clicked(self):
         # Note - this is more of an integration test as we're not

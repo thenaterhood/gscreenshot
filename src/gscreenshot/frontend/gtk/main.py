@@ -12,9 +12,9 @@ import typing
 from time import sleep
 from gscreenshot import Gscreenshot
 from gscreenshot.compat import get_resource_string
+from gscreenshot.frontend.presenter import Presenter
 from gscreenshot.screenshooter.exceptions import NoSupportedScreenshooterError
 from .dialogs import WarningDialog
-from .presenter import Presenter
 from .view import View
 
 from gi import require_version
