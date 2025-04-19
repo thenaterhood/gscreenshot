@@ -41,10 +41,10 @@ echo "pandoc"
 %setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
 
 %build
-python -m build --wheel --no-isolation
+python3 -m build --wheel --no-isolation
 
 %install
-python -m installer --destdir="%{buildroot}/" dist/*.whl
+python3 -m installer --destdir="%{buildroot}/" dist/*.whl
 find %{buildroot} -type f -or -type l | sed -e s"|%{buildroot}||g" > INSTALLED_FILES
 
 %clean
