@@ -15,6 +15,9 @@ Prefix: %{_prefix}
 BuildArch: noarch
 BuildRequires: python3
 BuildRequires: python3-setuptools
+BuildRequires: python3-build
+BuildRequires: python3-installer
+BuildRequires: python3-wheel
 BuildRequires: gettext
 BuildRequires: pandoc
 Requires: scrot python3 python3-pillow python3-gobject python3-setuptools python3-xlib
