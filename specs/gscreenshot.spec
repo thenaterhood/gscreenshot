@@ -1,6 +1,6 @@
 %define name gscreenshot
-%define version 3.9.1
-%define unmangled_version 3.9.1
+%define version 3.9.2
+%define unmangled_version 3.9.2
 %define release 1
 
 Summary: A simple screenshot tool
@@ -16,6 +16,7 @@ BuildArch: noarch
 BuildRequires: python3
 BuildRequires: python3-setuptools
 BuildRequires: gettext
+BuildRequires: pandoc
 Requires: scrot python3 python3-pillow python3-gobject python3-setuptools python3-xlib
 Vendor: Nate Levesque <public@thenaterhood.com>
 Url: https://github.com/thenaterhood/gscreenshot
@@ -29,7 +30,8 @@ echo "python3-setuptools"
 echo "gettext"
 echo "python3-build"
 echo "python3-installer"
-echo "python3-wheel
+echo "python3-wheel"
+echo "pandoc"
 
 %if 0%{?fedora} >= 34 || 0%{?is_opensuse} || 0%{?centos_ver} == 8
   echo "pandoc"
@@ -43,6 +45,7 @@ python -m build --wheel --no-isolation
 
 %install
 python -m installer --destdir="%{buildroot}/" dist/*.whl
+find %{buildroot} -type f -or -type l | sed -e s"|%{buildroot}||g" > INSTALLED_FILES
 
 %clean
 rm -rf $RPM_BUILD_ROOT
