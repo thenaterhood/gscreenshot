@@ -1,3 +1,4 @@
+from.about_dialog import AboutDialog
 from .file_open_dialog import FileOpenDialog
 from .file_save_dialog import FileSaveDialog
 from .open_with_dialog import OpenWithDialog
@@ -6,6 +7,7 @@ from .confirm_dialog import ConfirmationDialog
 
 
 __all__ = [
+    "AboutDialog",
     "FileOpenDialog",
     "FileSaveDialog",
     "OpenWithDialog",

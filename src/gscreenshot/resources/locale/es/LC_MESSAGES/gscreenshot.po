@@ -186,8 +186,8 @@ msgstr "no se pudo mostrar la notificación de captura de pantalla: ¿funciona e
 msgid "unable to save cache file"
 msgstr "no se puede guardar el archivo de caché"
 
-msgid "Available features: {0}"
-msgstr "Funciones disponibles: {0}"
+msgid "Available features:"
+msgstr "Funciones disponibles:"
 
 msgid "Please install one of the following to use gscreenshot:"
 msgstr "instala uno de los siguientes:"

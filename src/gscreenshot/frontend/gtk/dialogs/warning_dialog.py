@@ -13,26 +13,26 @@ from gi.repository import Gtk # type: ignore
 i18n = gettext.gettext
 
 
-class WarningDialog():
+class WarningDialog(Gtk.MessageDialog):
     '''A warning dialog'''
 
     def __init__(self, message, parent=None):
         self.parent = parent
-        self.message_dialog = Gtk.MessageDialog(
-                parent,
-                None,
-                Gtk.MessageType.WARNING,
-                Gtk.ButtonsType.OK,
-                message
-                )
+        super().__init__(
+            parent,
+            None,
+            Gtk.MessageType.WARNING,
+            Gtk.ButtonsType.OK,
+            message
+        )
 
     def run(self):
         '''Run the warning dialog'''
         if self.parent is not None:
             self.parent.set_sensitive(False)
 
-        self.message_dialog.run()
-        self.message_dialog.destroy()
+        super().run()
+        self.destroy()
 
         if self.parent is not None:
             self.parent.set_sensitive(True)
