@@ -6,7 +6,7 @@ import mock
 
 from src.gscreenshot.screenshot.screenshot import Screenshot
 from src.gscreenshot.frontend.cli import main
-from gscreenshot.frontend.cli.args import get_args
+from src.gscreenshot.frontend.cli.args import get_args
 
 
 class CLITestGscreenshotCalls(unittest.TestCase):
