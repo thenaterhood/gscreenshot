@@ -17,7 +17,7 @@ class ConfirmationDialog(Gtk.Dialog):
     '''A confirmation dialog'''
 
     def __init__(self, message, parent=None):
-        Gtk.Dialog.__init__(self, title=i18n("Confirmation"), transient_for=parent, flags=0)
+        super().__init__(self, title=i18n("Confirmation"), transient_for=parent, flags=0)
         self.add_buttons(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
             "Continue", Gtk.ResponseType.OK
@@ -35,6 +35,7 @@ class ConfirmationDialog(Gtk.Dialog):
 
         self.connect("response", self._on_response)
         self.confirmed = False
+        box.show_all()
 
     def _on_response(self, _, response):
         self.confirmed = response == Gtk.ResponseType.OK
