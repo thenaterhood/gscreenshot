@@ -204,7 +204,8 @@ class GscreenshotTest(unittest.TestCase):
         self.fake_image.save.assert_not_called()
         self.assertFalse(success)
 
-    def test_save_last_image_ioerror(self):
+    @mock.patch("builtins.open", new_callable=mock_open, create=True)
+    def test_save_last_image_ioerror(self, mock_open):
 
         self.gscreenshot.screenshot_full_display()
         self.fake_image.save.side_effect = IOError("mocked IOError")

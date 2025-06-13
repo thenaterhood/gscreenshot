@@ -176,7 +176,7 @@ msgstr ""
 msgid "unable to save cache file"
 msgstr ""
 
-msgid "Available features: {0}"
+msgid "Available features:"
 msgstr ""
 
 msgid "Please install one of the following to use gscreenshot:"

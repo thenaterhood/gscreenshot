@@ -60,6 +60,7 @@ disable = [
 
 [tool.mypy]
 ignore_missing_imports = true
+follow_imports = "skip"
 exclude = [
     "src/gscreenshot/compat.py"
 ]

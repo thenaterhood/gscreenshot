@@ -11,20 +11,33 @@ import io
 import threading
 from time import sleep
 import typing
+from PIL import Image
 from gscreenshot.compat import get_resource_file
+from gscreenshot.frontend.abstract_view import AbstractGscreenshotView
+from gscreenshot.frontend.gtk.dialogs import (
+    AboutDialog,
+    ConfirmationDialog,
+    FileOpenDialog,
+    FileSaveDialog,
+    OpenWithDialog,
+    WarningDialog,
+)
+from gscreenshot.frontend.gtk.util import image_to_pixbuf
 from gscreenshot.screenshot import ScreenshotCollection
+from gscreenshot.screenshot.screenshot import Screenshot
 from gscreenshot.util import GSCapabilities
 
 from gi import require_version
 require_version('Gtk', '3.0')
 from gi.repository import Gdk # type: ignore
+from gi.repository import GLib # type: ignore
 from gi.repository import Gtk # type: ignore
 from gi.repository import GdkPixbuf # type: ignore
 
 i18n = gettext.gettext
 
 
-class View():
+class View(AbstractGscreenshotView):
     '''View class for the GTK frontend'''
 
     def __init__(self, window, builder, capabilities):
@@ -194,7 +207,25 @@ class View():
         if self._next_btn is not None:
             self._next_btn.connect('clicked', presenter.on_preview_next_clicked)
 
-    def flash_status_icon(self, stock_name: str="emblem-ok"):
+    def notify_save_complete(self):
+        """
+        Show an indication that saving the file completed
+        """
+        self._flash_status_icon("document-save")
+
+    def notify_copy_complete(self):
+        """
+        Show an indication that copying the file completed
+        """
+        self._flash_status_icon("edit-copy")
+
+    def notify_open_complete(self):
+        """
+        Show an indication that opening the file completed
+        """
+        self._flash_status_icon("document-open")
+
+    def _flash_status_icon(self, stock_name: str="emblem-ok"):
         """
         Shows the status/confirmation icon in the UI after an action
         for a second.
@@ -204,8 +235,10 @@ class View():
 
         This is non-blocking.
         """
-
-        self._status_icon.set_from_icon_name(stock_name, Gtk.IconSize.BUTTON)
+        try:
+            self._status_icon.set_from_icon_name(stock_name, Gtk.IconSize.BUTTON)
+        except AttributeError:
+            self._status_icon.set_from_icon_name("emblem_ok", Gtk.IconSize.BUTTON)
         self._enable_and_show(self._status_icon)
 
         while Gtk.events_pending():
@@ -345,10 +378,6 @@ class View():
         '''
         self._actions_menu.popup_at_pointer()
 
-    def get_window(self):
-        '''Returns the associated window'''
-        return self._window
-
     def toggle_fullscreen(self):
         '''Toggle the window to full screen'''
         if self._window_is_fullscreen:
@@ -442,35 +471,141 @@ class View():
 
         return height, width
 
-    def update_preview(self, pixbuf):
+    def update_preview(self, img: Image.Image):
         '''
         Update the preview widget with a new image.
 
         This assumes the pixbuf has already been resized appropriately.
         '''
-        self._preview.set_from_pixbuf(pixbuf)
+        self._preview.set_from_pixbuf(image_to_pixbuf(img))
 
-    def copy_to_clipboard(self, pixbuf):
+    def idle_add(self, callback):
+        """
+        Passthrough for GLib.idle_add
+        """
+        GLib.idle_add(callback)
+
+    def handle_preview_click_event(self, widget, event, *args):
+        '''
+        Handle a click on the screenshot preview widget
+        '''
+        # 3 is right click
+        if event.type == Gdk.EventType.BUTTON_PRESS and event.button == 3:
+            self.show_actions_menu()
+
+    def copy_to_clipboard(self, screenshot: Screenshot) -> bool:
         """
         Copy the provided image to the screen's clipboard,
         if it supports persistence
         """
         clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
         display = Gdk.Display.get_default()
+        img = screenshot.get_image()
 
         if display.supports_clipboard_persistence():
-            clipboard.set_image(pixbuf)
+            clipboard.set_image(image_to_pixbuf(img))
             clipboard.store()
             return True
 
         return False
 
+    def show_warning(self, warning: str):
+        """
+        Show a warning message
+        """
+        dialog = WarningDialog(warning, self._window)
+        self.run_dialog(dialog)
+
+    def show_about(self, capabilities: typing.Dict[str, str]):
+        """
+        Show the about dialog
+        """
+        about = AboutDialog(capabilities)
+        self.run_dialog(about)
+
+    def ask_open_with(self):
+        """
+        Ask the user what to open a file with
+
+        Note: return type is Gtk appinfo, for which
+        I haven't gotten the return type for type hinting TODO
+        """
+        appchooser = OpenWithDialog()
+
+        self.run_dialog(appchooser)
+
+        return appchooser.appinfo
+
+    def ask_for_save_location(
+        self, default_filename: str, default_folder: str
+    ) -> typing.Optional[str]:
+        """
+        Ask the user where to save something
+
+        Returns a file path as a string
+        """
+        save_dialog = FileSaveDialog(
+                default_filename,
+                default_folder,
+                self._window
+                )
+
+        ret = self.run_dialog(save_dialog)
+        if not ret:
+            return None
+
+        return str(ret)
+
+    def ask_for_save_directory(
+        self, default_folder: str, parent_folder: str
+    ) -> typing.Optional[str]:
+        """
+        Ask the user for a directory to save to
+
+        This is not equivalent to ask_for_save_location.
+        ask_for_save_location returns a filename whereas this returns a folder name
+        """
+        save_dialog = FileSaveDialog(
+            default_folder,
+            parent_folder,
+            self._window,
+            choose_directory=True,
+        )
+
+        ret = self.run_dialog(save_dialog)
+        if not ret:
+            return None
+
+        return str(ret)
+
+    def ask_for_file_to_open(self, formats=None) -> typing.Optional[str]:
+        """
+        Ask the user for a file to open
+        """
+        chooser = FileOpenDialog(
+            mime_types=formats
+        )
+
+        ret = self.run_dialog(chooser)
+        if ret is None:
+            return None
+
+        return str(ret)
+
+    def ask_confirmation(self, message: str) -> bool:
+        """
+        Request confirmation from the user
+        """
+        confirm_dialogue = ConfirmationDialog(
+            message=message,
+        )
+
+        self.run_dialog(confirm_dialogue)
+        return confirm_dialogue.confirmed
+
     def run_dialog(self, dialog):
         '''Run a dialog window and return the outcome'''
         self._window.set_sensitive(False)
-        if hasattr(dialog, "show_all"):
-            # Jank, but needed until all the dialogs are consistent
-            dialog.show_all()
         result = dialog.run()
         self._window.set_sensitive(True)
 
@@ -481,3 +616,18 @@ class View():
             pass
 
         return result
+
+    def widget_bool_value(self, widget) -> bool:
+        if hasattr(widget, "get_active"):
+            return widget.get_active()
+
+        return False
+
+    def widget_int_value(self, widget) -> int:
+        return widget.get_value()
+
+    def widget_str_value(self, widget) -> typing.Optional[str]:
+        if hasattr(widget, "get_model"):
+            return widget.get_model()[widget.get_active()][2]
+
+        return ""
