@@ -20,14 +20,12 @@ def image_to_pixbuf(image):
             descriptor.close()
 
             loader.write(contents)
+            loader.close()
+
             pixbuf = loader.get_pixbuf()
-            break
+            if pixbuf is not None:
+                break
         except GLib.GError:
             continue
-        finally:
-            try:
-                loader.close()
-            except GLib.GError:
-                pass
 
     return pixbuf
