@@ -5,15 +5,16 @@ import logging
 import logging.config
 import signal
 import sys
-import gscreenshot.frontend.cli
-from .args import get_args
+from gscreenshot.frontend import cli
+from gscreenshot.frontend import gtk
+from .cli.args import get_args
 
 
 log = logging.getLogger(__name__)
 
 
 try:
-    import gscreenshot.frontend.gtk.presenter
+    import gscreenshot.frontend.presenter
     GTK_CAPABLE = True
 except ValueError:
     GTK_CAPABLE = False
@@ -84,11 +85,11 @@ def delegate():
         }
         logging.config.dictConfig(logging_config)
 
-        app = gscreenshot.frontend.cli.run()
+        app = gscreenshot.frontend.cli.main()
 
         if args.gui and GTK_CAPABLE:
-            gscreenshot.frontend.gtk.main(app)
+            gtk.main(app)
         elif (len(sys.argv) > 1) or 'gscreenshot-cli' in sys.argv[0] or not GTK_CAPABLE:
             gscreenshot.frontend.cli.resume(app)
         else:
-            gscreenshot.frontend.gtk.main(app)
+            gtk.main(app)
