@@ -453,7 +453,7 @@ class Presenter():
         '''Handle the window getting toggled to fullscreen'''
         self._view.toggle_fullscreen()
 
-    def on_button_quit_clicked(self, widget=None, *_):
+    def on_button_quit_clicked(self, *_, widget=None):
         '''Handle the quit button'''
         self.quit(widget)
         return True
