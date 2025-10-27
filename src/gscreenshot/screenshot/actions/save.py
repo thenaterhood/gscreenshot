@@ -128,6 +128,10 @@ class SaveAction(ScreenshotAction[str | None]):
 
         if self.params.update_cache:
             cache = GscreenshotCache.load()
-            cache.update_values(write=True, last_save_dir=os.path.dirname(filename), last_save_type=file_type)
+            cache.update_values(
+                write=True,
+                last_save_dir=os.path.dirname(filename),
+                last_save_type=file_type,
+            )
 
         return filename
