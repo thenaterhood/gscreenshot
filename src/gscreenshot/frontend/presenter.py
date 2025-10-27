@@ -453,24 +453,26 @@ class Presenter():
         '''Handle the window getting toggled to fullscreen'''
         self._view.toggle_fullscreen()
 
-    def on_button_quit_clicked(self, widget=None):
+    def on_button_quit_clicked(self, *_, widget=None):
         '''Handle the quit button'''
         self.quit(widget)
+        return True
 
     def on_window_main_destroy(self, widget=None):
         '''Handle the titlebar close button'''
         self.quit(widget)
+        return True
 
     def on_window_resize(self, *_):
         '''Handle window resizes'''
         self._view.resize()
         self._show_preview()
 
-    def quit(self, *_, skip_warning=False):
+    def quit(self, *args, skip_warning=False):
         '''Exit the app'''
         if skip_warning:
             self._app.quit()
-            return  # not strictly needed most of the time
+            return True # not strictly needed most of the time
 
         screenshot_collection = self._app.get_screenshot_collection()
 
@@ -480,9 +482,11 @@ class Presenter():
             )
 
             if not confirmed:
-                return
+                return True
 
         self._app.quit()
+
+        return True
 
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()
