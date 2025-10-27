@@ -11,6 +11,7 @@ import threading
 import typing
 from gscreenshot import Gscreenshot
 from gscreenshot.cache import GscreenshotCache
+from gscreenshot.filename import get_time_filename
 from gscreenshot.frontend.abstract_view import AbstractGscreenshotView
 from gscreenshot.screenshot.actions import (
     CopyAction,
@@ -295,9 +296,10 @@ class Presenter():
             return False
 
         while not (saved or cancelled):
+            cache = GscreenshotCache.load()
             fname = self._view.ask_for_save_location(
-                self._app.get_time_filename(),
-                GscreenshotCache.load().last_save_dir
+                get_time_filename(filetype=cache.last_save_type),
+                cache.last_save_dir
             )
             saved = False
             if fname is not None:
