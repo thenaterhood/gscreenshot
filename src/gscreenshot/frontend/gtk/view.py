@@ -17,9 +17,11 @@ from gscreenshot.frontend.abstract_view import AbstractGscreenshotView
 from gscreenshot.frontend.gtk.dialogs import (
     AboutDialog,
     ConfirmationDialog,
+    InputDialog,
     FileOpenDialog,
     FileSaveDialog,
     OpenWithDialog,
+    SettingsDialog,
     WarningDialog,
 )
 from gscreenshot.frontend.gtk.util import image_to_pixbuf
@@ -63,6 +65,8 @@ class View(AbstractGscreenshotView):
         self._actions_menu:Gtk.Menu = builder.get_object('menu_saveas_additional_actions')
         self._status_icon:Gtk.Image = builder.get_object('status_icon')
         self._preview_overlay:Gtk.Overlay = builder.get_object('image_overlay')
+
+        self._stored_region_menu:Gtk.Menu = builder.get_object('stored_regions_menu')
 
         self._preview_event_box.drag_source_set(
             Gdk.ModifierType.BUTTON1_MASK,
@@ -344,6 +348,23 @@ class View(AbstractGscreenshotView):
                     0
                 )
 
+    def update_available_regions(self, regions: dict, on_activate: typing.Callable):
+        for child in self._stored_region_menu.get_children():
+            self._stored_region_menu.remove(child)
+
+        if not len(regions):
+            none_item = Gtk.MenuItem("(None)")
+            none_item.set_sensitive(False)
+            none_item.show()
+            self._stored_region_menu.append(none_item)
+            return
+
+        for name in regions.keys():
+            item = Gtk.MenuItem(name)
+            item.connect("activate", on_activate)
+            item.show()
+            self._stored_region_menu.append(item)
+
     def run(self):
         '''Run the view'''
         self._window.set_position(Gtk.WindowPosition.CENTER)
@@ -371,6 +392,10 @@ class View(AbstractGscreenshotView):
 
         self._window.set_size_request(gscreenshot_width, gscreenshot_height)
         self.unhide()
+
+    def show_settings(self, stored_regions: dict, on_delete_region: typing.Callable):
+        settings = SettingsDialog(stored_regions=stored_regions, on_delete_region=on_delete_region)
+        self.run_dialog(settings)
 
     def show_actions_menu(self):
         '''
@@ -591,6 +616,15 @@ class View(AbstractGscreenshotView):
             return None
 
         return str(ret)
+
+    def ask_input(self, message: str) -> str | None:
+        """
+        Opens a dialog to ask for a text input
+        """
+        dialog = InputDialog(message=message)
+        data = self.run_dialog(dialog)
+
+        return data
 
     def ask_confirmation(self, message: str) -> bool:
         """

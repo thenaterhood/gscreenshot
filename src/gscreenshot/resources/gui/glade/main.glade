@@ -106,8 +106,50 @@ Version: 3.0.1
         <signal name="activate" handler="on_use_last_region_clicked" swapped="no"/>
       </object>
     </child>
+    <child>
+      <object class="GtkMenuItem" id="action_save_last_selection">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Save this region</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="on_region_save_clicked" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="stored_regions_submenu">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Saved regions</property>
+        <property name="use-underline">True</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="stored_regions_menu">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <child>
+              <object class="GtkMenuItem" id="stored_regions_none">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can-focus">False</property>
+                <property name="opacity">0.69999999999999996</property>
+                <property name="label" translatable="yes">(None)</property>
+                <property name="use-underline">True</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="manage_saved_regions">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Managed saved regions</property>
+        <property name="use-underline">True</property>
+        <signal name="activate" handler="on_settings_clicked" swapped="no"/>
+      </object>
+    </child>
   </object>
-  <object class="GtkWindow" id="window_main">
+  <object class="GtkApplicationWindow" id="window_main">
     <property name="width-request">-1</property>
     <property name="height-request">-1</property>
     <property name="visible">True</property>
