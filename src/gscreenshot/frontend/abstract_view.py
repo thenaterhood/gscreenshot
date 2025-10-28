@@ -192,7 +192,7 @@ class AbstractGscreenshotView():
         """
         return None
 
-    def ask_input(self, message: str) -> str | None:
+    def ask_input(self, message: str) -> typing.Optional[str]:
         """
         Opens a dialog to ask for a text input
         """

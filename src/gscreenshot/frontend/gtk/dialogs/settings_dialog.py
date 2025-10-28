@@ -1,11 +1,14 @@
+#pylint: disable=wrong-import-order
+#pylint: disable=wrong-import-position
+#pylint: disable=ungrouped-imports
 import typing
 import gi
 gi.require_version("Gtk", "3.0")
-from gi.repository import Gtk, Gdk
+from gi.repository import Gtk, Gdk # type: ignore
 
 
 class ListWithActions(Gtk.Box):
-    def __init__(self, label_text, store, remove_handler, add_handler = None, entry_placeholder=""):
+    def __init__(self, label_text, store, remove_handler, add_handler=None, entry_placeholder=""):
         super().__init__(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         self.set_property("margin", 10)
         self.store = store
@@ -38,7 +41,9 @@ class ListWithActions(Gtk.Box):
             self.entry.set_placeholder_text(entry_placeholder)
             self.pack_start(self.entry, False, False, 5)
 
-            add_button = Gtk.Button(label=f"Add {label_text[:-1] if label_text.endswith('s') else label_text}")
+            add_button = Gtk.Button(
+                label=f"Add {label_text[:-1] if label_text.endswith('s') else label_text}",
+            )
             add_button.connect("clicked", add_handler)
             self.pack_start(add_button, False, False, 5)
 
@@ -77,13 +82,9 @@ class SettingsDialog(Gtk.Dialog):
         self.main_box.pack_start(self.region_box, True, True, 0)
         self.main_box.show_all()
 
-    def on_region_icon_clicked(self, widget, path):
-        iter = self.region_store.get_iter(path)
-        region_name = self.region_store.get_value(iter, 0)
+    def on_region_icon_clicked(self, _widget, path):
+        liststore_iter = self.region_store.get_iter(path)
+        region_name = self.region_store.get_value(liststore_iter, 0)
         self.on_delete_region(region_name)
-        if iter:
-            self.region_store.remove(iter)
-
-    def run(self):
-        ''' Run the dialog'''
-        super().run()
+        if liststore_iter:
+            self.region_store.remove(liststore_iter)

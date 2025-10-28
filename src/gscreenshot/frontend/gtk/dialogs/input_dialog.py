@@ -32,22 +32,22 @@ class InputDialog(Gtk.Dialog):
         label.set_margin_start(20)
         label.set_margin_top(20)
 
-        input = Gtk.Entry()
-        self.input = input
+        entry = Gtk.Entry()
+        self.input = entry
 
-        input.set_max_width_chars(60)
-        input.set_margin_end(20)
-        input.set_margin_start(20)
-        input.set_margin_top(20)
-        input.set_margin_bottom(20)
+        entry.set_max_width_chars(60)
+        entry.set_margin_end(20)
+        entry.set_margin_start(20)
+        entry.set_margin_top(20)
+        entry.set_margin_bottom(20)
 
         box = self.get_content_area()
         box.add(label)
-        box.add(input)
+        box.add(entry)
 
         self.connect("response", self._on_response)
         self.confirmed = False
-        
+
         box.show_all()
 
     def _on_response(self, _, response):
@@ -60,4 +60,3 @@ class InputDialog(Gtk.Dialog):
         ''' Run the dialog'''
         super().run()
         return self.text
-

@@ -352,7 +352,7 @@ class View(AbstractGscreenshotView):
         for child in self._stored_region_menu.get_children():
             self._stored_region_menu.remove(child)
 
-        if not len(regions):
+        if len(regions) < 1:
             none_item = Gtk.MenuItem("(None)")
             none_item.set_sensitive(False)
             none_item.show()
@@ -617,7 +617,7 @@ class View(AbstractGscreenshotView):
 
         return str(ret)
 
-    def ask_input(self, message: str) -> str | None:
+    def ask_input(self, message: str) -> typing.Optional[str]:
         """
         Opens a dialog to ask for a text input
         """
