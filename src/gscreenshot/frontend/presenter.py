@@ -62,6 +62,11 @@ class Presenter():
                 cursors
                 )
 
+        self._view.update_available_regions(
+            self._app.get_available_regions(),
+            self.on_stored_region_selected
+        )
+
         self._view.show_cursor_options(self._capture_cursor)
 
     def _begin_take_screenshot(self, app_method, **args):
@@ -469,6 +474,53 @@ class Presenter():
         '''Handle window resizes'''
         self._view.resize()
         self._show_preview()
+
+    def on_region_save_clicked(self, *_):
+        last_screenshot = self._app.current
+        region = None
+
+        if last_screenshot is not None:
+            effects = last_screenshot.get_effects()
+            crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
+            if crop_effect and "region" in crop_effect.meta:
+                region = crop_effect.meta["region"]
+
+        if not region:
+            return
+
+        name = self._view.ask_input("Region Name")
+        if not name:
+            return
+
+        self._app.add_stored_region(name, region)
+
+        self._view.update_available_regions(
+            self._app.get_available_regions(),
+            self.on_stored_region_selected
+        )
+
+    def on_stored_region_selected(self, menu_item):
+        region = self._app.get_available_regions().get(
+            menu_item.get_label()
+        )
+
+        self.take_screenshot(
+            self._app.screenshot_selected,
+            region=region
+        )
+
+    def on_settings_clicked(self, *_):
+        def on_delete_region(region_name: str):
+            self._app.remove_stored_region(region_name)
+            self._view.update_available_regions(
+                self._app.get_available_regions(),
+                self.on_stored_region_selected,
+            )
+
+        self._view.show_settings(
+            stored_regions=self._app.get_available_regions(),
+            on_delete_region=on_delete_region,
+        )
 
     def quit(self, *args, skip_warning=False):
         '''Exit the app'''

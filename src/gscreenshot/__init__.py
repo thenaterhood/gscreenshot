@@ -139,6 +139,25 @@ class Gscreenshot():
         log.debug("set select border weight to '%s'", select_border_weight)
         self._select_border_weight = select_border_weight
 
+    def add_stored_region(self, name: str, region: list):
+        cache = GscreenshotCache().load()
+
+        regions = cache.stored_regions
+        regions[name] = region
+
+        cache.update_values(True, stored_regions=regions)
+
+    def remove_stored_region(self, name: str):
+        cache = GscreenshotCache().load()
+
+        regions = cache.stored_regions
+        del regions[name]
+
+        cache.update_values(True, stored_regions=regions)
+
+    def get_available_regions(self) -> typing.Dict[str, list]:
+        return GscreenshotCache().load().stored_regions
+
     def register_stamp_image(self, fname: str,
         name: typing.Optional[str]=None
     ) -> typing.Optional[str]:

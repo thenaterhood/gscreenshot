@@ -74,8 +74,17 @@ class AbstractGscreenshotView():
         '''
         return
 
+    def update_available_regions(self, regions: dict, on_activate: typing.Callable):
+        return
+
     def run(self):
         '''Run the view'''
+        return
+
+    def show_settings(self, stored_regions: dict, on_delete_region: typing.Callable):
+        '''
+        Open the settings dialog
+        '''
         return
 
     def show_actions_menu(self):
@@ -180,6 +189,12 @@ class AbstractGscreenshotView():
     def ask_for_file_to_open(self, formats=None) -> typing.Optional[str]:
         """
         Ask the user for a file to open
+        """
+        return None
+
+    def ask_input(self, message: str) -> typing.Optional[str]:
+        """
+        Opens a dialog to ask for a text input
         """
         return None
 

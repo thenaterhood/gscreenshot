@@ -61,6 +61,6 @@ class ScreenshotEffect():
         return self._alias
 
     @property
-    def meta(self) -> typing.Dict[str, str]:
+    def meta(self) -> typing.Dict[str, typing.Any]:
         '''Returns the metadata (if any)'''
         return self._meta
