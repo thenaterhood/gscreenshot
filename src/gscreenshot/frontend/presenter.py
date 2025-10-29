@@ -475,7 +475,7 @@ class Presenter():
         self._view.resize()
         self._show_preview()
 
-    def on_region_save_clicked(self, *_):
+    def on_region_save_clicked(self, *_, region_name = None):
         last_screenshot = self._app.current
         region = None
 
@@ -488,11 +488,11 @@ class Presenter():
         if not region:
             return
 
-        name = self._view.ask_input("Region Name")
-        if not name:
+        region_name = region_name or self._view.ask_input("Region Name")
+        if not region_name:
             return
 
-        self._app.add_stored_region(name, region)
+        self._app.add_stored_region(region_name, region)
 
         self._view.update_available_regions(
             self._app.get_available_regions(),
@@ -500,9 +500,13 @@ class Presenter():
         )
 
     def on_stored_region_selected(self, menu_item):
-        region = self._app.get_available_regions().get(
-            menu_item.get_label()
-        )
+        region_name = self._view.widget_str_value(menu_item)
+        region = None
+
+        if region_name:
+            region = self._app.get_available_regions().get(
+                region_name
+            )
 
         self.take_screenshot(
             self._app.screenshot_selected,

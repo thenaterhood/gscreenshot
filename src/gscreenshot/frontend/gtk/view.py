@@ -664,4 +664,7 @@ class View(AbstractGscreenshotView):
         if hasattr(widget, "get_model"):
             return widget.get_model()[widget.get_active()][2]
 
+        if hasattr(widget, "get_label"):
+            return widget.get_label()
+
         return ""
