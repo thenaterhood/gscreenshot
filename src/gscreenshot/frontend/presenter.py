@@ -526,6 +526,29 @@ class Presenter():
             on_delete_region=on_delete_region,
         )
 
+    def on_uncrop_clicked(self, *_):
+        screenshot = self._app.current_always
+        for effect in screenshot.get_effects():
+            if isinstance(effect, CropEffect):
+                effect.disable()
+
+        self._show_preview()
+
+    def on_change_region_clicked(self, region_name):
+        region_name = self._view.widget_str_value(region_name)
+
+        if not region_name:
+            return
+
+        screenshot = self._app.current_always
+        region = self._app.get_available_regions().get(region_name)
+        for effect in screenshot.get_effects():
+            if isinstance(effect, CropEffect):
+                effect.disable()
+
+        screenshot.add_effect(CropEffect(region=region))
+        self._show_preview()
+
     def quit(self, *args, skip_warning=False):
         '''Exit the app'''
         if skip_warning:
