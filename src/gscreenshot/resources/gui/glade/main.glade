@@ -169,7 +169,7 @@ Version: 3.0.1
             <property name="orientation">vertical</property>
             <property name="baseline-position">top</property>
             <child>
-              <object class="GtkMenuBar">
+              <object class="GtkMenuBar" id="header_bar">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <child>
