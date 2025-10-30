@@ -119,7 +119,7 @@ Version: 3.0.1
       <object class="GtkMenuItem" id="stored_regions_submenu">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Saved regions</property>
+        <property name="label" translatable="yes">Use saved region</property>
         <property name="use-underline">True</property>
         <child type="submenu">
           <object class="GtkMenu" id="stored_regions_menu">
@@ -137,15 +137,6 @@ Version: 3.0.1
             </child>
           </object>
         </child>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="manage_saved_regions">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="label" translatable="yes">Managed saved regions</property>
-        <property name="use-underline">True</property>
-        <signal name="activate" handler="on_settings_clicked" swapped="no"/>
       </object>
     </child>
   </object>
