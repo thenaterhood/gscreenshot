@@ -255,10 +255,16 @@ class Presenter():
             if crop_effect and "region" in crop_effect.meta:
                 region = crop_effect.meta["region"]
 
-        self.take_screenshot(
-            self._app.screenshot_selected,
-            region=region
-        )
+        if region:
+            self.take_screenshot(
+                self._app.screenshot_selected,
+                region=region
+            )
+
+        else:
+            self.take_screenshot(
+                self._app.screenshot_full_display
+            )
 
     def on_preview_prev_clicked(self, *_):
         '''Handle a click of the "previous" button on the preview'''
