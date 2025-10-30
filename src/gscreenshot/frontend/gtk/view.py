@@ -484,7 +484,7 @@ class View(AbstractGscreenshotView):
         if self._header_bar is not None:
             header_height = self._header_bar.get_allocation().height
 
-        width_x = .85 if self._header_bar is not None else .9
+        width_x = .95 if self._header_bar is not None else .9
 
         preview_size = (
             (window_size.height-control_size.height-(.6*header_height))*.98,
