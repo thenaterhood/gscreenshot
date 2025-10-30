@@ -505,7 +505,7 @@ class Presenter():
             self.on_stored_region_selected
         )
 
-    def on_stored_region_selected(self, menu_item, action: typing.Literal["new", "edit"] = "new"):
+    def on_stored_region_selected(self, menu_item, action = "new"):
         region_name = self._view.widget_str_value(menu_item)
         region = None
 
