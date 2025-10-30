@@ -488,7 +488,7 @@ class Presenter():
         if last_screenshot is not None:
             effects = last_screenshot.get_effects()
             crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
-            if crop_effect and "region" in crop_effect.meta:
+            if crop_effect and crop_effect.enabled and "region" in crop_effect.meta:
                 region = crop_effect.meta["region"]
 
         if not region:
