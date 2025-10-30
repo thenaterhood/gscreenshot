@@ -36,6 +36,7 @@ In a nutshell, gscreenshot supports the following (depending on your configurati
 
 - Capturing a full-screen screenshot
 - Capturing a region of the screen interactively
+- Capturing a region of the screen non-interactively using a pre-saved region
 - Capturing a window interactively
 - Capturing the cursor
 - Capturing the cursor, using an alternate cursor glyph
@@ -111,6 +112,13 @@ Other than region selection, gscreenshot's CLI is non-interactive and is suitabl
 -g, \--pointer-glyph
 :   Use an alternate image when capturing the cursor. "adwaita", "prohibit", "allow" are built in, or pass
     a file path to use a custom image.
+
+--use-region *REGION*
+:   Instead of doing interactive region selection, take a screenshot using the stored region of the provided
+    name.
+
+--save-region-as *REGION*
+:   Use with region selection. Save the selected region for future use under the name *REGION*. See --use-region.
 
 -v
 :  Show more gscreenshot output

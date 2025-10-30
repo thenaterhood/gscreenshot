@@ -67,6 +67,7 @@ class View(AbstractGscreenshotView):
         self._preview_overlay:Gtk.Overlay = builder.get_object('image_overlay')
 
         self._stored_region_menu:Gtk.Menu = builder.get_object('stored_regions_menu')
+        self._change_region_menu:Gtk.Menu = builder.get_object('change_region_menu')
 
         self._preview_event_box.drag_source_set(
             Gdk.ModifierType.BUTTON1_MASK,
@@ -352,18 +353,31 @@ class View(AbstractGscreenshotView):
         for child in self._stored_region_menu.get_children():
             self._stored_region_menu.remove(child)
 
+        for child in self._change_region_menu.get_children():
+            self._change_region_menu.remove(child)
+
         if len(regions) < 1:
             none_item = Gtk.MenuItem("(None)")
             none_item.set_sensitive(False)
             none_item.show()
             self._stored_region_menu.append(none_item)
+
+            none_edit_item = Gtk.MenuItem("(None)")
+            none_edit_item.set_sensitive(False)
+            none_edit_item.show()
+            self._change_region_menu.append(none_edit_item)
             return
 
         for name in regions.keys():
             item = Gtk.MenuItem(name)
-            item.connect("activate", on_activate)
+            item.connect("activate", lambda widget: on_activate(widget, action="new"))
             item.show()
             self._stored_region_menu.append(item)
+
+            edit_item = Gtk.MenuItem(name)
+            edit_item.connect("activate", lambda widget: on_activate(widget, action="edit"))
+            edit_item.show()
+            self._change_region_menu.append(edit_item)
 
     def run(self):
         '''Run the view'''
@@ -379,9 +393,9 @@ class View(AbstractGscreenshotView):
         geometry = self._window.get_screen().get_monitor_geometry(initial_screen)
 
         if self._header_bar is not None:
-            height_x = .6
+            height_x = .5
         else:
-            height_x = .48
+            height_x = .5
 
         gscreenshot_height = geometry.height * height_x
         gscreenshot_width = gscreenshot_height * .9
@@ -484,7 +498,7 @@ class View(AbstractGscreenshotView):
         if self._header_bar is not None:
             header_height = self._header_bar.get_allocation().height
 
-        width_x = .8 if self._header_bar is not None else .98
+        width_x = .95 if self._header_bar is not None else .9
 
         preview_size = (
             (window_size.height-control_size.height-(.6*header_height))*.98,
@@ -663,5 +677,8 @@ class View(AbstractGscreenshotView):
     def widget_str_value(self, widget) -> typing.Optional[str]:
         if hasattr(widget, "get_model"):
             return widget.get_model()[widget.get_active()][2]
+
+        if hasattr(widget, "get_label"):
+            return widget.get_label()
 
         return ""
