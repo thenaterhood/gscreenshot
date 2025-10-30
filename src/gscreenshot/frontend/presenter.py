@@ -505,7 +505,7 @@ class Presenter():
             self.on_stored_region_selected
         )
 
-    def on_stored_region_selected(self, menu_item):
+    def on_stored_region_selected(self, menu_item, action: typing.Literal["new", "edit"] = "new"):
         region_name = self._view.widget_str_value(menu_item)
         region = None
 
@@ -514,10 +514,20 @@ class Presenter():
                 region_name
             )
 
-        self.take_screenshot(
-            self._app.screenshot_selected,
-            region=region
-        )
+        if action == "new":
+            self.take_screenshot(
+                self._app.screenshot_selected,
+                region=region
+            )
+        elif action == "edit":
+            screenshot = self._app.current_always
+            effects = screenshot.get_effects()
+            crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
+            if crop_effect and crop_effect.enabled:
+                screenshot.remove_effect(crop_effect)
+
+            screenshot.add_effect(CropEffect(region))
+            self._show_preview()
 
     def on_settings_clicked(self, *_):
         def on_delete_region(region_name: str):

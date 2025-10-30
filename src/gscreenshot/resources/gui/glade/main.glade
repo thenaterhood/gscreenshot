@@ -164,7 +164,7 @@ Version: 3.0.1
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <child>
-                  <object class="GtkMenuItem">
+                  <object class="GtkMenuItem" id="file_menu">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">_File</property>
@@ -232,7 +232,7 @@ Version: 3.0.1
                   </object>
                 </child>
                 <child>
-                  <object class="GtkMenuItem">
+                  <object class="GtkMenuItem" id="edit_menu">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">_Edit</property>
@@ -266,7 +266,7 @@ Version: 3.0.1
                   </object>
                 </child>
                 <child>
-                  <object class="GtkMenuItem">
+                  <object class="GtkMenuItem" id="screenshot_menu">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">_Screenshot</property>
@@ -302,12 +302,35 @@ Version: 3.0.1
                             <signal name="activate" handler="on_uncrop_clicked" swapped="no"/>
                           </object>
                         </child>
+                        <child>
+                          <object class="GtkMenuItem">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">Change Region</property>
+                            <property name="use-underline">True</property>
+                            <child type="submenu">
+                              <object class="GtkMenu" id="change_region_menu">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkMenuItem">
+                                    <property name="visible">True</property>
+                                    <property name="sensitive">False</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="label" translatable="yes">(None)</property>
+                                    <property name="use-underline">True</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkMenuItem">
+                  <object class="GtkMenuItem" id="settings_menu">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">Settings</property>
@@ -330,7 +353,7 @@ Version: 3.0.1
                   </object>
                 </child>
                 <child>
-                  <object class="GtkMenuItem">
+                  <object class="GtkMenuItem" id="help_menu">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">_Help</property>
