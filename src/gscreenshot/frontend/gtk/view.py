@@ -379,9 +379,9 @@ class View(AbstractGscreenshotView):
         geometry = self._window.get_screen().get_monitor_geometry(initial_screen)
 
         if self._header_bar is not None:
-            height_x = .6
+            height_x = .5
         else:
-            height_x = .48
+            height_x = .5
 
         gscreenshot_height = geometry.height * height_x
         gscreenshot_width = gscreenshot_height * .9
@@ -484,7 +484,7 @@ class View(AbstractGscreenshotView):
         if self._header_bar is not None:
             header_height = self._header_bar.get_allocation().height
 
-        width_x = .8 if self._header_bar is not None else .98
+        width_x = .85 if self._header_bar is not None else .9
 
         preview_size = (
             (window_size.height-control_size.height-(.6*header_height))*.98,
