@@ -523,7 +523,7 @@ class Presenter():
             screenshot = self._app.current_always
             effects = screenshot.get_effects()
             crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
-            if crop_effect and crop_effect.enabled:
+            if crop_effect:
                 screenshot.remove_effect(crop_effect)
 
             screenshot.add_effect(CropEffect(region))
