@@ -36,20 +36,12 @@ class AboutDialog(Gtk.AboutDialog):
         description = i18n(get_program_description())
 
         capabilities_formatted = []
-        capabilities_rows = []
 
         for capability, provider in capabilities.items():
             capabilities_formatted.append(f"{i18n(capability)} ({provider})")
 
-        capabilities_row = ""
-        for count, item in enumerate(sorted(capabilities_formatted), 1):
-            capabilities_row = capabilities_row + item.ljust(50)
-            if count % 2 == 0:
-                capabilities_rows.append(capabilities_row)
-                capabilities_row = ""
-
         description += "\n" + i18n("Available features:")
-        description += "\n" + "\n".join(capabilities_rows)
+        description += "\n" + "\n".join(capabilities_formatted)
 
         self.set_comments(i18n(description))
 
