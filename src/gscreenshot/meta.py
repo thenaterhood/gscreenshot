@@ -21,10 +21,11 @@ def get_program_authors() -> typing.List[str]:
     return authors
 
 
-def get_app_icon() -> Image.Image:
+def get_app_icon(variant: str = "") -> Image.Image:
     """Returns the application icon"""
+    name = "gscreenshot.png" if not variant else f"gscreenshot-{variant}.png"
     pixmaps_path = 'gscreenshot.resources.pixmaps'
-    filename = get_resource_file(pixmaps_path, "gscreenshot.png")
+    filename = get_resource_file(pixmaps_path, name)
     return Image.open(filename)
 
 
