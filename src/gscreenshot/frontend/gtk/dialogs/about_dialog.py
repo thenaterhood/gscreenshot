@@ -33,7 +33,8 @@ class AboutDialog(Gtk.AboutDialog):
 
         self.set_authors(get_program_authors())
 
-        description = i18n("This fork of gscreenshot turned 10 in 2025. Thanks for using gscreenshot!\n")
+        description = i18n("This fork of gscreenshot turned 10 in 2025.\n")
+        description += i18n("Thanks for using gscreenshot!\n")
         description += i18n(get_program_description())
 
         capabilities_formatted = []
