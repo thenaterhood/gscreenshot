@@ -117,6 +117,18 @@ def get_args(args = None):
             help=_("The name of a custom cursor glyph ('adwaita', 'prohibit', 'allow') or path to an image.")
     )
     parser.add_argument(
+            '--save-region-as',
+            required=False,
+            default='',
+            help=_("If selecting a region, remember the region as this name for later use.")
+    )
+    parser.add_argument(
+            '--use-region',
+            required=False,
+            default='',
+            help=_("Use a stored region with this name for the screenshot.")
+    )
+    parser.add_argument(
             '--gui',
             required=False,
             action='store_true',

@@ -62,8 +62,13 @@ def main(app: typing.Optional[Gscreenshot] = None, args = None):
     presenter.capture_cursor_toggled(args.pointer)
     presenter.selected_cursor_changed(args.pointer_glyph)
 
-    if args.selection is not False:
+    if args.use_region:
+        presenter.on_stored_region_selected(args.use_region)
+    elif args.selection is not False:
         presenter.on_button_selectarea_clicked()
+        if args.save_region_as:
+            presenter.on_region_save_clicked(region_name=args.save_region_as)
+
     else:
         presenter.on_button_all_clicked()
 

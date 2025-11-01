@@ -11,6 +11,7 @@ import threading
 import typing
 from gscreenshot import Gscreenshot
 from gscreenshot.cache import GscreenshotCache
+from gscreenshot.filename import get_time_filename
 from gscreenshot.frontend.abstract_view import AbstractGscreenshotView
 from gscreenshot.screenshot.actions import (
     CopyAction,
@@ -60,6 +61,11 @@ class Presenter():
         self._view.update_available_cursors(
                 cursors
                 )
+
+        self._view.update_available_regions(
+            self._app.get_available_regions(),
+            self.on_stored_region_selected
+        )
 
         self._view.show_cursor_options(self._capture_cursor)
 
@@ -249,10 +255,16 @@ class Presenter():
             if crop_effect and "region" in crop_effect.meta:
                 region = crop_effect.meta["region"]
 
-        self.take_screenshot(
-            self._app.screenshot_selected,
-            region=region
-        )
+        if region:
+            self.take_screenshot(
+                self._app.screenshot_selected,
+                region=region
+            )
+
+        else:
+            self.take_screenshot(
+                self._app.screenshot_full_display
+            )
 
     def on_preview_prev_clicked(self, *_):
         '''Handle a click of the "previous" button on the preview'''
@@ -295,9 +307,10 @@ class Presenter():
             return False
 
         while not (saved or cancelled):
+            cache = GscreenshotCache.load()
             fname = self._view.ask_for_save_location(
-                self._app.get_time_filename(),
-                GscreenshotCache.load().last_save_dir
+                get_time_filename(filetype=cache.last_save_type),
+                cache.last_save_dir
             )
             saved = False
             if fname is not None:
@@ -453,24 +466,110 @@ class Presenter():
         '''Handle the window getting toggled to fullscreen'''
         self._view.toggle_fullscreen()
 
-    def on_button_quit_clicked(self, widget=None):
+    def on_button_quit_clicked(self, *_, widget=None):
         '''Handle the quit button'''
         self.quit(widget)
+        return True
 
     def on_window_main_destroy(self, widget=None):
         '''Handle the titlebar close button'''
         self.quit(widget)
+        return True
 
     def on_window_resize(self, *_):
         '''Handle window resizes'''
         self._view.resize()
         self._show_preview()
 
-    def quit(self, *_, skip_warning=False):
+    def on_region_save_clicked(self, *_, region_name = None):
+        last_screenshot = self._app.current
+        region = None
+
+        if last_screenshot is not None:
+            effects = last_screenshot.get_effects()
+            crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
+            if crop_effect and crop_effect.enabled and "region" in crop_effect.meta:
+                region = crop_effect.meta["region"]
+
+        if not region:
+            return
+
+        region_name = region_name or self._view.ask_input("Region Name")
+        if not region_name:
+            return
+
+        self._app.add_stored_region(region_name, region)
+
+        self._view.update_available_regions(
+            self._app.get_available_regions(),
+            self.on_stored_region_selected
+        )
+
+    def on_stored_region_selected(self, menu_item, action = "new"):
+        region_name = self._view.widget_str_value(menu_item)
+        region = None
+
+        if region_name:
+            region = self._app.get_available_regions().get(
+                region_name
+            )
+
+        if action == "new":
+            self.take_screenshot(
+                self._app.screenshot_selected,
+                region=region
+            )
+        elif action == "edit":
+            screenshot = self._app.current_always
+            effects = screenshot.get_effects()
+            crop_effect = next((i for i in effects if isinstance(i, CropEffect)), None)
+            if crop_effect:
+                screenshot.remove_effect(crop_effect)
+
+            screenshot.add_effect(CropEffect(region))
+            self._show_preview()
+
+    def on_settings_clicked(self, *_):
+        def on_delete_region(region_name: str):
+            self._app.remove_stored_region(region_name)
+            self._view.update_available_regions(
+                self._app.get_available_regions(),
+                self.on_stored_region_selected,
+            )
+
+        self._view.show_settings(
+            stored_regions=self._app.get_available_regions(),
+            on_delete_region=on_delete_region,
+        )
+
+    def on_uncrop_clicked(self, *_):
+        screenshot = self._app.current_always
+        for effect in screenshot.get_effects():
+            if isinstance(effect, CropEffect):
+                effect.disable()
+
+        self._show_preview()
+
+    def on_change_region_clicked(self, region_name):
+        region_name = self._view.widget_str_value(region_name)
+
+        if not region_name:
+            return
+
+        screenshot = self._app.current_always
+        region = self._app.get_available_regions().get(region_name)
+        for effect in screenshot.get_effects():
+            if isinstance(effect, CropEffect):
+                effect.disable()
+
+        screenshot.add_effect(CropEffect(region=region))
+        self._show_preview()
+
+    def quit(self, *args, skip_warning=False):
         '''Exit the app'''
         if skip_warning:
             self._app.quit()
-            return  # not strictly needed most of the time
+            return True # not strictly needed most of the time
 
         screenshot_collection = self._app.get_screenshot_collection()
 
@@ -480,9 +579,11 @@ class Presenter():
             )
 
             if not confirmed:
-                return
+                return True
 
         self._app.quit()
+
+        return True
 
     def _show_preview(self):
         height, width = self._view.get_preview_dimensions()

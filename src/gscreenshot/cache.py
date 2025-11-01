@@ -1,5 +1,5 @@
 
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 import gettext
 import json
 import logging
@@ -26,6 +26,11 @@ class GscreenshotCache():
 
     last_save_dir: str = os.path.expanduser("~")
     """Last directory gscreenshot saved a screenshot to"""
+
+    last_save_type: str = "png"
+    """Last file type gscreenshot saved to"""
+
+    stored_regions: dict = field(default_factory=dict)
 
     def write(self) -> bool:
         """Writes the cache to disk"""

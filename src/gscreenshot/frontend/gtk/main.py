@@ -91,6 +91,7 @@ def main(app: typing.Optional[Gscreenshot] = None):
     #window.add_accel_group(accel)
 
     window.connect("key-press-event", presenter.handle_keypress)
+    window.connect("delete-event", presenter.on_button_quit_clicked)
 
     keymappings = {
         Gdk.keyval_to_lower(Gdk.keyval_from_name('Escape')):

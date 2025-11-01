@@ -17,9 +17,11 @@ from gscreenshot.frontend.abstract_view import AbstractGscreenshotView
 from gscreenshot.frontend.gtk.dialogs import (
     AboutDialog,
     ConfirmationDialog,
+    InputDialog,
     FileOpenDialog,
     FileSaveDialog,
     OpenWithDialog,
+    SettingsDialog,
     WarningDialog,
 )
 from gscreenshot.frontend.gtk.util import image_to_pixbuf
@@ -63,6 +65,9 @@ class View(AbstractGscreenshotView):
         self._actions_menu:Gtk.Menu = builder.get_object('menu_saveas_additional_actions')
         self._status_icon:Gtk.Image = builder.get_object('status_icon')
         self._preview_overlay:Gtk.Overlay = builder.get_object('image_overlay')
+
+        self._stored_region_menu:Gtk.Menu = builder.get_object('stored_regions_menu')
+        self._change_region_menu:Gtk.Menu = builder.get_object('change_region_menu')
 
         self._preview_event_box.drag_source_set(
             Gdk.ModifierType.BUTTON1_MASK,
@@ -344,6 +349,36 @@ class View(AbstractGscreenshotView):
                     0
                 )
 
+    def update_available_regions(self, regions: dict, on_activate: typing.Callable):
+        for child in self._stored_region_menu.get_children():
+            self._stored_region_menu.remove(child)
+
+        for child in self._change_region_menu.get_children():
+            self._change_region_menu.remove(child)
+
+        if len(regions) < 1:
+            none_item = Gtk.MenuItem("(None)")
+            none_item.set_sensitive(False)
+            none_item.show()
+            self._stored_region_menu.append(none_item)
+
+            none_edit_item = Gtk.MenuItem("(None)")
+            none_edit_item.set_sensitive(False)
+            none_edit_item.show()
+            self._change_region_menu.append(none_edit_item)
+            return
+
+        for name in regions.keys():
+            item = Gtk.MenuItem(name)
+            item.connect("activate", lambda widget: on_activate(widget, action="new"))
+            item.show()
+            self._stored_region_menu.append(item)
+
+            edit_item = Gtk.MenuItem(name)
+            edit_item.connect("activate", lambda widget: on_activate(widget, action="edit"))
+            edit_item.show()
+            self._change_region_menu.append(edit_item)
+
     def run(self):
         '''Run the view'''
         self._window.set_position(Gtk.WindowPosition.CENTER)
@@ -358,9 +393,9 @@ class View(AbstractGscreenshotView):
         geometry = self._window.get_screen().get_monitor_geometry(initial_screen)
 
         if self._header_bar is not None:
-            height_x = .6
+            height_x = .5
         else:
-            height_x = .48
+            height_x = .5
 
         gscreenshot_height = geometry.height * height_x
         gscreenshot_width = gscreenshot_height * .9
@@ -371,6 +406,10 @@ class View(AbstractGscreenshotView):
 
         self._window.set_size_request(gscreenshot_width, gscreenshot_height)
         self.unhide()
+
+    def show_settings(self, stored_regions: dict, on_delete_region: typing.Callable):
+        settings = SettingsDialog(stored_regions=stored_regions, on_delete_region=on_delete_region)
+        self.run_dialog(settings)
 
     def show_actions_menu(self):
         '''
@@ -459,7 +498,7 @@ class View(AbstractGscreenshotView):
         if self._header_bar is not None:
             header_height = self._header_bar.get_allocation().height
 
-        width_x = .8 if self._header_bar is not None else .98
+        width_x = .95 if self._header_bar is not None else .9
 
         preview_size = (
             (window_size.height-control_size.height-(.6*header_height))*.98,
@@ -592,6 +631,15 @@ class View(AbstractGscreenshotView):
 
         return str(ret)
 
+    def ask_input(self, message: str) -> typing.Optional[str]:
+        """
+        Opens a dialog to ask for a text input
+        """
+        dialog = InputDialog(message=message)
+        data = self.run_dialog(dialog)
+
+        return data
+
     def ask_confirmation(self, message: str) -> bool:
         """
         Request confirmation from the user
@@ -629,5 +677,8 @@ class View(AbstractGscreenshotView):
     def widget_str_value(self, widget) -> typing.Optional[str]:
         if hasattr(widget, "get_model"):
             return widget.get_model()[widget.get_active()][2]
+
+        if hasattr(widget, "get_label"):
+            return widget.get_label()
 
         return ""

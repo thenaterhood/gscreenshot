@@ -46,14 +46,17 @@ def interpolate_filename(filename:str, screenshot: typing.Optional["Screenshot"]
     return interpolated
 
 
-def get_time_filename(screenshot: typing.Optional["Screenshot"] = None) -> str:
+def get_time_filename(
+        screenshot: typing.Optional["Screenshot"] = None,
+        filetype: typing.Optional[str] = None) -> str:
     """
     Generates a returns a filename based on the current time
 
     Returns:
         str
     """
-    return interpolate_filename("gscreenshot_%Y-%m-%d-%H%M%S.png", screenshot)
+    filetype = filetype or "png"
+    return interpolate_filename(f"gscreenshot_%Y-%m-%d-%H%M%S.{filetype}", screenshot)
 
 
 def get_time_foldername(screenshot: typing.Optional["Screenshot"]) -> str:

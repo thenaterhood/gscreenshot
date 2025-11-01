@@ -17,7 +17,7 @@ class ScreenshotTest(unittest.TestCase):
     def test_add_fake_cursor(self):
         pixmaps_path = "gscreenshot.resources.pixmaps"
         with \
-            as_file(files(pixmaps_path).joinpath('gscreenshot.png')) as gscreenshot_png,\
+            as_file(files(pixmaps_path).joinpath('gscreenshot-grey.png')) as gscreenshot_png,\
             as_file(files(pixmaps_path).joinpath('cursor-adwaita.png')) as adwaita:
 
             original_img = Image.open(gscreenshot_png)
