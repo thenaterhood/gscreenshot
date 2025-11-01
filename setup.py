@@ -13,7 +13,7 @@ except:
 
 data_files = [
     ('share/applications', ['dist/desktop/gscreenshot.desktop']),
-    ('share/pixmaps', ['dist/pixmaps/gscreenshot.png']),
+    ('share/pixmaps', ['dist/pixmaps/gscreenshot.png', 'dist/pixmaps/gscreenshot-10year.png']),
     ('share/menu', ['dist/menu/gscreenshot']),
     ('share/man/man1', ['generated/gscreenshot.1.gz']),
     ('share/zsh/site-functions', ['dist/completions/zsh/_gscreenshot']),

@@ -57,4 +57,4 @@ class AboutDialog(Gtk.AboutDialog):
 
         self.set_version(get_program_version())
 
-        self.set_logo(image_to_pixbuf(get_app_icon()))
+        self.set_logo(image_to_pixbuf(get_app_icon(variant="10year")))
