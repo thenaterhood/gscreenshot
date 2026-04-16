@@ -21,6 +21,7 @@ import os
 import sys
 import shutil
 import subprocess
+from urllib.parse import unquote
 
 from random import SystemRandom
 from time import sleep
@@ -105,7 +106,7 @@ class XdgPortalScreenshot:
         '''
         if response == 0:
             uri = result["uri"]
-            path = uri.replace("file://", "")
+            path = unquote(uri.replace("file://", ""))
             shutil.move(path, sys.argv[1])
         else:
             print(response, result)
