@@ -29,7 +29,7 @@ class AboutDialog(Gtk.AboutDialog):
     '''An about dialog'''
 
     def __init__(self, capabilities: Dict[str, str], parent=None):
-        super().__init__(self, transient_for=parent)
+        super().__init__(transient_for=parent)
 
         self.set_authors(get_program_authors())
 
