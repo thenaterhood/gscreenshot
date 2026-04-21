@@ -17,7 +17,7 @@ class ConfirmationDialog(Gtk.Dialog):
     '''A confirmation dialog'''
 
     def __init__(self, message, parent=None):
-        super().__init__(self, title=i18n("Confirmation"), transient_for=parent, flags=0)
+        super().__init__(title=i18n("Confirmation"), transient_for=parent, flags=0)
         self.add_buttons(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
             "Continue", Gtk.ResponseType.OK

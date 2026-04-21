@@ -18,7 +18,7 @@ class OpenWithDialog(Gtk.AppChooserDialog):
 
     def __init__(self, parent=None):
 
-        Gtk.AppChooserDialog.__init__(self, content_type="image/png", parent=parent)
+        super().__init__(content_type="image/png", parent=parent)
         self.set_title(i18n("Choose an Application"))
         self.connect("response", self._on_response)
         self.appinfo = None

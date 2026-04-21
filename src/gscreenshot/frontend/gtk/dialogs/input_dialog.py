@@ -17,7 +17,7 @@ class InputDialog(Gtk.Dialog):
     '''An input dialog'''
 
     def __init__(self, message, parent=None):
-        super().__init__(self, title=i18n("Name"), transient_for=parent, flags=0)
+        super().__init__(title=i18n("Name"), transient_for=parent, flags=0)
         self.text = None
         self.add_buttons(
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
